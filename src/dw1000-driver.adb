@@ -498,9 +498,32 @@ is
 
    end Set_Tx_Frame_Length;
 
-   procedure Start_Tx (Delayed_Tx  : in     Boolean;
-                       Rx_After_Tx : in     Boolean;
-                       Result      :    out Result_Type)
+   procedure Start_Tx_Immediate (Rx_After_Tx : in Boolean)
+   is
+      use type Types.Bits_1;
+
+      SYS_CTRL_Reg   : SYS_CTRL_Type;
+
+   begin
+      SYS_CTRL_Reg := SYS_CTRL_Type'
+        (SFCST      => 0,
+         TXSTRT     => 1,
+         TXDLYS     => 0, --  No delay
+         CANSFCS    => 0,
+         TRXOFF     => 0,
+         WAIT4RESP  => (if Rx_After_Tx then 1 else 0),
+         RXENAB     => 0,
+         RXDLYE     => 0,
+         HRBPT      => 0,
+         Reserved_1 => 0,
+         Reserved_2 => 0,
+         Reserved_3 => 0);
+
+      SYS_CTRL.Write (SYS_CTRL_Reg);
+   end Start_Tx_Immediate;
+
+   procedure Start_Tx_Delayed (Rx_After_Tx : in     Boolean;
+                               Result      :    out Result_Type)
    is
       use type Types.Bits_1;
 
@@ -508,65 +531,49 @@ is
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
    begin
-      SYS_CTRL_Reg := SYS_CTRL_Type'(SFCST      => 0,
-                                     TXSTRT     => 0,
-                                     TXDLYS     => 0,
-                                     CANSFCS    => 0,
-                                     TRXOFF     => 0,
-                                     WAIT4RESP  => 0,
-                                     RXENAB     => 0,
-                                     RXDLYE     => 0,
-                                     HRBPT      => 0,
-                                     Reserved_1 => 0,
-                                     Reserved_2 => 0,
-                                     Reserved_3 => 0);
+      SYS_CTRL_Reg := SYS_CTRL_Type'
+        (SFCST      => 0,
+         TXSTRT     => 1,
+         TXDLYS     => 1, --  Delayed transmit
+         CANSFCS    => 0,
+         TRXOFF     => 0,
+         WAIT4RESP  => (if Rx_After_Tx then 1 else 0),
+         RXENAB     => 0,
+         RXDLYE     => 0,
+         HRBPT      => 0,
+         Reserved_1 => 0,
+         Reserved_2 => 0,
+         Reserved_3 => 0);
 
-      if Rx_After_Tx then
-         SYS_CTRL_Reg.WAIT4RESP := 1;
-      end if;
+      SYS_CTRL.Write (SYS_CTRL_Reg);
 
-      if Delayed_Tx then
-         -- Delayed transmit
+      SYS_STATUS.Read (SYS_STATUS_Reg);
 
-         SYS_CTRL_Reg.TXDLYS := 1;
-         SYS_CTRL_Reg.TXSTRT := 1;
-         SYS_CTRL.Write (SYS_CTRL_Reg);
-
-         SYS_STATUS.Read (SYS_STATUS_Reg);
-
-         if SYS_STATUS_Reg.HPDWARN = 0 then
-            Result := Success;
-
-         else
-            -- Cancel the transmit
-            SYS_CTRL_Reg := SYS_CTRL_Type'(SFCST      => 0,
-                                           TXSTRT     => 0,
-                                           TXDLYS     => 0,
-                                           CANSFCS    => 0,
-                                           TRXOFF     => 1,
-                                           WAIT4RESP  => 0,
-                                           RXENAB     => 0,
-                                           RXDLYE     => 0,
-                                           HRBPT      => 0,
-                                           Reserved_1 => 0,
-                                           Reserved_2 => 0,
-                                           Reserved_3 => 0);
-            SYS_CTRL.Write (SYS_CTRL_Reg);
-
-            Set_Sleep_After_Tx (Enabled => False);
-
-            Result := Error;
-         end if;
+      if SYS_STATUS_Reg.HPDWARN = 0 then
+         Result := Success;
 
       else
-         -- Immediate transmit
-         SYS_CTRL_Reg.TXSTRT := 1;
+         -- Cancel the transmit
+         SYS_CTRL_Reg := SYS_CTRL_Type'(SFCST      => 0,
+                                        TXSTRT     => 0,
+                                        TXDLYS     => 0,
+                                        CANSFCS    => 0,
+                                        TRXOFF     => 1,
+                                        WAIT4RESP  => 0,
+                                        RXENAB     => 0,
+                                        RXDLYE     => 0,
+                                        HRBPT      => 0,
+                                        Reserved_1 => 0,
+                                        Reserved_2 => 0,
+                                        Reserved_3 => 0);
          SYS_CTRL.Write (SYS_CTRL_Reg);
 
-         Result := Success;
+         Set_Sleep_After_Tx (Enabled => False);
+
+         Result := Error;
       end if;
 
-   end Start_Tx;
+   end Start_Tx_Delayed;
 
    procedure Read_Rx_Data (Data   :    out Types.Byte_Array;
                            Offset : in     Natural)
@@ -767,8 +774,36 @@ is
 
    end Sync_Rx_Buffer_Pointers;
 
-   procedure Enable_Rx (Delayed : in     Boolean;
-                        Result  :    out Result_Type)
+
+   procedure Start_Rx_Immediate
+   is
+      use type Types.Bits_1;
+
+      SYS_CTRL_Reg   : SYS_CTRL_Type;
+
+   begin
+      Sync_Rx_Buffer_Pointers;
+
+      SYS_CTRL_Reg := SYS_CTRL_Type'
+        (SFCST      => 0,
+         TXSTRT     => 0,
+         TXDLYS     => 0,
+         CANSFCS    => 0,
+         TRXOFF     => 0,
+         WAIT4RESP  => 0,
+         RXENAB     => 1,
+         RXDLYE     => 0,
+         HRBPT      => 0,
+         Reserved_1 => 0,
+         Reserved_2 => 0,
+         Reserved_3 => 0);
+
+      SYS_CTRL.Write (SYS_CTRL_Reg);
+
+   end Start_Rx_Immediate;
+
+
+   procedure Start_Rx_Delayed (Result  : out Result_Type)
    is
       use type Types.Bits_1;
 
@@ -778,46 +813,39 @@ is
    begin
       Sync_Rx_Buffer_Pointers;
 
-      SYS_CTRL_Reg := SYS_CTRL_Type'(SFCST      => 0,
-                             TXSTRT     => 0,
-                             TXDLYS     => 0,
-                             CANSFCS    => 0,
-                             TRXOFF     => 0,
-                             WAIT4RESP  => 0,
-                             RXENAB     => 1,
-                             RXDLYE     => 0,
-                             HRBPT      => 0,
-                             Reserved_1 => 0,
-                             Reserved_2 => 0,
-                             Reserved_3 => 0);
-      if Delayed then
-         SYS_CTRL_Reg.RXDLYE := 1;
-      end if;
+      SYS_CTRL_Reg := SYS_CTRL_Type'
+        (SFCST      => 0,
+         TXSTRT     => 0,
+         TXDLYS     => 0,
+         CANSFCS    => 0,
+         TRXOFF     => 0,
+         WAIT4RESP  => 0,
+         RXENAB     => 1,
+         RXDLYE     => 1, --  Delayed RX
+         HRBPT      => 0,
+         Reserved_1 => 0,
+         Reserved_2 => 0,
+         Reserved_3 => 0);
 
       SYS_CTRL.Write (SYS_CTRL_Reg);
 
-      if Delayed then
-         -- Check for errors
-         SYS_STATUS.Read (SYS_STATUS_Reg);
+      -- Check for errors
+      SYS_STATUS.Read (SYS_STATUS_Reg);
 
-         if SYS_STATUS_Reg.HPDWARN = 1 then
-            Force_Tx_Rx_Off;
+      if SYS_STATUS_Reg.HPDWARN = 1 then
+         Force_Tx_Rx_Off;
 
-            -- Clear the delay bit
-            SYS_CTRL_Reg.RXDLYE := 0;
-            SYS_CTRL.Write (SYS_CTRL_Reg);
+         -- Clear the delay bit
+         SYS_CTRL_Reg.RXDLYE := 0;
+         SYS_CTRL.Write (SYS_CTRL_Reg);
 
-            Result := Error;
-
-         else
-            Result := Success;
-         end if;
+         Result := Error;
 
       else
          Result := Success;
       end if;
 
-   end Enable_Rx;
+   end Start_Rx_Delayed;
 
    procedure Set_Rx_Mode (Mode        : in Rx_Modes;
                           Rx_On_Time  : in Types.Bits_4;

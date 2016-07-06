@@ -320,20 +320,20 @@ is
         and then Data'Length + Offset <= DW1000.Constants.RX_BUFFER_Length);
    --  Read the received frame from the Rx buffer.
 
-   procedure Start_Tx (Delayed_Tx  : in     Boolean;
-                       Rx_After_Tx : in     Boolean;
-                       Result      :    out Result_Type)
+   procedure Start_Tx_Immediate (Rx_After_Tx : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (Delayed_Tx, Rx_After_Tx),
+     Depends => (DW1000.BSP.Device_State => + Rx_After_Tx);
+
+   procedure Start_Tx_Delayed (Rx_After_Tx : in     Boolean;
+                               Result      :    out Result_Type)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + Rx_After_Tx,
                  Result                  => (DW1000.BSP.Device_State,
-                                             Delayed_Tx,
                                              Rx_After_Tx));
-   --  Transmit the contents of the TX buffer.
+   --  Transmit the contents of the TX buffer with a delay.
    --
-   --  When Delayed_Tx is False then the packet is transmitted immediately
-   --  without delay. When Delayed_Tx is false then the transmit is delayed
-   --  for the currently configured delay time. The delay time can be set
-   --  using the Set_Tx_Rx_Delay_Time procedure.
+   --  The time at which the packet is to be transmitted must be set before
+   --  calling this procedure by using the Set_Delayed_Tx_Rx_Time procedure.
    --
    --  When Rx_After_Tx is True then the receiver is automatically enabled
    --  after the transmission is completed.
@@ -466,18 +466,23 @@ is
    --  This procedure configures the following registers:
    --    * SYS_CTRL
 
-   procedure Enable_Rx (Delayed : in     Boolean;
-                        Result  :    out Result_Type)
+   procedure Start_Rx_Immediate
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Delayed,
-                 Result                  => (DW1000.BSP.Device_State,
-                                             Delayed)),
-     Post => (if not Delayed then Result = Success);
-   --  Enable the receiver.
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State);
+   --  Enable the receiver immediately (without a delay).
    --
-   --  If Delayed is set to True then the receiver is enabled only after the
-   --  delay configured by the Set_Tx_Rx_Delay_Time procedure after this
-   --  procedure is called.
+   --  This procedure configures the following registers:
+   --    * SYS_CTRL
+
+   procedure Start_Rx_Delayed (Result  : out Result_Type)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                 Result                  => DW1000.BSP.Device_State);
+   --  Enable the receiver after a delay.
+   --
+   --  The receiver is enabled only at the time configured by calling the
+   --  Set_Tx_Rx_Delay_Time procedure, which must be set before calling this
+   --  procedure.
    --
    --  This procedure configures the following registers:
    --    * SYS_CTRL
