@@ -76,4 +76,19 @@ is
       return Coarse_System_Time (Fixed_31 (MSB) * Coarse_System_Time'Delta);
    end To_Coarse_System_Time;
 
+
+   function Calculate_Span (Start_Time : in Fine_System_Time;
+                            End_Time   : in Fine_System_Time)
+                            return System_Time_Span
+   is
+   begin
+      if Start_Time <= End_Time then
+         return System_Time_Span (End_Time - Start_Time);
+
+      else
+         return System_Time_Span ((Fine_System_Time'Last - Start_Time) +
+                                    End_Time);
+      end if;
+   end Calculate_Span;
+
 end DW1000.System_Time;

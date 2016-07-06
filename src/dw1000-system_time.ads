@@ -129,7 +129,8 @@ is
    --  PLL), and so this Coarse_System_Time type is not appropriate in such
    --  circumstances.
 
-   type System_Time_Span is new Fine_System_Time;
+   type System_Time_Span is new Fine_System_Time
+   range Fine_System_Time'Range;
 
    function To_Bits_40 (Time : in Fine_System_Time) return Bits_40
      with SPARK_Mode => On;
@@ -197,6 +198,49 @@ is
    is (To_Coarse_System_Time (System_Time_Offset (To_Fine_System_Time (Time),
                                                   Span)));
 
+
+   function Calculate_Span (Start_Time : in Fine_System_Time;
+                            End_Time   : in Fine_System_Time)
+                            return System_Time_Span;
+   --  Calculate the time span between two points in time.
+   --
+   --  Note that since the DW1000 system time wraps-around after about every
+   --  17 seconds, so it is possible for the End_Time to be less than the
+   --  Start_Time. This function takes this wrap-around behavior into account.
+
+   function Calculate_Span (Start_Time : in Coarse_System_Time;
+                            End_Time   : in Coarse_System_Time)
+                            return System_Time_Span
+   is (Calculate_Span (To_Fine_System_Time (Start_Time),
+                       To_Fine_System_Time (End_Time)));
+   --  Calculate the time span between two points in time.
+   --
+   --  Note that since the DW1000 system time wraps-around after about every
+   --  17 seconds, so it is possible for the End_Time to be less than the
+   --  Start_Time. This function takes this wrap-around behavior into account.
+
+
+   function Calculate_Span (Start_Time : in Fine_System_Time;
+                            End_Time   : in Coarse_System_Time)
+                            return System_Time_Span
+   is (Calculate_Span (Start_Time, To_Fine_System_Time (End_Time)));
+   --  Calculate the time span between two points in time.
+   --
+   --  Note that since the DW1000 system time wraps-around after about every
+   --  17 seconds, so it is possible for the End_Time to be less than the
+   --  Start_Time. This function takes this wrap-around behavior into account.
+
+
+   function Calculate_Span (Start_Time : in Coarse_System_Time;
+                            End_Time   : in Fine_System_Time)
+                            return System_Time_Span
+   is (Calculate_Span (To_Fine_System_Time (Start_Time), End_Time));
+   --  Calculate the time span between two points in time.
+   --
+   --  Note that since the DW1000 system time wraps-around after about every
+   --  17 seconds, so it is possible for the End_Time to be less than the
+   --  Start_Time. This function takes this wrap-around behavior into account.
+
 private
 
    function To_Bits_40 (Time : in Fine_System_Time) return Bits_40
@@ -206,7 +250,7 @@ private
    --  support an operation mixing fixed point and universal real types.
 
    function To_Bits_40 (Time : in Coarse_System_Time) return Bits_40
-   is (Bits_40(Time * (499200000.0 * 128.0)))
+   is (Bits_40 (Time * (499200000.0 * 128.0)))
    with SPARK_Mode => Off;
 
 end DW1000.System_Time;
