@@ -26,8 +26,9 @@ pragma Partition_Elaboration_Policy (Sequential);
 with Ada.Real_Time;
 with DW1000.Constants;
 with DW1000.BSP;
-with DW1000.Types;      use DW1000.Types;
-with Interfaces;        use Interfaces;
+with DW1000.System_Time; use DW1000.System_Time;
+with DW1000.Types;       use DW1000.Types;
+with Interfaces;         use Interfaces;
 
 --  This package contains high-level procedures for using the DW1000.
 package DW1000.Driver
@@ -340,7 +341,7 @@ is
    --  This procedure configures the following registers:
    --    * SYS_CTRL
 
-   procedure Set_Tx_Rx_Delay_Time (Delay_Time : in Types.Bits_40)
+   procedure Set_Delayed_Tx_Rx_Time (Delay_Time : in Coarse_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Delay_Time);
    --  Set the receive and transmit delay.
@@ -350,6 +351,10 @@ is
    --
    --  The delay time is measured in units of 499.2 MHz * 128, i.e. the least
    --  significant bit of the delay time is approximately 15.65 ps.
+   --
+   --  Note that the 9 low order bits of the input value are ignored by the
+   --  DW1000, as described in Section 7.2.12 of the DW1000 User Manual
+   --  (DX_TIME register).
    --
    --  This procedure configures the following registers:
    --    * DX_TIME
@@ -367,25 +372,61 @@ is
    --  This procedure configures the following registers:
    --    * PMSC_CTRL1
 
-   procedure Read_Rx_Timestamp (Timestamp : out Types.Bits_40)
+   procedure Read_Rx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                  Timestamp               => DW1000.BSP.Device_State);
-   --  Read the 40-bit timestamp associated with the last received packet.
+   --  Read the corrected timestamp associated with the last received packet.
    --
-   --  The timestamp is measured in units of 499.2 MHz * 128, i.e. the least
-   --  significant bit of the timestamp is approximately 15.65 ps.
+   --  This timestamp is the timestamp that has been fully corrected for the
+   --  time of packet reception. The timestamp is in units of approximately
+   --  15.65 picoseconds.
 
-   procedure Read_Tx_Timestamp (Timestamp : out Types.Bits_40)
+   procedure Read_Rx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                  Timestamp               => DW1000.BSP.Device_State);
-   --  Read the 40-bit timestamp associated with the last transmitted packet.
+   --  Read the raw timestamp associated with the last received packet.
    --
-   --  The timestamp is measured in units of 499.2 MHz * 128, i.e. the least
-   --  significant bit of the timestamp is approximately 15.65 ps.
+   --  This timestamp is the timestamp before the various corrections for the
+   --  time of reception have been applied. The timestamp is in units of
+   --  approximately 8.013 nanoseconds.
 
-   procedure Read_System_Timestamp (Timestamp : out Types.Bits_40)
+   procedure Read_Rx_Timestamps (Adjusted : out Fine_System_Time;
+                                 Raw      : out Coarse_System_Time)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                 (Adjusted, Raw)         => DW1000.BSP.Device_State);
+   --  Read both the raw and adjusted timestamps for the last received packet.
+
+   procedure Read_Tx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                 Timestamp               => DW1000.BSP.Device_State);
+   --  Read the corrected timestamp associated with the last transmitted
+   --  packet.
+   --
+   --  This timestamp is the timestamp that has been fully corrected for the
+   --  time of packet transmission. The timestamp is in units of approximately
+   --  15.65 picoseconds.
+
+   procedure Read_Tx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                 Timestamp               => DW1000.BSP.Device_State);
+   --  Read the raw timestamp associated with the last transmitted packet.
+   --
+   --  This timestamp is the timestamp before the various corrections for the
+   --  time of transmission have been applied. The timestamp is in units of
+   --  approximately 8.013 nanoseconds.
+
+   procedure Read_Tx_Timestamps (Adjusted : out Fine_System_Time;
+                                 Raw      : out Coarse_System_Time)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                 (Adjusted, Raw)         => DW1000.BSP.Device_State);
+
+   procedure Read_System_Timestamp (Timestamp : out Coarse_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                  Timestamp               => DW1000.BSP.Device_State);

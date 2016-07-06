@@ -578,11 +578,11 @@ is
          Data        => Data);
    end Read_Rx_Data;
 
-   procedure Set_Tx_Rx_Delay_Time (Delay_Time : in Types.Bits_40)
+   procedure Set_Delayed_Tx_Rx_Time (Delay_Time : in Coarse_System_Time)
    is
    begin
-      DX_TIME.Write (DX_TIME_Type'(DX_TIME => Delay_Time));
-   end Set_Tx_Rx_Delay_Time;
+      DX_TIME.Write (DX_TIME_Type'(DX_TIME => To_Bits_40 (Delay_Time)));
+   end Set_Delayed_Tx_Rx_Time;
 
    procedure Set_Sleep_After_Tx (Enabled : in Boolean)
    is
@@ -594,31 +594,77 @@ is
       PMSC_CTRL1.Write (PMSC_CTRL1_Reg);
    end Set_Sleep_After_Tx;
 
-   procedure Read_Rx_Timestamp (Timestamp : out Types.Bits_40)
+   procedure Read_Rx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
    is
       RX_TIME_Reg : RX_TIME_Type;
 
    begin
       RX_TIME.Read (RX_TIME_Reg);
-      Timestamp := RX_TIME_Reg.RX_STAMP;
-   end Read_Rx_Timestamp;
+      Timestamp := To_Fine_System_Time (RX_TIME_Reg.RX_STAMP);
+   end Read_Rx_Adjusted_Timestamp;
 
-   procedure Read_Tx_Timestamp (Timestamp : out Types.Bits_40)
+
+   procedure Read_Rx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
+   is
+      RX_Time_Reg : RX_Time_Type;
+
+   begin
+      RX_TIME.Read (RX_TIME_Reg);
+      Timestamp := To_Coarse_System_Time (RX_TIME_Reg.RX_RAWST);
+   end Read_Rx_Raw_Timestamp;
+
+
+   procedure Read_Rx_Timestamps (Adjusted : out Fine_System_Time;
+                                 Raw      : out Coarse_System_Time)
+   is
+      RX_Time_Reg : RX_Time_Type;
+
+   begin
+      RX_TIME.Read (RX_TIME_Reg);
+      Adjusted := To_Fine_System_Time (RX_TIME_Reg.RX_STAMP);
+      Raw      := To_Coarse_System_Time (RX_TIME_Reg.RX_RAWST);
+   end Read_Rx_Timestamps;
+
+
+   procedure Read_Tx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
    is
       TX_TIME_Reg : TX_TIME_Type;
 
    begin
       TX_TIME.Read (TX_TIME_Reg);
-      Timestamp := TX_TIME_Reg.TX_STAMP;
-   end Read_Tx_Timestamp;
+      Timestamp := To_Fine_System_Time (TX_TIME_Reg.TX_STAMP);
+   end Read_Tx_Adjusted_Timestamp;
 
-   procedure Read_System_Timestamp (Timestamp : out Types.Bits_40)
+
+   procedure Read_Tx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
+   is
+      TX_Time_Reg : TX_Time_Type;
+
+   begin
+      TX_TIME.Read (TX_TIME_Reg);
+      Timestamp := To_Coarse_System_Time (TX_TIME_Reg.TX_RAWST);
+   end Read_Tx_Raw_Timestamp;
+
+
+   procedure Read_Tx_Timestamps (Adjusted : out Fine_System_Time;
+                                 Raw      : out Coarse_System_Time)
+   is
+      TX_Time_Reg : TX_Time_Type;
+
+   begin
+      TX_TIME.Read (TX_TIME_Reg);
+      Adjusted := To_Fine_System_Time (TX_TIME_Reg.TX_STAMP);
+      Raw      := To_Coarse_System_Time (TX_TIME_Reg.TX_RAWST);
+   end Read_Tx_Timestamps;
+
+
+   procedure Read_System_Timestamp (Timestamp : out Coarse_System_Time)
    is
       SYS_TIME_Reg : SYS_TIME_Type;
 
    begin
       SYS_TIME.Read (SYS_TIME_Reg);
-      Timestamp := SYS_TIME_Reg.SYS_TIME;
+      Timestamp := To_Coarse_System_Time (SYS_TIME_Reg.SYS_TIME);
    end Read_System_Timestamp;
 
    procedure Check_Overrun (Overrun : out Boolean)
