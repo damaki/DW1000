@@ -29,6 +29,17 @@ interface to the DW1000. The package spec is already defined in the file
 ``src/dw1000-bsp.ads``, and an example implementation of ``dw1000-bsp.adb`` can
 be found in ``bsp-examples/evb1000/dw1000-bsp.adb``.
 
+## 3.1 See Also
+
+If you are using the [DecaWave EVB1000](http://www.decawave.com/products/evk1000-evaluation-kit) 
+evaluation board then there are the following two SPARK and Ada projects on 
+GitHub which are useful:
+  * [EVB1000](https://github.com/damaki/EVB1000): SPARK drivers for the LCD, LED,
+    and switch peripherals on the EVB1000. 
+  * [Ravenscar-sfp-stm32f105](https://github.com/damaki/ravenscar-sfp-stm32f105):
+    a Ravenscar runtime for the STM32F105 ARM Cortex-M3 microcontroller on the
+    EVB1000.
+
 # 4. Examples
 
 Here's some examples of SPARK code using the driver:
