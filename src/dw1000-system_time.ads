@@ -22,9 +22,11 @@
 
 with DW1000.Types; use DW1000.Types;
 
---  @description Types and functions for dealing with time derived from the
---               DW1000 system time (clocked at 63.8976 GHz).
+--  @summary
+--  Types and functions for dealing with time derived from the DW1000 system
+--  time (clocked at 63.8976 GHz).
 --
+--  @description
 --  The DW1000's system time is used for several 40-bit timestamps which are
 --  measured in units of approx. 15.65 picoseconds. The timestamps which use
 --  this 40-bit 63.8976 GHz system time are listed below:
@@ -67,7 +69,8 @@ with SPARK_Mode => On
 is
 
    Fine_System_Time_Delta : constant := 1.0 / (499200000.0 * 128.0);
-   Fine_System_Time_Last  : constant := Fine_System_Time_Delta * (2.0**40 - 1.0);
+   Fine_System_Time_Last  : constant :=
+                              Fine_System_Time_Delta * (2.0**40 - 1.0);
 
    Coarse_System_Time_Delta : constant := Fine_System_Time_Delta * 512.0;
    Coarse_System_Time_Last  : constant := Fine_System_Time_Last;
@@ -158,9 +161,11 @@ is
    function To_Fine_System_Time (Time : in Coarse_System_Time)
                                  return Fine_System_Time
    is (To_Fine_System_Time (To_Bits_40 (Time)));
+   --  Convert Coarse_System_Time to the equivalent Fine_System_Time value.
 
 
-   function To_Coarse_System_Time (Bits : in Bits_40) return Coarse_System_Time;
+   function To_Coarse_System_Time (Bits : in Bits_40)
+                                   return Coarse_System_Time;
    --  Convert a 40-bit register value to Coarse_System_Time.
 
    function To_Coarse_System_Time (Time : in Fine_System_Time)

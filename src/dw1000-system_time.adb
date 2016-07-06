@@ -25,7 +25,8 @@ with SPARK_Mode => On
 is
 
    function System_Time_Offset (Time : in Fine_System_Time;
-                                Span : in System_Time_Span) return Fine_System_Time
+                                Span : in System_Time_Span)
+                                return Fine_System_Time
    is
       Span_FST : constant Fine_System_Time := Fine_System_Time (Span);
    begin
@@ -48,9 +49,9 @@ is
         Small => 1.0;
       --  Type big enough to hold all possible values of Bits_40.
       --
-      --  Normally, values of Bits_40 cannot be multiplied with fixed point types,
-      --  however, casting a Bits_40 value to Fixed_40 then permits such an
-      --  operation between Fixed_40 and the other fixed point type
+      --  Normally, values of Bits_40 cannot be multiplied with fixed point
+      --  types, however, casting a Bits_40 value to Fixed_40 then permits such
+      --  an operation between Fixed_40 and the other fixed point type
       --  (e.g. System_Time).
 
    begin
