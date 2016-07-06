@@ -21,6 +21,8 @@
 -------------------------------------------------------------------------------
 
 with Interfaces;  use Interfaces;
+with STM32.AFIO;
+with STM32.EXTI;
 with STM32.GPIO;
 with STM32.RCC;
 with STM32.SPI;
@@ -140,6 +142,7 @@ begin
    STM32.RCC.RCC_Periph.APB2ENR.SPI1EN := 1;
    STM32.RCC.RCC_Periph.APB2ENR.AFIOEN := 1;
    STM32.RCC.RCC_Periph.APB2ENR.IOPAEN := 1;
+   STM32.RCC.RCC_Periph.APB2ENR.IOPBEN := 1;
 
    --  Configure GPIO
    STM32.GPIO.GPIOA_Periph.CRL.MODE4 := 2#11#;
@@ -175,5 +178,17 @@ begin
    STM32.SPI.SPI1_Periph.CRCPR.CRCPOLY := 7;
    STM32.SPI.SPI1_Periph.CR1.SPE := 1;
 
-end DW1000.BSP;
+   --  Configure IRQ
+   STM32.GPIO.GPIOB_Periph.CRL.CNF5  := 2#10#;  --  Input with pull-up/down
+   STM32.GPIO.GPIOB_Periph.CRL.MODE5 := 2#00#;  --  Input mode
+   STM32.GPIO.GPIOB_Periph.BRR.BR.Arr (5) := 1; --  Pull-down
 
+   STM32.AFIO.AFIO_Periph.EXTICR2.EXTI.Arr (5) := 2#0001#; --  GPIOB
+
+   STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5)  := 0;
+   STM32.EXTI.EXTI_Periph.EMR.MR.Arr (5)  := 0;
+   STM32.EXTI.EXTI_Periph.RTSR.TR.Arr (5) := 1; --  Rising edge enabled
+   STM32.EXTI.EXTI_Periph.FTSR.TR.Arr (5) := 0; --  Falling edge disabled
+   STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5)  := 1; --  Enable interrupt
+
+end DW1000.BSP;
