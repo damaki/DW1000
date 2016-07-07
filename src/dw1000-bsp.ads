@@ -39,6 +39,16 @@ is
      Depends => (Device_State => null);
    --  Resets the DW1000 via the RSTn line.
 
+   procedure Acknowledge_DW1000_IRQ
+     with Global => (In_Out => Device_State);
+   --  Acknowledge the IRQ request from the DW1000.
+   --
+   --  This should be called from the interrupt handler of the DW1000 IRQ line
+   --  to acknowledge the interrupt.
+   --
+   --- Failure to call this procedure from the interrupt handler may result in
+   --  an infinite interrupt loop.
+
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
                                Data   : in DW1000.Types.Byte_Array)
      with Global => (In_Out => Device_State),

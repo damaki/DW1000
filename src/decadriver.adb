@@ -316,19 +316,19 @@ is
 
          --  Configure IRQs
          DW1000.Registers.SYS_MASK.Read (SYS_MASK_Reg);
-         SYS_MASK_Reg.MRXSFDTO := 0;
-         SYS_MASK_Reg.MRXPHE   := 0;
-         SYS_MASK_Reg.MRXRFSL  := 0;
-         SYS_MASK_Reg.MRXFCE   := 0;
+         SYS_MASK_Reg.MRXSFDTO := 1;
+         SYS_MASK_Reg.MRXPHE   := 1;
+         SYS_MASK_Reg.MRXRFSL  := 1;
+         SYS_MASK_Reg.MRXFCE   := 1;
          SYS_MASK_Reg.MRXDFR   := 1; --  Always detect frame received
          SYS_MASK_Reg.MTXFRS   := 1; --  Always detect frame sent
          DW1000.Registers.SYS_MASK.Write (SYS_MASK_Reg);
 
-         Detect_Frame_Timeout := False;
-         Detect_SFD_Timeout   := False;
-         Detect_PHR_Error     := False;
-         Detect_RS_Error      := False;
-         Detect_FCS_Error     := False;
+         Detect_Frame_Timeout := True;
+         Detect_SFD_Timeout   := True;
+         Detect_PHR_Error     := True;
+         Detect_RS_Error      := True;
+         Detect_FCS_Error     := True;
 
       end Initialize;
 
@@ -530,6 +530,8 @@ is
                Reserved_2 => 0);
 
       begin
+         DW1000.BSP.Acknowledge_DW1000_IRQ;
+
          DW1000.Registers.SYS_STATUS.Read (SYS_STATUS_Reg);
 
          if SYS_STATUS_Reg.RXRFTO = 1 then
@@ -564,16 +566,30 @@ is
                   Receiver.Notify_Receive_Error (FCS_Error);
                end if;
                SYS_STATUS_Clear.RXFCE := 1;
+
             end if;
 
-            SYS_STATUS_Clear.RXDFR := 1;
+            --  Clear RX flags
+            SYS_STATUS_Clear.RXDFR   := 1;
+            SYS_STATUS_Clear.RXPRD   := 1;
+            SYS_STATUS_Clear.RXSFDD  := 1;
+            SYS_STATUS_Clear.LDEDONE := 1;
+            SYS_STATUS_Clear.RXPHD   := 1;
          end if;
 
          if SYS_STATUS_Reg.TXFRS = 1 then
             --  Frame sent
             Transmitter.Notify_Tx_Complete;
+
+            -- Clear all TX events
+            SYS_STATUS_Clear.AAT   := 1;
             SYS_STATUS_Clear.TXFRS := 1;
+            SYS_STATUS_Clear.TXFRB := 1;
+            SYS_STATUS_Clear.TXPHS := 1;
+            SYS_STATUS_Clear.TXPRS := 1;
          end if;
+
+         SYS_STATUS_Clear.AFFREJ := 1;
 
          --  Clear events that we have seen.
          DW1000.Registers.SYS_STATUS.Write (SYS_STATUS_Clear);

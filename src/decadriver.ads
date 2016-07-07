@@ -595,6 +595,28 @@ is
                                                 PHR_Error,
                                                 RS_Error,
                                                 FCS_Error));
+      --  Configure which error notifications are enabled.
+      --
+      --  @param Frame_Timeout Set to True if error notifications should be
+      --     given for frame timeout events. When False, the frame timeout
+      --     event is ignored.
+      --
+      --  @param SFD_Timeout Set to True if error notifications should be
+      --     given for SFD timeout events. When False, the SFD timeout
+      --     event is ignored.
+      --
+      --  @param PHR_Error Set to True if error notifications should be
+      --     given for physical header error events. When False, the physical
+      --     header errors are ignored.
+      --
+      --  @param RS_Error Set to True if error notifications should be
+      --     given when a frame could not be decoded because an uncorrectable
+      --     error was detected in the Reed-Solomon decoder. When False, the
+      --     Reed-Solomon decoding errors are ignored.
+      --
+      --  @param FCS_Error Set to True if error notifications should be
+      --     given for packets with an invalid FCS. When False, then FCS errors
+      --     are ignored.
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation ""Configure_Errors""",

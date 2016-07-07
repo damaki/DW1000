@@ -64,6 +64,12 @@ is
       STM32.GPIO.GPIOA_Periph.CRL.CNF0  := 2#01#; --  Floating input
    end Reset_DW1000;
 
+   procedure Acknowledge_DW1000_IRQ
+   is
+   begin
+      STM32.EXTI.EXTI_Periph.PR.PR.Arr (5) := 1;
+   end Acknowledge_DW1000_IRQ;
+
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
                                Data   : in DW1000.Types.Byte_Array)
    is
@@ -185,10 +191,9 @@ begin
 
    STM32.AFIO.AFIO_Periph.EXTICR2.EXTI.Arr (5) := 2#0001#; --  GPIOB
 
-   STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5)  := 0;
+   STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5)  := 1; --  Enable interrupt
    STM32.EXTI.EXTI_Periph.EMR.MR.Arr (5)  := 0;
    STM32.EXTI.EXTI_Periph.RTSR.TR.Arr (5) := 1; --  Rising edge enabled
    STM32.EXTI.EXTI_Periph.FTSR.TR.Arr (5) := 0; --  Falling edge disabled
-   STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5)  := 1; --  Enable interrupt
 
 end DW1000.BSP;
