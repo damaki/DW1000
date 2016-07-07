@@ -31,12 +31,15 @@ is
 
       Ret : constant Access_Test_Suite := new Test_Suite;
    begin
-      Ret.Add_Test(Caller.Create("Test conversion: Bits_40 -> Coarse -> Bits_40",
-                                 Tests.Test_Bits_40_Coarse'Access));
-      Ret.Add_Test(Caller.Create("Test conversion: Bits_40 -> Fine -> Bits_40",
-                                 Tests.Test_Bits_40_Fine'Access));
-      Ret.Add_Test(Caller.Create("Test conversion: Coarse -> Fine -> Coarse",
-                                 Tests.Test_To_Coarse_System_Time'Access));
+      Ret.Add_Test(Caller.Create
+                   ("Test conversion: Bits_40 -> Fine -> Bits_40",
+                      Tests.Test_Bits_40_Fine'Access));
+      Ret.Add_Test(Caller.Create
+                   ("Test conversion: Bits_40 -> Coarse -> Bits_40",
+                      Tests.Test_Bits_40_Coarse'Access));
+      Ret.Add_Test(Caller.Create
+                   ("Test conversion: Coarse -> Fine -> Coarse",
+                      Tests.Test_To_Coarse_System_Time'Access));
 
       return Ret;
    end Suite;

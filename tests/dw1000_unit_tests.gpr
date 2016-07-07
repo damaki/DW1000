@@ -6,7 +6,7 @@ project Dw1000_Unit_Tests is
    for Exec_Dir use "obj";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnata", "-g", "-ffunction-sections", "-fdata-sections", "-funroll-loops", "-gnatn", "-O");
+      for Default_Switches ("ada") use ("-gnata", "-g", "-ffunction-sections", "-fdata-sections", "-funroll-loops", "-gnatn");
    end Compiler;
 
    for Source_Dirs use (".", "../src");
