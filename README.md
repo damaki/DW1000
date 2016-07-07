@@ -12,7 +12,7 @@ This DW1000 driver written and verified using the SPARK language. GNATprove is
 used to prove the absence of runtime errors such as: numerical overflow,
 infinite loops, division by zero, and out-of-bounds array accesses.
 
-_Note: Due to a bug in GNATprove from SPARK GPL 2016 it is currently not possible to run GNATprove in proof mode on the_ ``DecaDriver`` _package, or packages which have visibility to the_ ``DecaDriver`` _package. However, it is still possible to run perform flow analysis with GNATprove on all files, and the majority of the driver is able to be analyzed in proof mode with GNATprove._
+_Note: Due to a bug in GNATprove from SPARK GPL 2016 it is currently not possible to run GNATprove in proof mode on the_ ``DecaDriver`` _package, or packages which have visibility to the_ ``DecaDriver`` _package. However, it is still possible to run perform flow analysis with GNATprove on all files, and the majority of the driver is able to be analyzed in proof mode with GNATprove. This bug has been fixed in the development version of SPARK Pro._
 
 # 2. License
 
