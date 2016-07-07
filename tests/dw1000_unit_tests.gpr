@@ -1,0 +1,28 @@
+with "aunit";
+
+project Dw1000_Unit_Tests is
+
+   for Object_Dir use "obj";
+   for Exec_Dir use "obj";
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnata", "-g", "-ffunction-sections", "-fdata-sections", "-funroll-loops", "-gnatn", "-O");
+   end Compiler;
+
+   for Source_Dirs use (".", "../src");
+   for Main use ("test_dw1000.adb");
+
+   package Linker is
+      for Default_Switches ("ada") use ("-g", "-Wl,--gc-sections");
+   end Linker;
+
+   package Binder is
+      for Default_Switches ("ada") use ("-E");
+   end Binder;
+
+   package Builder is
+      for Default_Switches ("ada") use ("-j4");
+   end Builder;
+
+end Dw1000_Unit_Tests;
+

@@ -72,7 +72,7 @@ is
    Fine_System_Time_Last  : constant :=
                               Fine_System_Time_Delta * (2.0**40 - 1.0);
 
-   Coarse_System_Time_Delta : constant := Fine_System_Time_Delta * 512.0;
+   Coarse_System_Time_Delta : constant := 512.0 / (499200000.0 * 128.0);
    Coarse_System_Time_Last  : constant := Fine_System_Time_Last;
 
    type Fine_System_Time is
@@ -111,7 +111,7 @@ is
    type Coarse_System_Time is
    delta Coarse_System_Time_Delta
    range 0.0 .. Coarse_System_Time_Last
-     with Small => 2.0**(-31);
+     with Small => 2.0**(-37);
    --  Type for representing the DW1000 coarse grained system time in seconds,
    --  with a precision of at least 8.013 nanoseconds.
    --
@@ -160,8 +160,7 @@ is
 
 
    function To_Fine_System_Time (Time : in Coarse_System_Time)
-                                 return Fine_System_Time
-   is (To_Fine_System_Time (To_Bits_40 (Time)));
+                                 return Fine_System_Time;
    --  Convert Coarse_System_Time to the equivalent Fine_System_Time value.
 
 
@@ -170,8 +169,7 @@ is
    --  Convert a 40-bit register value to Coarse_System_Time.
 
    function To_Coarse_System_Time (Time : in Fine_System_Time)
-                                   return Coarse_System_Time
-   is (To_Coarse_System_Time (To_Bits_40 (Time)));
+                                   return Coarse_System_Time;
    --  Convert a fine system time to a coarse system time.
    --
    --  This function rounds down to the nearest multiple of (approx.) 8.013
@@ -252,5 +250,21 @@ private
    function To_Bits_40 (Time : in Coarse_System_Time) return Bits_40
    is (Bits_40 (Time * (499200000.0 * 128.0)))
    with SPARK_Mode => Off;
+   --  SPARK mode is disabled as a workaround because GNATprove does not
+   --  support an operation mixing fixed point and universal real types.
+
+   function To_Fine_System_Time (Time : in Coarse_System_Time)
+                                 return Fine_System_Time
+   is (Fine_System_Time (Time))
+     with SPARK_Mode => Off;
+   --  SPARK mode is disabled as a workaround because GNATprove does not
+   --  support conversions between different fixed-point types.
+
+   function To_Coarse_System_Time (Time : in Fine_System_Time)
+                                   return Coarse_System_Time
+   is (Coarse_System_Time (Time))
+     with SPARK_Mode => Off;
+   --  SPARK mode is disabled as a workaround because GNATprove does not
+   --  support conversions between different fixed-point types.
 
 end DW1000.System_Time;

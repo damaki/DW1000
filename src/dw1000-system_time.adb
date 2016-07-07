@@ -68,7 +68,7 @@ is
         with Size => 31,
         Small => 1.0;
 
-      MSB : constant Bits_31 := Bits_31 (Bits / 2**9);
+      MSB : constant Fixed_31 := Fixed_31 (Bits / 2**9);
       --  The DW1000 ignores the 9 low order bits of the timestamp; they are
       --  set to 0.
 
