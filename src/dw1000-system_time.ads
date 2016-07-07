@@ -239,6 +239,57 @@ is
    --  17 seconds, so it is possible for the End_Time to be less than the
    --  Start_Time. This function takes this wrap-around behavior into account.
 
+   ----------------------------------------------------------------------------
+
+   --  @summary
+   --  Lemmas for proving properties about System_Time type conversions.
+   --
+   --  @description
+   --  To use a lemma in proof, simply use the desired lemma function in a
+   --  pragma Assert statement, as shown in the below example:
+   --
+   --     pragma Assert (DW1000.System_Time.Lemmas.Bits_40_Fine_Conv_Inverse);
+   --
+   package Lemmas
+   with SPARK_Mode => On
+   is
+
+      function Bits_40_Fine_Conv_Inverse return Boolean
+        with Ghost,
+        Post => (Bits_40_Fine_Conv_Inverse'Result
+                 and (for all X in Bits_40'Range =>
+                          (X = To_Bits_40 (To_Fine_System_Time (X)))));
+      --  Proves that To_Bits_40 is the inverse to To_Fine_System_Time
+
+
+      function Bits_40_Coarse_Conv_Inverse return Boolean
+        with Ghost,
+        Post => (Bits_40_Coarse_Conv_Inverse'Result
+                 and (for all X in Bits_40'Range =>
+                          (X = To_Bits_40 (To_Coarse_System_Time (X)))));
+      --  Proves that To_Bits_40 is the inverse to To_Coarse_System_Time
+
+
+      function To_Coarse_System_Time_Conv_Inverse (X : in Coarse_System_Time)
+                                                   return Boolean
+        with Ghost,
+        Post => (To_Coarse_System_Time_Conv_Inverse'Result
+                 and X = To_Coarse_System_Time (To_Fine_System_Time (X)));
+      --  Proves that To_Coarse_System_Time is the inverse to
+      --  To_Fine_System_Time (for Coarse_System_Time type).
+
+
+      function Bits_40_Conv_Transitive return Boolean
+        with Ghost,
+        Post =>
+          (Bits_40_Conv_Transitive'Result
+           and (for all X in Bits_40'Range =>
+                  (X = To_Bits_40
+                   (To_Coarse_System_Time (To_Fine_System_Time (X))))));
+      --
+
+   end Lemmas;
+
 private
 
    function To_Bits_40 (Time : in Fine_System_Time) return Bits_40

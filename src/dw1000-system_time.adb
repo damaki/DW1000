@@ -91,4 +91,48 @@ is
       end if;
    end Calculate_Span;
 
+
+   package body Lemmas
+   with SPARK_Mode => On
+   is
+
+      function Bits_40_Fine_Conv_Inverse return Boolean
+      is
+      begin
+         pragma Assume ((for all X in Bits_40'Range =>
+                           (X = To_Bits_40 (To_Fine_System_Time (X)))),
+                        "property is proved with an exhaustive unit test");
+         return True;
+      end Bits_40_Fine_Conv_Inverse;
+
+
+      function Bits_40_Coarse_Conv_Inverse return Boolean
+      is
+      begin
+         pragma Assume ((for all X in Bits_40'Range =>
+                           (X = To_Bits_40 (To_Coarse_System_Time (X)))),
+                        "property is proved with an exhaustive unit test");
+         return True;
+      end Bits_40_Coarse_Conv_Inverse;
+
+
+      function To_Coarse_System_Time_Conv_Inverse (X : in Coarse_System_Time)
+                                                   return Boolean
+      is
+      begin
+         pragma Assume (X = To_Coarse_System_Time (To_Fine_System_Time (X)),
+                        "property is proved with an exhaustive unit test");
+         return True;
+      end To_Coarse_System_Time_Conv_Inverse;
+
+      function Bits_40_Conv_Transitive return Boolean
+      is
+      begin
+         pragma Assert (Bits_40_Coarse_Conv_Inverse);
+
+         return True;
+      end Bits_40_Conv_Transitive;
+
+   end Lemmas;
+
 end DW1000.System_Time;
