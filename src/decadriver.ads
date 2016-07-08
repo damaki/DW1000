@@ -237,7 +237,7 @@ is
      with Dynamic_Predicate => (if Rx_Frame_Type.Error = No_Error
                                 then Rx_Frame_Type.Size > 0
                                 else (Rx_Frame_Type.Size = 0
-                                      and Rx_Frame_Type.Timestamp = 0.0));
+                                  and Rx_Frame_Type.Timestamp = 0.0));
 
    type Rx_Frame_Queue_Index is mod DecaDriver_Config.Receiver_Queue_Size;
 

@@ -93,8 +93,72 @@ is
 
    type SFD_Timeout_Number is new Natural range 0 .. (2**16) - 1;
 
+   type SFD_Length_Number is new Natural range 8 .. 64
+     with Static_Predicate => SFD_Length_Number in 8 .. 16 | 64;
+
    type Rx_Modes is (Normal, Sniff);
 
+   function To_Positive (PAC : in Preamble_Acq_Chunk_Length) return Positive
+   is (case PAC is
+          when PAC_8  => 8,
+          when PAC_16 => 16,
+          when PAC_32 => 32,
+          when PAC_64 => 64);
+
+
+   function To_Positive (Preamble_Length : in Preamble_Lengths) return Positive
+   is (case Preamble_Length is
+          when PLEN_64   => 64,
+          when PLEN_128  => 128,
+          when PLEN_256  => 256,
+          when PLEN_512  => 512,
+          when PLEN_1024 => 1024,
+          when PLEN_1536 => 1536,
+          when PLEN_2048 => 2048,
+          when PLEN_4096 => 4096);
+
+   function Recommended_PAC (Preamble_Length : in Preamble_Lengths)
+                             return Preamble_Acq_Chunk_Length
+   is (case Preamble_Length is
+          when PLEN_64   => PAC_8,
+          when PLEN_128  => PAC_8,
+          when PLEN_256  => PAC_16,
+          when PLEN_512  => PAC_16,
+          when PLEN_1024 => PAC_32,
+          when PLEN_1536 => PAC_64,
+          when PLEN_2048 => PAC_64,
+          when PLEN_4096 => PAC_64);
+   --  Get the recommended preamble acquisition chunk (PAC) length based
+   --  on the preamble length.
+   --
+   --  These recommendations are from Section 4.1.1 of the DW1000 User Manual.
+
+
+   function Recommended_SFD_Timeout
+     (Preamble_Length : in Preamble_Lengths;
+      SFD_Length      : in SFD_Length_Number;
+      PAC             : in Preamble_Acq_Chunk_Length)
+      return SFD_Timeout_Number
+   is (SFD_Timeout_Number
+       ((To_Positive (Preamble_Length) + Positive (SFD_Length) + 1) -
+          To_Positive (PAC)));
+   --  Compute the recommended SFD timeout for a given preamble length, SFD
+   --  length, and preamble acquisition chunk length.
+   --
+   --  For example, with a preable length of 1024 symbols, an SFD length of
+   --  64 symbols, and a PAC length of 32 symbols the recommended SFD timeout
+   --  is 1024 + 64 + 1 - 32 = 1057 symbols.
+   --
+   --  @param Preamble_Length The length of the preamble in symbols.
+   --
+   --  @param SFD_Length The length of the SFD in symbols. The SFD length
+   --     depends on whether or not a non-standard SFD is used, and the data
+   --     rate. For a data rate of 110 kbps the SFD length is 64 symbols for
+   --     the standard SFD and DecaWave-defined SFD. For a data rate of 850
+   --     kbps and above the SFD length is 8 symbols for a standard SFD, and 8
+   --     or 16 symbols for the DecaWave-defined SFD sequence.
+   --
+   --  @param PAC The preamble acquisition chunk length.
 
    procedure Load_LDE_From_ROM
      with Global => (In_Out => DW1000.BSP.Device_State,
