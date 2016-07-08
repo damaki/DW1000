@@ -251,7 +251,7 @@ is
                                             Offset => Offset);
       end Set_Tx_Frame_Length;
 
-      procedure Set_Delayed_Tx_Time(Time : in DW1000.System_Time.Coarse_System_Time)
+      procedure Set_Delayed_Tx_Time(Time : in Coarse_System_Time)
       is
       begin
          DW1000.Driver.Set_Delayed_Tx_Rx_Time (Time);

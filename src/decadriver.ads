@@ -303,14 +303,14 @@ is
       --  according to certain criterea according to the IEEE 802.15.4-2011
       --  MAC layer.
       --
-      --  To configure which frames are accepted or rejected by the DW1000 see the
-      --  Configure_Frame_Filtering procedure.
+      --  To configure which frames are accepted or rejected by the DW1000 see
+      --  the Configure_Frame_Filtering procedure.
       --
       --  @param Enabled When set to True frame filtering is enabled. Otherwise,
       --     it is disabled.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Set_Frame_Filtering_Enabled""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Configure_Frame_Filtering (Behave_As_Coordinator : in Boolean;
@@ -375,7 +375,7 @@ is
       --     will reject these frames.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Configure_Frame_Filtering""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Rx_Auto_Reenable (Enabled : in Boolean)
@@ -401,7 +401,7 @@ is
       --      header error), EXCEPT a frame wait timeout error.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Set_Rx_Auto_Reenable""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Delayed_Rx_Time(Time : in Coarse_System_Time)
@@ -426,7 +426,7 @@ is
       --  receive time.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Set_Delayed_Rx_Time""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
 
@@ -437,7 +437,7 @@ is
       --  Turn on the receiver immediately (without delay).
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Start_Rx_Immediate""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
 
@@ -453,7 +453,7 @@ is
       --  calling this procedure.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Start_Rx_Delayed""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
 
@@ -463,15 +463,15 @@ is
                     Receiver_Type           => + DW1000.BSP.Device_State);
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Notify_Frame_Received""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
 
       --  Reads a received frame from the DW1000.
       --
       --  WARNING: This is intended to only be called by the DecaDriver IRQ
-      --  when the DW1000 signals that a frame has been received. This procedure
-      --  should not be called by the user.
+      --  when the DW1000 signals that a frame has been received. This
+      --  procedure should not be called by the user.
 
       procedure Notify_Receive_Error (Error : in Rx_Errors)
         with Depends => (Receiver_Type => + Error),
@@ -521,7 +521,7 @@ is
                 Data'Length + Offset <= 1024);
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Set_Tx_Data""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Tx_Frame_Length (Length : in Natural;
@@ -536,7 +536,7 @@ is
                 Length + Offset <= DW1000.Constants.TX_BUFFER_Length);
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Set_Tx_Frame_Length""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Delayed_Tx_Time(Time : in Coarse_System_Time)
@@ -561,7 +561,7 @@ is
       --  receive time.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Set_Delayed_Tx_Time""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
 
@@ -582,7 +582,7 @@ is
       --  enabled after the transmission is completed.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Start_Tx_Immediate""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
 
@@ -613,7 +613,7 @@ is
       --  procedure.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Start_Tx_Delayed""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Notify_Tx_Complete;
@@ -676,7 +676,7 @@ is
       --  disabled and is not run when packets are received.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Initialize""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Configure (Config : in Configuration_Type)
@@ -689,7 +689,7 @@ is
       --  Configure the DW1000 for a specific channel, PRF, preamble, etc...
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Configure""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
 
@@ -735,7 +735,7 @@ is
       --     are ignored.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Configure_Errors""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Force_Tx_Rx_Off
@@ -747,7 +747,7 @@ is
       --  This will abort any reception or transmission currently in progress.
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""Force_Tx_Rx_Off""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
       function Get_Part_ID return Bits_32;
@@ -775,7 +775,7 @@ is
                                                 Driver_Type));
       pragma Annotate
         (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation ""DW1000_IRQ""",
+         "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
       --  DW1000 IRQ handler.
       --

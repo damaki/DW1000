@@ -184,7 +184,8 @@ is
    procedure Read_OTP (Address : in     Bits_11;
                        Word    :    out Bits_32)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => ((DW1000.BSP.Device_State, Word) => (DW1000.BSP.Device_State, Address));
+     Depends => ((DW1000.BSP.Device_State, Word) => (DW1000.BSP.Device_State,
+                                                     Address));
    --  Reads a 32-bit word from the DW1000 one-time programmable (OTP) memory.
    --
    --  The package DW1000.Constants defines the addresses used to store the

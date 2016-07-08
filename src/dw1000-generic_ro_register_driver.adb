@@ -24,7 +24,8 @@ with DW1000.Register_Driver;
 
 package body DW1000.Generic_RO_Register_Driver
 is
-   subtype Register_Byte_Array is DW1000.Types.Byte_Array(1 .. Register_Type'Size / 8);
+   subtype Register_Byte_Array is
+     DW1000.Types.Byte_Array(1 .. Register_Type'Size / 8);
 
    procedure Deserialize(Source : in     Register_Byte_Array;
                          Target :    out Register_Type)
@@ -52,7 +53,9 @@ is
       Reg_Bytes : Register_Byte_Array;
 
    begin
-      DW1000.Register_Driver.Read_Register(Register_ID, Sub_Register, Reg_Bytes);
+      DW1000.Register_Driver.Read_Register(Register_ID,
+                                           Sub_Register,
+                                           Reg_Bytes);
 
       Deserialize(Source => Reg_Bytes,
                   Target => Reg);

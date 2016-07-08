@@ -80,7 +80,8 @@ is
                Sub_Index                => Present,
                Register_ID              => Register_ID,
                Extended_Address         => Extended,
-               Register_Sub_Address_LSB => Types.Bits_7 (Sub_Address and 16#7F#),
+               Register_Sub_Address_LSB =>
+                 Types.Bits_7 (Sub_Address and 16#7F#),
                Register_Sub_Address_MSB => Types.Bits_8 (Sub_Address / 2**7));
          begin
             BSP.Read_Transaction(Header => To_Bytes (Header),
@@ -128,7 +129,8 @@ is
                Sub_Index                => Present,
                Register_ID              => Register_ID,
                Extended_Address         => Extended,
-               Register_Sub_Address_LSB => Types.Bits_7 (Sub_Address and 16#7F#),
+               Register_Sub_Address_LSB =>
+                 Types.Bits_7 (Sub_Address and 16#7F#),
                Register_Sub_Address_MSB => Types.Bits_8 (Sub_Address / 2**7));
          begin
             BSP.Write_Transaction(Header => To_Bytes (Header),
