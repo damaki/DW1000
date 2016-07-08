@@ -462,6 +462,38 @@ is
       USR_SFD.Write (USR_SFD_Reg);
    end Configure_Nonstandard_SFD_Length;
 
+   procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
+   is
+      SYS_CFG_Reg : SYS_CFG_Type;
+   begin
+      SYS_CFG.Read (SYS_CFG_Reg);
+      SYS_CFG_Reg.FFEN := (if Enabled then 1 else 0);
+      SYS_CFG.Write (SYS_CFG_Reg);
+   end Set_Frame_Filtering_Enabled;
+
+   procedure Configure_Frame_Filtering (Behave_As_Coordinator   : in Boolean;
+                                        Allow_Beacon_Frame      : in Boolean;
+                                        Allow_Data_Frame        : in Boolean;
+                                        Allow_Ack_Frame         : in Boolean;
+                                        Allow_MAC_Cmd_Frame     : in Boolean;
+                                        Allow_Reserved_Frame    : in Boolean;
+                                        Allow_Frame_Type_4      : in Boolean;
+                                        Allow_Frame_Type_5      : in Boolean)
+   is
+      SYS_CFG_Reg : SYS_CFG_Type;
+   begin
+      SYS_CFG.Read (SYS_CFG_Reg);
+      SYS_CFG_Reg.FFBC := (if Behave_As_Coordinator then 1 else 0);
+      SYS_CFG_Reg.FFAB := (if Allow_Beacon_Frame    then 1 else 0);
+      SYS_CFG_Reg.FFAD := (if Allow_Data_Frame      then 1 else 0);
+      SYS_CFG_Reg.FFAA := (if Allow_Ack_Frame       then 1 else 0);
+      SYS_CFG_Reg.FFAM := (if Allow_MAC_Cmd_Frame   then 1 else 0);
+      SYS_CFG_Reg.FFAR := (if Allow_Reserved_Frame  then 1 else 0);
+      SYS_CFG_Reg.FFA4 := (if Allow_Frame_Type_4    then 1 else 0);
+      SYS_CFG_Reg.FFA5 := (if Allow_Frame_Type_5    then 1 else 0);
+      SYS_CFG.Write (SYS_CFG_Reg);
+   end Configure_Frame_Filtering;
+
    procedure Set_Smart_Tx_Power (Enabled : in Boolean)
    is
       SYS_CFG_Reg : SYS_CFG_Type;

@@ -96,6 +96,45 @@ is
          return Rx_Count;
       end Pending_Frames_Count;
 
+      procedure Discard_Pending_Frames
+      is
+      begin
+         Rx_Count := 0;
+      end Discard_Pending_Frames;
+
+      procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
+      is
+      begin
+         DW1000.Driver.Set_Frame_Filtering_Enabled (Enabled);
+      end Set_Frame_Filtering_Enabled;
+
+      procedure Configure_Frame_Filtering (Behave_As_Coordinator : in Boolean;
+                                           Allow_Beacon_Frame    : in Boolean;
+                                           Allow_Data_Frame      : in Boolean;
+                                           Allow_Ack_Frame       : in Boolean;
+                                           Allow_MAC_Cmd_Frame   : in Boolean;
+                                           Allow_Reserved_Frame  : in Boolean;
+                                           Allow_Frame_Type_4    : in Boolean;
+                                           Allow_Frame_Type_5    : in Boolean)
+      is
+      begin
+         DW1000.Driver.Configure_Frame_Filtering
+           (Behave_As_Coordinator => Behave_As_Coordinator,
+            Allow_Beacon_Frame    => Allow_Beacon_Frame,
+            Allow_Data_Frame      => Allow_Data_Frame,
+            Allow_Ack_Frame       => Allow_Ack_Frame,
+            Allow_MAC_Cmd_Frame   => Allow_MAC_Cmd_Frame,
+            Allow_Reserved_Frame  => Allow_Reserved_Frame,
+            Allow_Frame_Type_4    => Allow_Frame_Type_4,
+            Allow_Frame_Type_5    => Allow_Frame_Type_5);
+      end Configure_Frame_Filtering;
+
+      procedure Set_Rx_Auto_Reenable (Enabled : in Boolean)
+      is
+      begin
+         DW1000.Driver.Set_Auto_Rx_Reenable (Enabled);
+      end Set_Rx_Auto_Reenable;
+
       procedure Set_Delayed_Rx_Time(Time : in Coarse_System_Time)
       is
       begin
@@ -127,7 +166,7 @@ is
          Frame_Length := Natural (RX_FINFO_Reg.RXFLEN) +
                          Natural (RX_FINFO_Reg.RXFLE) * 2**7;
 
-         pragma Assert (Frame_Length <= 1024);
+         pragma Assert (Frame_Length <= DW1000.Constants.RX_BUFFER_Length);
 
          if Frame_Length > 0 then
             if Rx_Count >= Frame_Queue'Length then
@@ -464,6 +503,12 @@ is
          Detect_RS_Error      := RS_Error;
          Detect_FCS_Error     := FCS_Error;
       end Configure_Errors;
+
+      procedure Force_Tx_Rx_Off
+      is
+      begin
+         DW1000.Driver.Force_Tx_Rx_Off;
+      end Force_Tx_Rx_Off;
 
       function Get_Part_ID return Bits_32
       is

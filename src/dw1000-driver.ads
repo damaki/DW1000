@@ -252,6 +252,81 @@ is
    --  This procedure configures the following registers:
    --    * USR_SFD
 
+   procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + Enabled);
+   --  Enable or disable frame filtering.
+   --
+   --  Frame filtering allows the DW1000 to automatically reject frames
+   --  according to certain criterea according to the IEEE 802.15.4-2011
+   --  MAC layer.
+   --
+   --  To configure which frames are accepted or rejected by the DW1000 see the
+   --  Configure_Frame_Filtering procedure.
+   --
+   --  @param Enabled When set to True frame filtering is enabled. Otherwise,
+   --     it is disabled.
+
+   procedure Configure_Frame_Filtering (Behave_As_Coordinator : in Boolean;
+                                        Allow_Beacon_Frame    : in Boolean;
+                                        Allow_Data_Frame      : in Boolean;
+                                        Allow_Ack_Frame       : in Boolean;
+                                        Allow_MAC_Cmd_Frame   : in Boolean;
+                                        Allow_Reserved_Frame  : in Boolean;
+                                        Allow_Frame_Type_4    : in Boolean;
+                                        Allow_Frame_Type_5    : in Boolean)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                             Behave_As_Coordinator,
+                                             Allow_Beacon_Frame,
+                                             Allow_Data_Frame,
+                                             Allow_Ack_Frame,
+                                             Allow_MAC_Cmd_Frame,
+                                             Allow_Reserved_Frame,
+                                             Allow_Frame_Type_4,
+                                             Allow_Frame_Type_5));
+   --  Configure which MAC frame types are automatically filtered by the
+   --  DW1000.
+   --
+   --  Note that the frame filtering configuration only takes effect when
+   --  frame filtering is enabled (see Set_Frame_Filtering_Enabled).
+   --
+   --  @param Behave_As_Coordinator When set to True the DW1000 will accept
+   --     a frame without a destination address if the source address has
+   --     the PAN ID matching the coordinator's PAN ID. When set to False
+   --     and when filtering is enabled the DW1000 will reject these frames.
+   --
+   --  @param Allow_Beacon_Frame When set to True the DW1000 will accept
+   --     frames whose frame type is a beacon frame. When set to False
+   --     and when filtering is enabled the DW1000 will reject these frames.
+   --
+   --  @param Allow_Data_Frame When set to True the DW1000 will accept
+   --     frames whose frame type is a data frame. When set to False
+   --     and when filtering is enabled the DW1000 will reject these frames.
+   --
+   --  @param Allow_Ack_Frame When set to True the DW1000 will accept frames
+   --     whose frame type is an acknowledgement frame. When set to False
+   --     and when filtering is enabled the DW1000 will reject these frames.
+   --
+   --  @param Allow_MAC_Cmd_Frame When set to True the DW1000 will accept
+   --     frames whose frame type is a MAC command frame. When set to False
+   --     and when filtering is enabled the DW1000 will reject these frames.
+   --
+   --  @param Allow_Reserved_Frame When set to True the DW1000 will accept
+   --     frames whose frame type is set to a reserved value (values 2#100#
+   --     to 2#111#) as defined by IEEE 802.15.4-2011. When set to False
+   --     and when filtering is enabled the DW1000 will reject these frames.
+   --
+   --  @param Allow_Frame_Type_4 When set to True the DW1000 will accept
+   --     frames whose frame type is set to the value 2#100#, i.e. 4.
+   --     When set to False and when frame filtering is enabled the DW1000
+   --     will reject these frames.
+   --
+   --  @param Allow_Frame_Type_5 When set to True the DW1000 will accept
+   --     frames whose frame type is set to the value 2#101#, i.e. 5.
+   --     When set to False and when frame filtering is enabled the DW1000
+   --     will reject these frames.
+
    procedure Set_Smart_Tx_Power (Enabled : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Enabled);
@@ -521,11 +596,23 @@ is
    procedure Set_Auto_Rx_Reenable (Enabled : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Enabled);
-   --  Configures the receiver to automatically re-enable after frame reception
+   --  Enable or disable the Rx auto re-enable feature.
    --
-   --  When the auto Rx re-enable is enabled the receiver will automatically
-   --  re-enable itself after each frame is received. This is useful when
-   --  using double-buffer mode.
+   --  This feature has different behaviour depending on whether or not the
+   --  receiver is operating in double-buffer mode.
+   --
+   --  When Rx auto re-enable is disabled the receiver will stop receiving
+   --  when any receive event happens (e.g. an error occurred, or a frame
+   --  was received OK).
+   --
+   --  When Rx auto re-enable is enabled then the receiver behaviour
+   --  depends on the double-buffer configuration:
+   --    * In single-buffer mode the receiver is automatically re-enabled
+   --      after a receive error occurs (e.g. physical header error),
+   --      EXCEPT a frame wait timeout error.
+   --    * In double-buffer mode the receiver is automatically re-enabled
+   --      when a frame is received, or when an error occurs (e.g. physical
+   --      header error), EXCEPT a frame wait timeout error.
    --
    --  This procedure configures the following registers:
    --    * SYS_CFG

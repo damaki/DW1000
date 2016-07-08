@@ -288,6 +288,122 @@ is
         with Post => Pending_Frames_Count'Result <= 2;
       --  Returns the number of received frames that are waiting to be read.
 
+      procedure Discard_Pending_Frames
+        with Depends => (Receiver_Type => Receiver_Type);
+      --  Discard any pending frames that have been received, but have not yet
+      --  been read.
+
+      procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => + Enabled,
+                    Receiver_Type           => Receiver_Type);
+      --  Enable or disable frame filtering.
+      --
+      --  Frame filtering allows the DW1000 to automatically reject frames
+      --  according to certain criterea according to the IEEE 802.15.4-2011
+      --  MAC layer.
+      --
+      --  To configure which frames are accepted or rejected by the DW1000 see the
+      --  Configure_Frame_Filtering procedure.
+      --
+      --  @param Enabled When set to True frame filtering is enabled. Otherwise,
+      --     it is disabled.
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation ""Set_Frame_Filtering_Enabled""",
+         "Procedures in DW1000.BSP are not blocking");
+
+      procedure Configure_Frame_Filtering (Behave_As_Coordinator : in Boolean;
+                                           Allow_Beacon_Frame    : in Boolean;
+                                           Allow_Data_Frame      : in Boolean;
+                                           Allow_Ack_Frame       : in Boolean;
+                                           Allow_MAC_Cmd_Frame   : in Boolean;
+                                           Allow_Reserved_Frame  : in Boolean;
+                                           Allow_Frame_Type_4    : in Boolean;
+                                           Allow_Frame_Type_5    : in Boolean)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                                Behave_As_Coordinator,
+                                                Allow_Beacon_Frame,
+                                                Allow_Data_Frame,
+                                                Allow_Ack_Frame,
+                                                Allow_MAC_Cmd_Frame,
+                                                Allow_Reserved_Frame,
+                                                Allow_Frame_Type_4,
+                                                Allow_Frame_Type_5),
+                    Receiver_Type           => Receiver_Type);
+      --  Configure which MAC frame types are automatically filtered by the
+      --  DW1000.
+      --
+      --  Note that the frame filtering configuration only takes effect when
+      --  frame filtering is enabled.
+      --
+      --  @param Behave_As_Coordinator When set to True the DW1000 will accept
+      --     a frame without a destination address if the source address has
+      --     the PAN ID matching the coordinator's PAN ID. When set to False
+      --     and when filtering is enabled the DW1000 will reject these frames.
+      --
+      --  @param Allow_Beacon_Frame When set to True the DW1000 will accept
+      --     frames whose frame type is a beacon frame. When set to False
+      --     and when filtering is enabled the DW1000 will reject these frames.
+      --
+      --  @param Allow_Data_Frame When set to True the DW1000 will accept
+      --     frames whose frame type is a data frame. When set to False
+      --     and when filtering is enabled the DW1000 will reject these frames.
+      --
+      --  @param Allow_Ack_Frame When set to True the DW1000 will accept frames
+      --     whose frame type is an acknowledgement frame. When set to False
+      --     and when filtering is enabled the DW1000 will reject these frames.
+      --
+      --  @param Allow_MAC_Cmd_Frame When set to True the DW1000 will accept
+      --     frames whose frame type is a MAC command frame. When set to False
+      --     and when filtering is enabled the DW1000 will reject these frames.
+      --
+      --  @param Allow_Reserved_Frame When set to True the DW1000 will accept
+      --     frames whose frame type is set to a reserved value (values 2#100#
+      --     to 2#111#) as defined by IEEE 802.15.4-2011. When set to False
+      --     and when filtering is enabled the DW1000 will reject these frames.
+      --
+      --  @param Allow_Frame_Type_4 When set to True the DW1000 will accept
+      --     frames whose frame type is set to the value 2#100#, i.e. 4.
+      --     When set to False and when frame filtering is enabled the DW1000
+      --     will reject these frames.
+      --
+      --  @param Allow_Frame_Type_5 When set to True the DW1000 will accept
+      --     frames whose frame type is set to the value 2#101#, i.e. 5.
+      --     When set to False and when frame filtering is enabled the DW1000
+      --     will reject these frames.
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation ""Configure_Frame_Filtering""",
+         "Procedures in DW1000.BSP are not blocking");
+
+      procedure Set_Rx_Auto_Reenable (Enabled : in Boolean)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => + Enabled,
+                    Receiver_Type           => Receiver_Type);
+      --  Enable or disable the Rx auto re-enable feature.
+      --
+      --  This feature has different behaviour depending on whether or not the
+      --  receiver is operating in double-buffer mode.
+      --
+      --  When Rx auto re-enable is disabled the receiver will stop receiving
+      --  when any receive event happens (e.g. an error occurred, or a frame
+      --  was received OK).
+      --
+      --  When Rx auto re-enable is enabled then the receiver behaviour
+      --  depends on the double-buffer configuration:
+      --    * In single-buffer mode the receiver is automatically re-enabled
+      --      after a receive error occurs (e.g. physical header error),
+      --      EXCEPT a frame wait timeout error.
+      --    * In double-buffer mode the receiver is automatically re-enabled
+      --      when a frame is received, or when an error occurs (e.g. physical
+      --      header error), EXCEPT a frame wait timeout error.
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation ""Set_Rx_Auto_Reenable""",
+         "Procedures in DW1000.BSP are not blocking");
+
       procedure Set_Delayed_Rx_Time(Time : in Coarse_System_Time)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Time,
@@ -620,6 +736,18 @@ is
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation ""Configure_Errors""",
+         "Procedures in DW1000.BSP are not blocking");
+
+      procedure Force_Tx_Rx_Off
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                    Driver_Type             => Driver_Type);
+      --  Switch off the transmitter and receiver.
+      --
+      --  This will abort any reception or transmission currently in progress.
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation ""Force_Tx_Rx_Off""",
          "Procedures in DW1000.BSP are not blocking");
 
       function Get_Part_ID return Bits_32;
