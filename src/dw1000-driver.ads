@@ -594,6 +594,10 @@ is
    --
    --  This also clears the status registers.
 
+   procedure Toggle_Host_Side_Rx_Buffer_Pointer
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State);
+
    procedure Sync_Rx_Buffer_Pointers
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State);

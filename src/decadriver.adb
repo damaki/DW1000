@@ -129,6 +129,12 @@ is
             Allow_Frame_Type_5    => Allow_Frame_Type_5);
       end Configure_Frame_Filtering;
 
+      procedure Set_Rx_Double_Buffer (Enabled : in Boolean)
+      is
+      begin
+         DW1000.Driver.Set_Rx_Double_Buffer (Enabled);
+      end Set_Rx_Double_Buffer;
+
       procedure Set_Rx_Auto_Reenable (Enabled : in Boolean)
       is
       begin
@@ -191,6 +197,8 @@ is
 
             Frame_Ready := True;
          end if;
+
+         DW1000.Driver.Toggle_Host_Side_Rx_Buffer_Pointer;
       end Notify_Frame_Received;
 
       procedure Notify_Receive_Error (Error : in Rx_Errors)

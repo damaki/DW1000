@@ -786,12 +786,20 @@ is
 
    end Force_Tx_Rx_Off;
 
+   procedure Toggle_Host_Side_Rx_Buffer_Pointer
+   is
+      SYS_CTRL_Reg   : SYS_CTRL_Type;
+   begin
+      SYS_CTRL.Read (SYS_CTRL_Reg);
+      SYS_CTRL_Reg.HRBPT := 1;
+      SYS_CTRL.Write (SYS_CTRL_Reg);
+   end Toggle_Host_Side_Rx_Buffer_Pointer;
+
    procedure Sync_Rx_Buffer_Pointers
    is
       use type Types.Bits_1;
 
       SYS_STATUS_Reg : SYS_STATUS_Type;
-      SYS_CTRL_Reg   : SYS_CTRL_Type;
 
    begin
       SYS_STATUS.Read (SYS_STATUS_Reg);
@@ -799,9 +807,7 @@ is
       -- Check if the IC side receive buffer pointer is the same
       -- as the host side receive buffer pointer.
       if SYS_STATUS_Reg.ICRBP /= SYS_STATUS_Reg.HSRBP then
-         SYS_CTRL.Read (SYS_CTRL_Reg);
-         SYS_CTRL_Reg.HRBPT := 1;
-         SYS_CTRL.Write (SYS_CTRL_Reg);
+         Toggle_Host_Side_Rx_Buffer_Pointer;
       end if;
 
    end Sync_Rx_Buffer_Pointers;
