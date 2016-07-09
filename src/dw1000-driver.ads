@@ -593,10 +593,21 @@ is
    --  Force off the tranceiver.
    --
    --  This also clears the status registers.
+   --
+   --  Turning off the tranceiver will cancel any pending receive or
+   --  transmit operation.
 
    procedure Toggle_Host_Side_Rx_Buffer_Pointer
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State);
+   --  Toggle the host side receive buffer pointer (HSRBP).
+   --
+   --  This procedure is only relevant when double-buffer mode is enabled.
+   --  Calling this procedure signals to the DW1000 that the host IC is
+   --  finished with the contents of the current double-buffered set.
+   --
+   --  It should be called after the host IC has finished reading the receive
+   --  registers after a packet has been received.
 
    procedure Sync_Rx_Buffer_Pointers
      with Global => (In_Out => DW1000.BSP.Device_State),
@@ -633,10 +644,12 @@ is
 
    procedure Set_Rx_Mode (Mode        : in Rx_Modes;
                           Rx_On_Time  : in Types.Bits_4;
-                          Rx_Off_Time : in Types.Bits_8)
+                          Rx_Off_Time : in Coarse_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + (Mode, Rx_On_Time, Rx_Off_Time)),
-     Pre => (if Mode = Sniff then Rx_Off_Time > 0);
+     Pre =>
+       ((if Mode = Sniff then Rx_Off_Time > 0.0)
+        and Rx_Off_Time < Coarse_System_Time'Delta * (128.0 * 2.0**8));
    --  Enables or disables the receiver sniff mode.
    --
    --  When Mode is set to Normal then when the receiver is turned on (see
@@ -651,13 +664,15 @@ is
    --  the receiver is then disabled for the Rx_Off_Time, after which it is
    --  re-enabled to repeat the process.
    --
-   --  The Rx_On_Time is measured in units of the preamble accumulation count
+   --  The Rx_On_Time is measured in units of the preamble acquisition count
    --  (PAC) see Section 4.1.1 of the DW100 User Manual for more information.
    --
    --  The Rx_Off_Time is measured in units of the 128 system clock cycles, or
    --  approximately 1 us. If the Mode is set to Sniff then the Rx_Off_Time
    --  must be non-zero (a value of 0 would disable the sniff mode on the
    --  DW1000).
+   --
+   --  The Rx_Off_Time must be less than 15.385 microseconds.
    --
    --  This procedure configures the following registers:
    --    * RX_SNIFF
@@ -824,5 +839,21 @@ is
                                              Rx_OK_LED_Enable,
                                              SFD_LED_Enable,
                                              Test_Flash));
+   --  Configure the behaviour of the LEDs.
+   --
+   --  @param Tx_LED_Enable When set to True the DW1000 will flash the Tx LED
+   --     while the transmitter is on.
+   --
+   --  @param Rx_LED_Enable When set to True the DW1000 will flash the Rx LED
+   --     while the receiver is on.
+   --
+   --  @param Rx_OK_LED_Enable When set to True the DW1000 will flash the LED
+   --     when a packet is received without errors.
+   --
+   --  @param SFD_LED_Enable When set to True the DW1000 will flash the LED
+   --     when an SFD is detected.
+   --
+   --  @param Test_Flash When set to True the DW1000 will flash the configured
+   --     LEDs once, immediately after the LEDs are configured.
 
 end DW1000.Driver;
