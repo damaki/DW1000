@@ -21,9 +21,10 @@
 -------------------------------------------------------------------------------
 
 with DW1000.Constants;
+with DW1000.Reception_Quality; use DW1000.Reception_Quality;
 with DW1000.Registers;
 with DW1000.Register_Driver;
-with Interfaces;             use Interfaces;
+with Interfaces;               use Interfaces;
 
 package body DecaDriver
 with SPARK_Mode => On
@@ -58,20 +59,92 @@ is
            24 => Bits_16 (0.22 * 2**16));
 
 
+   function Receive_Timestamp (Frame_Info : in Frame_Info_Type)
+                               return Fine_System_Time
+   is
+   begin
+      return To_Fine_System_Time (Frame_Info.RX_TIME_Reg.RX_STAMP);
+   end Receive_Timestamp;
+
+
+   function Receive_Signal_Power (Frame_Info : in Frame_Info_Type)
+                                  return Float
+   is
+      RXBR       : Bits_2;
+      SFD_LENGTH : Bits_8;
+      RXPACC     : Bits_12;
+   begin
+      RXBR := Frame_Info.RX_FINFO_Reg.RXBR;
+      if RXBR = 2#11# then --  Detect reserved value
+         RXBR := 2#10#; --  default to 6.8 Mbps
+      end if;
+
+      SFD_LENGTH := Frame_Info.SFD_LENGTH;
+      if not (SFD_LENGTH in 8 | 16) then
+         SFD_LENGTH := 8; --  default to length 8
+      end if;
+
+      RXPACC := Adjust_RXPACC
+        (RXPACC           => Frame_Info.RX_FINFO_Reg.RXPACC,
+         RXPACC_NOSAT     => Frame_Info.RXPACC_NOSAT_Reg.RXPACC_NOSAT,
+         RXBR             => RXBR,
+         SFD_LENGTH       => SFD_LENGTH,
+         Non_Standard_SFD => Frame_Info.Non_Standard_SFD);
+
+      return Receive_Signal_Power
+        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = 2#10#,
+         RXPACC        => RXPACC,
+         CIR_PWR       => Frame_Info.RX_FQUAL_Reg.CIR_PWR);
+   end Receive_Signal_Power;
+
+
+   function First_Path_Signal_Power (Frame_Info : in Frame_Info_Type)
+                                     return Float
+   is
+      RXBR       : Bits_2;
+      SFD_LENGTH : Bits_8;
+      RXPACC     : Bits_12;
+   begin
+      RXBR := Frame_Info.RX_FINFO_Reg.RXBR;
+      if RXBR = 2#11# then --  Detect reserved value
+         RXBR := 2#10#; --  default to 6.8 Mbps
+      end if;
+
+      SFD_LENGTH := Frame_Info.SFD_LENGTH;
+      if not (SFD_LENGTH in 8 | 16) then
+         SFD_LENGTH := 8; --  default to length 8
+      end if;
+
+      RXPACC := Adjust_RXPACC
+        (RXPACC           => Frame_Info.RX_FINFO_Reg.RXPACC,
+         RXPACC_NOSAT     => Frame_Info.RXPACC_NOSAT_Reg.RXPACC_NOSAT,
+         RXBR             => RXBR,
+         SFD_LENGTH       => SFD_LENGTH,
+         Non_Standard_SFD => Frame_Info.Non_Standard_SFD);
+
+      return First_Path_Signal_Power
+        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = 2#10#,
+         F1            => Frame_Info.RX_TIME_Reg.FP_AMPL1,
+         F2            => Frame_Info.RX_FQUAL_Reg.FP_AMPL2,
+         F3            => Frame_Info.RX_FQUAL_Reg.FP_AMPL3,
+         RXPACC        => RXPACC);
+   end First_Path_Signal_Power;
+
+
    protected body Receiver_Type
    is
-      entry Wait (Frame     : in out DW1000.Types.Byte_Array;
-                  Size      :    out Frame_Length_Number;
-                  Timestamp :    out Fine_System_Time;
-                  Error     :    out Rx_Errors;
-                  Overrun   :    out Boolean)
+      entry Wait (Frame      : in out DW1000.Types.Byte_Array;
+                  Size       :    out Frame_Length_Number;
+                  Frame_Info :    out Frame_Info_Type;
+                  Error      :    out Rx_Errors;
+                  Overrun    :    out Boolean)
         when Frame_Ready
       is
       begin
-         Size      := Frame_Queue (Queue_Head).Size;
-         Timestamp := Frame_Queue (Queue_Head).Timestamp;
-         Error     := Frame_Queue (Queue_Head).Error;
-         Overrun   := Frame_Queue (Queue_Head).Overrun;
+         Size       := Frame_Queue (Queue_Head).Size;
+         Frame_Info := Frame_Queue (Queue_Head).Frame_Info;
+         Error      := Frame_Queue (Queue_Head).Error;
+         Overrun    := Frame_Queue (Queue_Head).Overrun;
 
          if Error = No_Error then
             if Frame'Length >= Size then
@@ -192,7 +265,39 @@ is
                Frame_Queue (Next_Idx).Size    := Frame_Length;
                Frame_Queue (Next_Idx).Error   := No_Error;
                Frame_Queue (Next_Idx).Overrun := Overrun_Occurred;
+
                Overrun_Occurred := False;
+
+               DW1000.Registers.RX_FINFO.Read
+                 (Frame_Queue (Next_Idx).Frame_Info.RX_FINFO_Reg);
+
+               DW1000.Registers.RX_FQUAL.Read
+                 (Frame_Queue (Next_Idx).Frame_Info.RX_FQUAL_Reg);
+
+               DW1000.Registers.RX_TIME.Read
+                 (Frame_Queue (Next_Idx).Frame_Info.RX_TIME_Reg);
+
+               declare
+                  Byte : Byte_Array (1 .. 1);
+               begin
+                  --  Don't read the entire USR_SFD register. We only need to
+                  --  read the first byte (the SFD_LENGTH field).
+                  DW1000.Register_Driver.Read_Register
+                    (Register_ID => DW1000.Registers.USR_SFD_Reg_ID,
+                     Sub_Address => 0,
+                     Data        => Byte);
+                  Frame_Queue (Next_Idx).Frame_Info.SFD_LENGTH := Byte (1);
+               end;
+
+               --  Check the CHAN_CTRL register to determine whether or not a
+               --  non-standard SFD is being used.
+               declare
+                  CHAN_CTRL_Reg : CHAN_CTRL_Type;
+               begin
+                  DW1000.Registers.CHAN_CTRL.Read (CHAN_CTRL_Reg);
+                  Frame_Queue (Next_Idx).Frame_Info.Non_Standard_SFD
+                    := CHAN_CTRL_Reg.DWSFD = 1;
+               end;
             end if;
 
             Frame_Ready := True;

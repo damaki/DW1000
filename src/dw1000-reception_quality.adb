@@ -21,11 +21,54 @@
 -------------------------------------------------------------------------------
 
 with Ada.Numerics.Generic_Elementary_Functions;
-with Interfaces;                                use Interfaces;
 
 package body DW1000.Reception_Quality
 with SPARK_Mode => On
 is
+
+
+   function Adjust_RXPACC (RXPACC              : in Bits_12;
+                           RXPACC_NOSAT        : in Bits_16;
+                           RXBR                : in Bits_2;
+                           SFD_LENGTH          : in Bits_8;
+                           Non_Standard_SFD    : in Boolean) return Bits_12
+   is
+      RXPACC_Adjustment : Bits_12;
+
+   begin
+      if Bits_16 (RXPACC) = RXPACC_NOSAT then
+         if Non_Standard_SFD then
+            --  DecaWave-defined SFD sequence is used
+            if RXBR = 2#00# then
+               --  110 kbps data rate. SFD length is always 64 symbols
+               RXPACC_Adjustment := 82;
+            else
+               --  850 kbps and 6.8 Mbps. SFD length is 8 or 16 symbols
+               RXPACC_Adjustment := (if SFD_LENGTH = 8 then 10 else 18);
+            end if;
+
+         else
+            --  Standard-defined SFD sequence is used
+            if RXBR = 2#00# then
+               -- 110 kbps data rate. SFD length is always 64 symbols
+               RXPACC_Adjustment := 64;
+            else
+               -- 850 kbps and 6.8 Mbps. SFD length is always 8 symbols.
+               RXPACC_Adjustment := 5;
+            end if;
+         end if;
+      else
+         --  No adjustment necessary
+         RXPACC_Adjustment := 0;
+      end if;
+
+      if RXPACC_Adjustment > RXPACC then
+         return 0;
+      else
+         return RXPACC - RXPACC_Adjustment;
+      end if;
+   end Adjust_RXPACC;
+
 
    function Log10 (X : in Long_Float) return Long_Float
      with Global => null,

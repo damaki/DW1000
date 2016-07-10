@@ -26,7 +26,7 @@ with DecaDriver_Config;
 with DW1000.Constants;
 with DW1000.Driver;          use DW1000.Driver;
 with DW1000.BSP;
-with DW1000.Register_Types;
+with DW1000.Register_Types;  use DW1000.Register_Types;
 with DW1000.System_Time;     use DW1000.System_Time;
 with Dw1000.Types;           use DW1000.Types;
 with System;
@@ -204,6 +204,7 @@ with System;
 package DecaDriver
 with SPARK_Mode => On
 is
+
    type Configuration_Type is record
       Channel             : DW1000.Driver.Channel_Number;
       PRF                 : DW1000.Driver.PRF_Type;
@@ -227,17 +228,44 @@ is
                       RS_Error,
                       FCS_Error);
 
+   type Frame_Info_Type is record
+      RX_TIME_Reg      : RX_TIME_Type;
+      RX_FINFO_Reg     : RX_FINFO_Type;
+      RX_FQUAL_Reg     : RX_FQUAL_Type;
+      RXPACC_NOSAT_Reg : RXPACC_NOSAT_Type;
+      SFD_LENGTH       : Bits_8;
+      Non_Standard_SFD : Boolean;
+   end record;
+   --  Stores information about received frames.
+
+   function Receive_Timestamp (Frame_Info : in Frame_Info_Type)
+                               return Fine_System_Time;
+   --  Get the corrected timestamp for the time of packet reception.
+   --
+   --  This timestamp marks the time at which the start of frame delimiter
+   --  (SFD) part of the physical frame was received by the DW1000. It is
+   --  used for the time-of-flight ranging algorithms.
+
+   function Receive_Signal_Power (Frame_Info : in Frame_Info_Type)
+                                  return Float
+     with Post => Receive_Signal_Power'Result in -166.90 .. -14.43;
+   --  Get the estimated receive signal power in dBm.
+
+   function First_Path_Signal_Power (Frame_Info : in Frame_Info_Type)
+                                     return Float
+     with Post => First_Path_Signal_Power'Result in -218.07 .. -12.66;
+   --  Get the estimated first path power in dBm.
+
    type Rx_Frame_Type is record
-      Size      : Frame_Length_Number;
-      Frame     : Byte_Array (Frame_Length_Number);
-      Timestamp : Fine_System_Time;
-      Error     : Rx_Errors;
-      Overrun   : Boolean;
+      Size       : Frame_Length_Number;
+      Frame      : Byte_Array (Frame_Length_Number);
+      Frame_Info : Frame_Info_Type;
+      Error      : Rx_Errors;
+      Overrun    : Boolean;
    end record
      with Dynamic_Predicate => (if Rx_Frame_Type.Error = No_Error
                                 then Rx_Frame_Type.Size > 0
-                                else (Rx_Frame_Type.Size = 0
-                                  and Rx_Frame_Type.Timestamp = 0.0));
+                                else (Rx_Frame_Type.Size = 0));
 
    type Rx_Frame_Queue_Index is mod DecaDriver_Config.Receiver_Queue_Size;
 
@@ -247,16 +275,20 @@ is
 
    type Tx_Power_Array is array (Natural range 0 .. 11) of Bits_32;
 
+   ----------------------------------------------------------------------------
+   -- Receiver_Type
+   ----------------------------------------------------------------------------
+
    protected type Receiver_Type
      with Interrupt_Priority => DecaDriver_Config.Driver_Priority
    is
-      entry Wait (Frame     : in out Byte_Array;
-                  Size      :    out Frame_Length_Number;
-                  Timestamp :    out Fine_System_Time;
-                  Error     :    out Rx_Errors;
-                  Overrun   :    out Boolean)
+      entry Wait (Frame      : in out Byte_Array;
+                  Size       :    out Frame_Length_Number;
+                  Frame_Info :    out Frame_Info_Type;
+                  Error      :    out Rx_Errors;
+                  Overrun    :    out Boolean)
       with Depends => (Frame         => + Receiver_Type,
-                       Timestamp     => Receiver_Type,
+                       Frame_Info    => Receiver_Type,
                        Size          => Receiver_Type,
                        Receiver_Type => Receiver_Type,
                        Error         => Receiver_Type,
@@ -264,7 +296,7 @@ is
         Pre => Frame'Length > 0,
         Post => (if Error = No_Error
                  then Size in 1 .. DW1000.Constants.RX_BUFFER_Length
-                 else Size = 0 and Timestamp = 0.0);
+                 else Size = 0);
       --  Waits for a frame to be received, or an error. When a frame is
       --  received (or if one has been previously received and is waiting to be
       --  read) then the frame's content and size are copied to the Frame and
@@ -306,8 +338,8 @@ is
       --  To configure which frames are accepted or rejected by the DW1000 see
       --  the Configure_Frame_Filtering procedure.
       --
-      --  @param Enabled When set to True frame filtering is enabled. Otherwise,
-      --     it is disabled.
+      --  @param Enabled When set to True frame filtering is enabled.
+      --     Otherwise, when False, it is disabled.
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -488,13 +520,33 @@ is
         Pre => Error /= No_Error;
 
    private
-
-      Frame_Queue : Rx_Frame_Queue_Type :=
-                      (others => (Size      => 0,
-                                  Timestamp => 0.0,
-                                  Frame     => (others => 0),
-                                  Error     => No_Error,
-                                  Overrun   => False));
+      Frame_Queue : Rx_Frame_Queue_Type
+        := (others => (Size       => 0,
+                       Frame      => (others => 0),
+                       Frame_Info => Frame_Info_Type'
+                         (RX_TIME_Reg      => RX_TIME_Type'(RX_STAMP => 0,
+                                                            FP_INDEX => 0,
+                                                            FP_AMPL1 => 0,
+                                                            RX_RAWST => 0),
+                          RX_FINFO_Reg     => RX_FINFO_Type'(RXFLEN   => 0,
+                                                             RXFLE    => 0,
+                                                             RXNSPL   => 0,
+                                                             RXBR     => 0,
+                                                             RNG      => 0,
+                                                             RXPRF    => 0,
+                                                             RXPSR    => 0,
+                                                             RXPACC   => 0,
+                                                             Reserved => 0),
+                          RX_FQUAL_Reg     => RX_FQUAL_Type'(STD_NOISE => 0,
+                                                             FP_AMPL2  => 0,
+                                                             FP_AMPL3  => 0,
+                                                             CIR_PWR   => 0),
+                          RXPACC_NOSAT_Reg =>
+                            RXPACC_NOSAT_Type'(RXPACC_NOSAT => 0),
+                          SFD_LENGTH       => 0,
+                          Non_Standard_SFD => False),
+                       Error      => No_Error,
+                       Overrun    => False));
       --  Cyclic buffer for storing received frames, read from the DW1000.
 
       Queue_Head       : Rx_Frame_Queue_Index := Rx_Frame_Queue_Index'Last;
@@ -503,6 +555,11 @@ is
       Frame_Ready      : Boolean              := False;
    end Receiver_Type;
 
+
+
+   ----------------------------------------------------------------------------
+   --  Transmitter_Type
+   ----------------------------------------------------------------------------
 
    protected type Transmitter_Type
      with Interrupt_Priority => DecaDriver_Config.Driver_Priority
@@ -642,6 +699,11 @@ is
    Receiver    : Receiver_Type;
    Transmitter : Transmitter_Type;
 
+
+
+   ----------------------------------------------------------------------------
+   --  Driver_Type
+   ----------------------------------------------------------------------------
 
    protected type Driver_Type
      with Interrupt_Priority => DecaDriver_Config.Driver_Priority
@@ -802,33 +864,32 @@ is
 
       Long_Frames : Boolean := False;
 
-      SYS_CFG_Reg : DW1000.Register_Types.SYS_CFG_Type :=
-                      DW1000.Register_Types.SYS_CFG_Type'
-                        (FFEN       => 0,
-                         FFBC       => 0,
-                         FFAB       => 0,
-                         FFAD       => 0,
-                         FFAA       => 0,
-                         FFAM       => 0,
-                         FFAR       => 0,
-                         FFA4       => 0,
-                         FFA5       => 0,
-                         HIRQ_POL   => 0,
-                         SPI_EDGE   => 0,
-                         DIS_FCE    => 0,
-                         DIS_DRXB   => 0,
-                         DIS_PHE    => 0,
-                         DIS_RSDE   => 0,
-                         FCS_INT2F  => 0,
-                         PHR_MODE   => 0,
-                         DIS_STXP   => 0,
-                         RXM110K    => 0,
-                         RXWTOE     => 0,
-                         RXAUTR     => 0,
-                         AUTOACK    => 0,
-                         AACKPEND   => 0,
-                         Reserved_1 => 0,
-                         Reserved_2 => 0);
+      SYS_CFG_Reg : SYS_CFG_Type := SYS_CFG_Type'
+        (FFEN       => 0,
+         FFBC       => 0,
+         FFAB       => 0,
+         FFAD       => 0,
+         FFAA       => 0,
+         FFAM       => 0,
+         FFAR       => 0,
+         FFA4       => 0,
+         FFA5       => 0,
+         HIRQ_POL   => 0,
+         SPI_EDGE   => 0,
+         DIS_FCE    => 0,
+         DIS_DRXB   => 0,
+         DIS_PHE    => 0,
+         DIS_RSDE   => 0,
+         FCS_INT2F  => 0,
+         PHR_MODE   => 0,
+         DIS_STXP   => 0,
+         RXM110K    => 0,
+         RXWTOE     => 0,
+         RXAUTR     => 0,
+         AUTOACK    => 0,
+         AACKPEND   => 0,
+         Reserved_1 => 0,
+         Reserved_2 => 0);
 
       Use_OTP_XTAL_Trim     : Boolean := False;
       Use_OTP_Antenna_Delay : Boolean := False;
@@ -841,6 +902,6 @@ is
 
    end Driver_Type;
 
-   Driver      : Driver_Type;
+   Driver : Driver_Type;
 
 end DecaDriver;

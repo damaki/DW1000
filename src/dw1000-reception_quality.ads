@@ -21,12 +21,48 @@
 -------------------------------------------------------------------------------
 
 with DW1000.Types; use DW1000.Types;
+with Interfaces;   use Interfaces;
 
 --  @summary
 --  Utility functions for measuring the quality of received frames.
 package DW1000.Reception_Quality
 with SPARK_Mode => On
 is
+
+   function Adjust_RXPACC (RXPACC              : in Bits_12;
+                           RXPACC_NOSAT        : in Bits_16;
+                           RXBR                : in Bits_2;
+                           SFD_LENGTH          : in Bits_8;
+                           Non_Standard_SFD    : in Boolean) return Bits_12
+     with Pre => (RXBR /= 2#11#
+                  and (if Non_Standard_SFD then SFD_LENGTH in 8 | 16
+                        else SFD_LENGTH = 8));
+   --  Apply the correction to the RXPACC value.
+   --
+   --  The preamble accumulation count (RXPACC) value may include SFD symbols
+   --  in the count. This
+   --
+   --  Note: This function does not support user-defined SFD sequences. It only
+   --  supports the standard and DecaWave defined SFD sequences. The specific
+   --  SFD sequence used is determined from the RXBR, SFD_LENGTH, and
+   --  Non_Standard_SFD parameters.
+   --
+   --  @param RXPACC The value of the RXPACC field from the RX_FINFO register.
+   --     This is the value which is to be adjusted.
+   --
+   --  @param RXPACC_NOSAT The value of the RXPACC_NOSAT register.
+   --
+   --  @param RXBR The value of the RXBR field from the RX_FINFO register.
+   --     This value determines the data rate of the received frame (110 kbps,
+   --     850 kbps, or 6.8 Mbps).
+   --
+   --  @param SFD_LENGTH The value of the SFD_LENGTH field from the USR_SFD
+   --     register. This value must be 8 or 16 symbols and is used only if
+   --     Non_Standard_SFD is True. Otherwise, the value does not matter.
+   --
+   --  @param Non_Standard_SFD Determines whether or not the standards-defined
+   --     SFD sequence is used, or the DecaWave defined sequence is used.
+
 
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
                                   RXPACC        : in Bits_12;
