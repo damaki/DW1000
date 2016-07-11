@@ -316,42 +316,45 @@ is
 
 
 
-   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Bits_16)
+   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
    is
       TX_ANTD_Reg : TX_ANTD_Type;
 
    begin
       TX_ANTD.Read (TX_ANTD_Reg);
 
-      Antenna_Delay := TX_ANTD_Reg.TX_ANTD;
+      Antenna_Delay := To_Fine_System_Time (Bits_40 (TX_ANTD_Reg.TX_ANTD));
    end Read_Tx_Antenna_Delay;
 
 
 
-   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Bits_16)
+   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Fine_System_Time)
    is
    begin
-      TX_ANTD.Write ( (TX_ANTD => Antenna_Delay) );
+      TX_ANTD.Write
+        ( (TX_ANTD => Bits_16 (To_Bits_40 (Antenna_Delay) and 16#FFFF#)) );
    end Write_Tx_Antenna_Delay;
 
 
 
-   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Bits_16)
+   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
    is
       LDE_RXANTD_Reg : LDE_RXANTD_Type;
 
    begin
       LDE_RXANTD.Read (LDE_RXANTD_Reg);
 
-      Antenna_Delay := LDE_RXANTD_Reg.LDE_RXANTD;
+      Antenna_Delay :=
+        To_Fine_System_Time (Bits_40 (LDE_RXANTD_Reg.LDE_RXANTD));
    end Read_Rx_Antenna_Delay;
 
 
 
-   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Bits_16)
+   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Fine_System_Time)
    is
    begin
-      LDE_RXANTD.Write ( (LDE_RXANTD => Antenna_Delay) );
+      LDE_RXANTD.Write
+        ( (LDE_RXANTD => Bits_16 (To_Bits_40(Antenna_Delay) and 16#FFFF#)) );
    end Write_Rx_Antenna_Delay;
 
 

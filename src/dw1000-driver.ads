@@ -321,7 +321,7 @@ is
                  EUI_Value) => DW1000.BSP.Device_State);
    --  Read the extended unique identified (EUID).
 
-   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Bits_16)
+   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => ((DW1000.BSP.Device_State,
                  Antenna_Delay) => DW1000.BSP.Device_State);
@@ -331,10 +331,11 @@ is
    --  time and time stamps, i.e. 499.2 MHz * 128, so the least significant
    --  bit is approximately 15.65 picoseconds.
 
-   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Bits_16)
+   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Fine_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                             Antenna_Delay));
+                                             Antenna_Delay)),
+     Pre => Antenna_Delay <= (2.0**16 - 1.0) * Fine_System_Time'Delta;
    --  Set the Tx antenna delay.
    --
    --  The antenna delay is a 16-bit value using the same unit as the system
@@ -343,8 +344,11 @@ is
    --
    --  This procedure configures the following registers:
    --    * TX_ANTD
+   --
+   --  @param Antenna_Delay The antenna delay. The maximum allowed value is
+   --     1025.625 nanoseconds.
 
-   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Bits_16)
+   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => ((DW1000.BSP.Device_State,
                  Antenna_Delay) => DW1000.BSP.Device_State);
@@ -354,10 +358,11 @@ is
    --  time and time stamps, i.e. 499.2 MHz * 128, so the least significant
    --  bit is approximately 15.65 picoseconds.
 
-   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Bits_16)
+   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Fine_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                             Antenna_Delay));
+                                             Antenna_Delay)),
+     Pre => Antenna_Delay <= (2.0**16 - 1.0) * Fine_System_Time'Delta;
    --  Set the Rx antenna delay.
    --
    --  The antenna delay is a 16-bit value using the same unit as the system
@@ -366,6 +371,9 @@ is
    --
    --  This procedure configures the following registers:
    --    * LDE_RXANTD
+   --
+   --  @param Antenna_Delay The antenna delay. The maximum allowed value is
+   --     1025.625 nanoseconds.
 
    procedure Configure_LDE (PRF : in PRF_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),
