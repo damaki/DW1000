@@ -446,6 +446,36 @@ is
    --  This procedure configures the following registers:
    --    * USR_SFD
 
+   procedure Configure_Non_Standard_SFD (Rx_SFD : in String;
+                                         Tx_SFD : in String)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + (Rx_SFD, Tx_SFD)),
+     Pre => (Rx_SFD'Length in 8 .. 16 | 64
+             and Tx_SFD'Length = Rx_SFD'Length
+             and (for all I in Rx_SFD'Range => Rx_SFD (I) in '+' | '-' | '0')
+             and (for all I in Tx_SFD'Range => Tx_SFD (I) in '+' | '-' | '0')
+            );
+   --  Configure a non-standard SFD sequence.
+   --
+   --  WARNING: Only experts should consider designing their own SFD sequence.
+   --  Designing an SFD is a complicated task, and is outside the scope of this
+   --  documentation. It is strongly recommended to use either the standard
+   --  defined SFD sequence, or the DecaWave defined SFD sequence.
+   --
+   --  The Rx_SFD and Tx_SFD strings must be strings containing only '+', '-',
+   --  and '0' characters. No other characters are permitted.
+   --  Below is an example of calling this procedure, using the
+   --  DecaWave defined 16-symbol SFD sequence as an example SFD sequence:
+   --
+   --     Configure_Non_Standard_SFD (Rx_SFD => "----+-+--++--+00",
+   --                                 Tx_SFD => "----+-+--++--+00");
+   --
+   --  Note that the Tx and Rx SFD must have the same length.
+   --
+   --  @param Rx_SFD The SFD sequence to use in the receiver.
+   --
+   --  @param Tx_SFD The SFD sequence to use in the transmitter.
+
    procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Enabled);

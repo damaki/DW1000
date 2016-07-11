@@ -480,6 +480,115 @@ is
       USR_SFD.Write (USR_SFD_Reg);
    end Configure_Nonstandard_SFD_Length;
 
+   procedure Configure_Non_Standard_SFD (Rx_SFD : in String;
+                                         Tx_SFD : in String)
+   is
+
+      --  Takes a string of up to 8 SFD symbols and compute the value of one
+      --  of the USR_SFD register's magnitude sub-registers (8 bits).
+      function Magnitude (SFD : in String) return Types.Bits_8
+        with Pre =>
+          (SFD'Length in 1 .. 8
+           and (for all I in SFD'Range => SFD (I) in '+' | '-' | '0'))
+      is
+         Result : Bits_8 := 0;
+
+      begin
+         for I in Natural range 0 .. SFD'Length - 1 loop
+            if SFD (SFD'First + I) /= '0' then
+               Result := Result or Bits_8 (2**I);
+            end if;
+         end loop;
+
+         return Result;
+      end Magnitude;
+
+      function Polarity (SFD : in String) return Types.Bits_8
+        with Pre =>
+          (SFD'Length in 1 .. 8
+           and (for all I in SFD'Range => SFD (I) in '+' | '-' | '0'))
+      is
+         Result : Bits_8 := 0;
+
+      begin
+         if SFD'Length > 0 then
+            for I in Natural range 0 .. SFD'Length - 1 loop
+               if SFD (SFD'First + I) = '-' then
+                  Result := Result or Bits_8 (2**I);
+               end if;
+            end loop;
+         end if;
+
+         return Result;
+      end Polarity;
+
+      USR_SFD_Reg : USR_SFD_Type;
+
+   begin
+      if Tx_SFD'Length = 8 then
+         USR_SFD_Reg.Sub_Registers :=
+           (0 => Bits_8 (Tx_SFD'Length),
+            1 => Magnitude (Tx_SFD),
+            3 => Polarity  (Tx_SFD),
+            5 => Magnitude (Rx_SFD),
+            7 => Polarity  (Rx_SFD),
+            others => 0);
+
+      elsif Tx_SFD'Length <= 16 then
+         USR_SFD_Reg.Sub_Registers :=
+           (0 => Bits_8 (Tx_SFD'Length),
+            1 => Magnitude (Tx_SFD (Tx_SFD'First     .. Tx_SFD'First + 7)),
+            2 => Magnitude (Tx_SFD (Tx_SFD'First + 8 .. Tx_SFD'Last     )),
+            3 => Polarity  (Tx_SFD (Tx_SFD'First     .. Tx_SFD'First + 7)),
+            4 => Polarity  (Tx_SFD (Tx_SFD'First + 8 .. Tx_SFD'Last     )),
+            5 => Magnitude (Rx_SFD (Rx_SFD'First     .. Rx_SFD'First + 7)),
+            6 => Magnitude (Rx_SFD (Rx_SFD'First + 8 .. Rx_SFD'Last     )),
+            7 => Polarity  (Rx_SFD (Rx_SFD'First     .. Rx_SFD'First + 7)),
+            8 => Polarity  (Rx_SFD (Rx_SFD'First + 8 .. Rx_SFD'Last     )),
+            others => 0);
+
+      else
+         USR_SFD_Reg.Sub_Registers :=
+           (0  => Bits_8 (Tx_SFD'Length),
+            9  => Magnitude (Tx_SFD (Tx_SFD'First      .. Tx_SFD'First + 7)),
+            10 => Magnitude (Tx_SFD (Tx_SFD'First + 8  .. Tx_SFD'First + 15)),
+            11 => Magnitude (Tx_SFD (Tx_SFD'First + 16 .. Tx_SFD'First + 23)),
+            12 => Magnitude (Tx_SFD (Tx_SFD'First + 24 .. Tx_SFD'First + 31)),
+            13 => Magnitude (Tx_SFD (Tx_SFD'First + 32 .. Tx_SFD'First + 39)),
+            14 => Magnitude (Tx_SFD (Tx_SFD'First + 40 .. Tx_SFD'First + 47)),
+            15 => Magnitude (Tx_SFD (Tx_SFD'First + 48 .. Tx_SFD'First + 55)),
+            16 => Magnitude (Tx_SFD (Tx_SFD'First + 56 .. Tx_SFD'Last)),
+            17 => Polarity  (Tx_SFD (Tx_SFD'First      .. Tx_SFD'First + 7)),
+            18 => Polarity  (Tx_SFD (Tx_SFD'First + 8  .. Tx_SFD'First + 15)),
+            19 => Polarity  (Tx_SFD (Tx_SFD'First + 16 .. Tx_SFD'First + 23)),
+            20 => Polarity  (Tx_SFD (Tx_SFD'First + 24 .. Tx_SFD'First + 31)),
+            21 => Polarity  (Tx_SFD (Tx_SFD'First + 32 .. Tx_SFD'First + 39)),
+            22 => Polarity  (Tx_SFD (Tx_SFD'First + 40 .. Tx_SFD'First + 47)),
+            23 => Polarity  (Tx_SFD (Tx_SFD'First + 48 .. Tx_SFD'First + 55)),
+            24 => Polarity  (Tx_SFD (Tx_SFD'First + 56 .. Tx_SFD'Last)),
+            25 => Magnitude (Rx_SFD (Rx_SFD'First      .. Rx_SFD'First + 7)),
+            26 => Magnitude (Rx_SFD (Rx_SFD'First + 8  .. Rx_SFD'First + 15)),
+            27 => Magnitude (Rx_SFD (Rx_SFD'First + 16 .. Rx_SFD'First + 23)),
+            28 => Magnitude (Rx_SFD (Rx_SFD'First + 24 .. Rx_SFD'First + 31)),
+            29 => Magnitude (Rx_SFD (Rx_SFD'First + 32 .. Rx_SFD'First + 39)),
+            30 => Magnitude (Rx_SFD (Rx_SFD'First + 40 .. Rx_SFD'First + 47)),
+            31 => Magnitude (Rx_SFD (Rx_SFD'First + 48 .. Rx_SFD'First + 55)),
+            32 => Magnitude (Rx_SFD (Rx_SFD'First + 56 .. Rx_SFD'Last)),
+            33 => Polarity  (Rx_SFD (Rx_SFD'First      .. Rx_SFD'First + 7)),
+            34 => Polarity  (Rx_SFD (Rx_SFD'First + 8  .. Rx_SFD'First + 15)),
+            35 => Polarity  (Rx_SFD (Rx_SFD'First + 16 .. Rx_SFD'First + 23)),
+            36 => Polarity  (Rx_SFD (Rx_SFD'First + 24 .. Rx_SFD'First + 31)),
+            37 => Polarity  (Rx_SFD (Rx_SFD'First + 32 .. Rx_SFD'First + 39)),
+            38 => Polarity  (Rx_SFD (Rx_SFD'First + 40 .. Rx_SFD'First + 47)),
+            39 => Polarity  (Rx_SFD (Rx_SFD'First + 48 .. Rx_SFD'First + 55)),
+            40 => Polarity  (Rx_SFD (Rx_SFD'First + 56 .. Rx_SFD'Last)),
+            others => 0);
+
+
+      end if;
+
+   end Configure_Non_Standard_SFD;
+
    procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
