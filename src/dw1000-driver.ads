@@ -315,11 +315,15 @@ is
    --     header (PHR) portion of the physical frame.
 
 
-   procedure Read_Extended_Unique_Identifier (EUI_Value : out Bits_64)
+   procedure Read_EUID (EUID : out Bits_64)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => ((DW1000.BSP.Device_State,
-                 EUI_Value) => DW1000.BSP.Device_State);
-   --  Read the extended unique identified (EUID).
+     Depends => ((DW1000.BSP.Device_State, EUID) => DW1000.BSP.Device_State);
+   --  Read the extended unique identifier (EUID).
+
+   procedure Write_EUID (EUID : in Bits_64)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + EUID);
+   --  Write the extended unique identifier (EUID).
 
    procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),

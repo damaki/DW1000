@@ -304,17 +304,21 @@ is
    end Read_OTP;
 
 
-   procedure Read_Extended_Unique_Identifier (EUI_Value : out Bits_64)
+   procedure Read_EUID (EUID : out Bits_64)
    is
       EUI_Reg : EUI_Type;
 
    begin
       EUI.Read (EUI_Reg);
 
-      EUI_Value := EUI_Reg.EUI;
-   end Read_Extended_Unique_Identifier;
+      EUID := EUI_Reg.EUI;
+   end Read_EUID;
 
-
+   procedure Write_EUID (EUID : in Bits_64)
+   is
+   begin
+      EUI.Write ( (EUI => EUID) );
+   end Write_EUID;
 
    procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
    is

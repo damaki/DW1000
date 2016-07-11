@@ -874,8 +874,8 @@ is
       Part_ID : Bits_32 := 0;
       Lot_ID  : Bits_32 := 0;
 
-      Antenna_Delay_PRF_64 : Bits_16 := 0;
-      Antenna_Delay_PRF_16 : Bits_16 := 0;
+      Antenna_Delay_PRF_64 : Fine_System_Time := 0.0;
+      Antenna_Delay_PRF_16 : Fine_System_Time := 0.0;
       XTAL_Trim            : Bits_5  := 2#1_0000#;
 
       Long_Frames : Boolean := False;
