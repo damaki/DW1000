@@ -96,6 +96,7 @@ with DecaDriver;
 with DW1000.BSP;
 with DW1000.Driver; use DW1000.Driver;
 with DW1000.Types;  use DW1000.Types;
+with EVB1000_Tx_Power;
 
 procedure Example
   with SPARK_Mode => On,
@@ -112,24 +113,29 @@ procedure Example
 is
    Frame_Data : constant Byte_Array(1 .. 127) := (others => 16#AA#);
 
+   Config     : constant DecaDriver.Configuration_Type
+     := (Channel             => 1,
+         PRF                 => PRF_64MHz,
+         Tx_Preamble_Length  => PLEN_1024,
+         Tx_PAC              => PAC_32,
+         Tx_Preamble_Code    => 9,
+         Rx_Preamble_Code    => 9,
+         Use_Nonstandard_SFD => False,
+         Data_Rate           => Data_Rate_110k,
+         PHR_Mode            => Standard_Frames,
+         SFD_Timeout         => 1025 + 64 - 32);
+
 begin
    DecaDriver.Driver.Initialize (Load_Antenna_Delay   => True,
                                  Load_XTAL_Trim       => True,
-                                 Load_Tx_Power_Levels => True,
                                  Load_UCode_From_ROM  => True);
 
-   DecaDriver.Driver.Configure (DecaDriver.Configuration_Type'
-                                  (Channel             => 1,
-                                   PRF                 => PRF_64MHz,
-                                   Tx_Preamble_Length  => PLEN_1024,
-                                   Tx_PAC              => PAC_32,
-                                   Tx_Preamble_Code    => 9,
-                                   Rx_Preamble_Code    => 9,
-                                   Use_Nonstandard_SFD => False,
-                                   Data_Rate           => Data_Rate_110k,
-                                   PHR_Mode            => Standard_Frames,
-                                   SFD_Timeout         => 1025 + 64 - 32,
-                                   Enable_Smart_Power  => False));
+   DecaDriver.Driver.Configure (Config);
+
+   --  The reference transmit power values for the DecaWave EVB1000 evalulation
+   --  board are used to configure the transmit power level.
+   DecaDriver.Transmitter.Configure_Tx_Power
+     (Smart_Tx_Power_Table (Positive (Config.Channel), Config.PRF));
 
    --  Continuously send packets
    loop
@@ -176,7 +182,6 @@ is
 begin
    DecaDriver.Driver.Initialize (Load_Antenna_Delay   => True,
                                  Load_XTAL_Trim       => True,
-                                 Load_Tx_Power_Levels => True,
                                  Load_UCode_From_ROM  => True);
 
    DecaDriver.Driver.Configure (DecaDriver.Configuration_Type'
