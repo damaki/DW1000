@@ -432,6 +432,11 @@ is
    --    * AGC_TUNE2
    --    * AGC_TUNE1
 
+   procedure Configure_TC (Channel : in Channel_Number)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + Channel);
+   --  Configure the transmit calibration (TC) block for the specified channel.
+
    procedure Configure_Nonstandard_SFD_Length (Data_Rate : in Data_Rates)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Data_Rate);

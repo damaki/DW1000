@@ -538,6 +538,8 @@ is
 
          DW1000.Driver.Configure_AGC (Config.PRF);
 
+         DW1000.Driver.Configure_TC (Config.Channel);
+
          --  If a non-std SFD is used then the SFD length must be programmed
          --  for the DecaWave SFD, based on the data rate.
          if Config.Use_Nonstandard_SFD then
@@ -595,9 +597,6 @@ is
                DW1000.Driver.Write_Rx_Antenna_Delay (Antenna_Delay_PRF_64);
             end if;
          end if;
-
-         --  Configure transmit power levels
-
 
       end Configure;
 

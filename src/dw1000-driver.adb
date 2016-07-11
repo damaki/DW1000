@@ -127,6 +127,16 @@ is
    -- This value for AGC_TUNE2 is given by the user manual
    AGC_TUNE2_Value : constant Types.Bits_32 := 16#2502A907#;
 
+   -- These values for TC_PGDELAY are given by the user manual
+   TC_PGDELAY_Values : constant array (Positive range 1 .. 7) of Bits_8
+     := (1 => 16#C9#,
+         2 => 16#C2#,
+         3 => 16#C5#,
+         4 => 16#95#,
+         5 => 16#C0#,
+         6 => 0,      --  Channel 6 not in Channel_Number
+         7 => 16#93#);
+
    -- This value for non-standard SFD lengths are given by the user manual
    Non_Standard_SFD_Lengths : constant array (Data_Rates) of Types.Bits_8
      := (Data_Rate_110k => 64,
@@ -452,6 +462,13 @@ is
         );
 
    end Configure_AGC;
+
+   procedure Configure_TC (Channel : in Channel_Number)
+   is
+   begin
+      TC_PGDELAY.Write
+        ((TC_PGDELAY => TC_PGDELAY_Values (Positive (Channel))));
+   end Configure_TC;
 
    procedure Configure_Nonstandard_SFD_Length (Data_Rate : in Data_Rates)
    is

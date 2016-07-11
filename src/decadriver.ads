@@ -216,7 +216,6 @@ is
       Data_Rate           : DW1000.Driver.Data_Rates;
       PHR_Mode            : DW1000.Driver.Physical_Header_Modes;
       SFD_Timeout         : DW1000.Driver.SFD_Timeout_Number;
-      Enable_Smart_Power  : Boolean;
    end record;
 
    subtype Frame_Length_Number is Natural range 0 .. 1024;
@@ -273,7 +272,7 @@ is
      array (Rx_Frame_Queue_Index)
      of Rx_Frame_Type;
 
-   type Tx_Power_Config_Type (Smart_Tx_Power_Enabled : Boolean) is record
+   type Tx_Power_Config_Type (Smart_Tx_Power_Enabled : Boolean := True) is record
       case Smart_Tx_Power_Enabled is
          when True =>
             Boost_Normal : DW1000.Driver.Tx_Power_Config_Type;
