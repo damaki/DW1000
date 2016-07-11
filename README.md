@@ -91,12 +91,12 @@ Here's some examples of SPARK code using the driver:
 ## 4.1 Transmitting frames
 
 ```Ada
-with Ada.Real_Time; use Ada.Real_Time;
+with Ada.Real_Time;    use Ada.Real_Time;
 with DecaDriver;
 with DW1000.BSP;
-with DW1000.Driver; use DW1000.Driver;
-with DW1000.Types;  use DW1000.Types;
-with EVB1000_Tx_Power;
+with DW1000.Driver;    use DW1000.Driver;
+with DW1000.Types;     use DW1000.Types;
+with EVB1000_Tx_Power; use EVB1000_Tx_Power;
 
 procedure Example
   with SPARK_Mode => On,

@@ -420,7 +420,6 @@ is
 
       procedure Initialize (Load_Antenna_Delay   : in Boolean;
                             Load_XTAL_Trim       : in Boolean;
-                            Load_Tx_Power_Levels : in Boolean;
                             Load_UCode_From_ROM  : in Boolean)
       is
          Word : Bits_32;

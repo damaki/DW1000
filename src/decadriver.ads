@@ -732,7 +732,6 @@ is
 
       procedure Initialize (Load_Antenna_Delay   : in Boolean;
                             Load_XTAL_Trim       : in Boolean;
-                            Load_Tx_Power_Levels : in Boolean;
                             Load_UCode_From_ROM  : in Boolean)
         with Global => (In_Out => DW1000.BSP.Device_State,
                         Input  => Ada.Real_Time.Clock_Time),
@@ -740,12 +739,10 @@ is
                                                 Driver_Type,
                                                 Load_Antenna_Delay,
                                                 Load_XTAL_Trim,
-                                                Load_Tx_Power_Levels,
                                                 Load_UCode_From_ROM),
                     Driver_Type             => + (DW1000.BSP.Device_State,
                                                   Load_Antenna_Delay,
                                                   Load_XTAL_Trim,
-                                                  Load_Tx_Power_Levels,
                                                   Load_UCode_From_ROM),
                     null                    => Ada.Real_Time.Clock_Time);
       --  Initialize the DecaDriver and DW1000.
