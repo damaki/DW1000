@@ -348,6 +348,22 @@ is
          return Tx_Idle;
       end Is_Tx_Complete;
 
+      procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
+      is
+      begin
+         if Config.Smart_Tx_Power_Enabled then
+            DW1000.Driver.Configure_Smart_Tx_Power
+              (Boost_Normal => Config.Boost_Normal,
+               Boost_500us  => Config.Boost_500us,
+               Boost_250us  => Config.Boost_250us,
+               Boost_125us  => Config.Boost_125us);
+         else
+            DW1000.Driver.Configure_Manual_Tx_Power
+              (Boost_SHR => Config.Boost_SHR,
+               Boost_PHR => Config.Boost_PHR);
+         end if;
+      end Configure_Tx_Power;
+
       procedure Set_Tx_Data (Data   : in DW1000.Types.Byte_Array;
                              Offset : in Natural)
       is
@@ -438,16 +454,6 @@ is
             XTAL_Trim := Bits_5 (Word and 2#1_1111#);
          else
             XTAL_Trim := 2#1_0000#; -- Set to midpoint
-         end if;
-
-         if Load_Tx_Power_Levels then
-            for I in OTP_Tx_Power_Levels'Range loop
-               DW1000.Driver.Read_OTP (Bits_11 (16#10# + I),
-                                      OTP_Tx_Power_Levels (I));
-            end loop;
-
-         else
-            OTP_Tx_Power_Levels := (others => 0);
          end if;
 
          if Load_UCode_From_ROM then
@@ -589,6 +595,9 @@ is
                DW1000.Driver.Write_Rx_Antenna_Delay (Antenna_Delay_PRF_64);
             end if;
          end if;
+
+         --  Configure transmit power levels
+
 
       end Configure;
 

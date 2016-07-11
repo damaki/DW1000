@@ -26,9 +26,10 @@ pragma Partition_Elaboration_Policy (Sequential);
 with Ada.Real_Time;
 with DW1000.Constants;
 with DW1000.BSP;
-with DW1000.System_Time; use DW1000.System_Time;
-with DW1000.Types;       use DW1000.Types;
-with Interfaces;         use Interfaces;
+with DW1000.Register_Types; use DW1000.Register_Types;
+with DW1000.System_Time;    use DW1000.System_Time;
+with DW1000.Types;          use DW1000.Types;
+with Interfaces;            use Interfaces;
 
 --  This package contains high-level procedures for using the DW1000.
 package DW1000.Driver
@@ -97,6 +98,24 @@ is
      with Static_Predicate => SFD_Length_Number in 8 .. 16 | 64;
 
    type Rx_Modes is (Normal, Sniff);
+
+   type Coarse_Tx_Power_Number is delta 3.0 range 0.0 .. 18.0
+     with Small => 0.5;
+   --  GNATprove requires a Small which is a negative power of 2 or 10.
+
+   type Fine_Tx_Power_Number is delta 0.5 range 0.0 .. 15.5
+     with Small => 0.5;
+
+   type Tx_Power_Config_Type (Coarse_Gain_Enabled : Boolean := True) is record
+      Fine_Gain : Fine_Tx_Power_Number;
+
+      case Coarse_Gain_Enabled is
+         when True =>
+            Coarse_Gain : Coarse_Tx_Power_Number;
+         when False =>
+            null;
+      end case;
+   end record;
 
    function To_Positive (PAC : in Preamble_Acq_Chunk_Length) return Positive
    is (case PAC is
@@ -190,6 +209,111 @@ is
    --
    --  The package DW1000.Constants defines the addresses used to store the
    --  various data stored in the OTP memory.
+
+   procedure Read_OTP_Tx_Power_Level (Channel  : in     Channel_Number;
+                                      PRF      : in     PRF_Type;
+                                      Tx_Power :    out TX_POWER_Type)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                             Channel,
+                                             PRF),
+                 Tx_Power                => (DW1000.BSP.Device_State,
+                                             Channel,
+                                             PRF));
+
+   function To_Bits_8 (Config : in Tx_Power_Config_Type) return Bits_8;
+   --  Convert a Tx power configuration to its Bits_8 representation for use
+   --  when writing to the TX_POWER register.
+   --
+   --  The TX_POWER register is composed of four Bits_8 fields, each of which
+   --  contains 3 bits for the coarse gain setting, and 5 bits for the fine
+   --  gain setting. This function converts to this Bits_8 representation.
+
+   function Fine_Gain (Tx_Power_Bits : in Bits_8) return Fine_Tx_Power_Number;
+   --  Get the fine gain setting from one of the fields in the TX_POWER
+   --  register.
+   --
+   --  The TX_POWER register is composed of four Bits_8 fields, each of which
+   --  contains 3 bits for the coarse gain setting, and 5 bits for the fine
+   --  gain setting. This function gets the fine gain parameter.
+
+   function Is_Coarse_Gain_Enabled (Tx_Power_Bits : in Bits_8) return Boolean
+   is ((Tx_Power_Bits and 2#111_00000#) /= 2#111_00000#);
+   --  Check if the coarse gain output is enabled or disabled.
+   --
+   --  The TX_POWER register is composed of four Bits_8 fields, each of which
+   --  contains 3 bits for the coarse gain setting, and 5 bits for the fine
+   --  gain setting. This function gets the coarse gain parameter.
+   --
+   --  Note that the specical value of 2#111# for the coarse gain bits in the
+   --  TX_POWER register's fields means that the coarse gain output is disabled
+   --  (only the fine gain is used). If the coarse gain is disabled, then this
+   --  function always returns False. Otherwise, it returns True.
+
+   function Coarse_Gain (Tx_Power_Bits : in Bits_8)
+                         return Coarse_Tx_Power_Number
+     with Post => (if not Is_Coarse_Gain_Enabled (Tx_Power_Bits)
+                   then Coarse_Gain'Result = 0.0);
+   --  Get the coarse gain setting from one of the fields in the TX_POWER
+   --  register.
+   --
+   --  The TX_POWER register is composed of four Bits_8 fields, each of which
+   --  contains 3 bits for the coarse gain setting, and 5 bits for the fine
+   --  gain setting. This function gets the coarse gain parameter.
+   --
+   --  Note that the specical value of 2#111# for the coarse gain bits in the
+   --  TX_POWER register's fields means that the coarse gain output is disabled
+   --  (only the fine gain is used). If the coarse gain is disabled, then this
+   --  function always returns 0.0.
+
+   procedure Configure_Smart_Tx_Power (Boost_Normal : Tx_Power_Config_Type;
+                                       Boost_500us  : Tx_Power_Config_Type;
+                                       Boost_250us  : Tx_Power_Config_Type;
+                                       Boost_125us  : Tx_Power_Config_Type)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                             Boost_Normal,
+                                             Boost_500us,
+                                             Boost_250us,
+                                             Boost_125us));
+   --  Enable and configure smart Tx power levels.
+   --
+   --  See Section 7.2.31.2 of the DW1000 User Manual for more information
+   --  about smart Tx power boosting.
+   --
+   --  The default values for the arguments are the default power levels
+   --  described in the DW1000 User Manual for the TX_POWER register.
+   --
+   --  @param Boost_Normal The Tx power level (in dB) to use for frames that
+   --     do not fall within the criterea for power boost. For example, a
+   --     value of 7.5 means 7.5 dB.
+   --
+   --  @param Boost_500us The Tx power boost level (in dB) to use for frames
+   --     at 6.8 Mbps whose duration is shorter than 0.5 ms (500 us).
+   --
+   --  @param Boost_256us The Tx power boost level (in dB) to use for frames
+   --     at 6.8 Mbps whose duration is shorter than 0.25 ms (250 us).
+   --
+   --  @param Boost_125us The Tx power boost level (in dB) to use for frames
+   --     at 6.8 Mbps whose duration is shorter than 0.125 ms (125 us).
+
+   procedure Configure_Manual_Tx_Power (Boost_SHR : Tx_Power_Config_Type;
+                                        Boost_PHR : Tx_Power_Config_Type)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                             Boost_SHR,
+                                             Boost_PHR));
+   --  Disable smart Tx power and configure manual Tx power levels.
+   --
+   --  See Section 7.2.31.3 of the DW1000 User Manual for more information
+   --  about manual Tx power control.
+   --
+   --  @param Boost_SFD The Tx power level (in dB) to use for the
+   --     synchronization header (SHR) portion of the physical frame.
+   --
+   --  @param Boost_PHR The Tx power level (in dB) to use for the physical
+   --     header (PHR) portion of the physical frame.
+
 
    procedure Read_Extended_Unique_Identifier (EUI_Value : out Bits_64)
      with Global => (In_Out => DW1000.BSP.Device_State),
@@ -411,6 +535,7 @@ is
    --
    --  This procedure configures the following registers:
    --    * SYS_CFG
+
 
    procedure Set_Tx_Data (Data   : in Types.Byte_Array;
                           Offset : in Natural)

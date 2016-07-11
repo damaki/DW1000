@@ -273,7 +273,19 @@ is
      array (Rx_Frame_Queue_Index)
      of Rx_Frame_Type;
 
-   type Tx_Power_Array is array (Natural range 0 .. 11) of Bits_32;
+   type Tx_Power_Config_Type (Smart_Tx_Power_Enabled : Boolean) is record
+      case Smart_Tx_Power_Enabled is
+         when True =>
+            Boost_Normal : DW1000.Driver.Tx_Power_Config_Type;
+            Boost_500us  : DW1000.Driver.Tx_Power_Config_Type;
+            Boost_250us  : DW1000.Driver.Tx_Power_Config_Type;
+            Boost_125us  : DW1000.Driver.Tx_Power_Config_Type;
+
+         when False =>
+            Boost_SHR    : DW1000.Driver.Tx_Power_Config_Type;
+            Boost_PHR    : DW1000.Driver.Tx_Power_Config_Type;
+      end case;
+   end record;
 
    ----------------------------------------------------------------------------
    -- Receiver_Type
@@ -576,6 +588,16 @@ is
       --
       --  Returns True when the transmitter is idle, and False otherwise.
 
+      procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                                Config),
+                    Transmitter_Type        => Transmitter_Type);
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation",
+         "Procedures in DW1000.BSP are not blocking");
+
       procedure Set_Tx_Data (Data   : in Byte_Array;
                              Offset : in Natural)
         with Global => (In_Out => DW1000.BSP.Device_State),
@@ -859,8 +881,6 @@ is
       Antenna_Delay_PRF_64 : Bits_16 := 0;
       Antenna_Delay_PRF_16 : Bits_16 := 0;
       XTAL_Trim            : Bits_5  := 2#1_0000#;
-
-      OTP_Tx_Power_Levels  : Tx_Power_Array := (others => 0);
 
       Long_Frames : Boolean := False;
 

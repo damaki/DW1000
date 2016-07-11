@@ -20,9 +20,10 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
+with Ada.Unchecked_Conversion;
+with DW1000.Constants;       use DW1000.Constants;
 with DW1000.Registers;       use DW1000.Registers;
 with DW1000.Register_Driver;
-with DW1000.Register_Types;  use DW1000.Register_Types;
 
 package body DW1000.Driver
 with SPARK_Mode => On
@@ -504,16 +505,155 @@ is
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Smart_Tx_Power;
 
+   procedure Read_OTP_Tx_Power_Level (Channel  : in     Channel_Number;
+                                      PRF      : in     PRF_Type;
+                                      Tx_Power :    out TX_POWER_Type)
+   is
+      Address : Bits_11;
+      Word    : Bits_32;
+
+      function Word_To_TX_POWER is new Ada.Unchecked_Conversion
+        (Source => Bits_32,
+         Target => TX_POWER_Type);
+
+   begin
+      case Channel is
+         when 1 => Address := OTP_ADDR_CH1_TX_POWER_PRF_64;
+         when 2 => Address := OTP_ADDR_CH2_TX_POWER_PRF_64;
+         when 3 => Address := OTP_ADDR_CH3_TX_POWER_PRF_64;
+         when 4 => Address := OTP_ADDR_CH4_TX_POWER_PRF_64;
+         when 5 => Address := OTP_ADDR_CH5_TX_POWER_PRF_64;
+         when 7 => Address := OTP_ADDR_CH7_TX_POWER_PRF_64;
+      end case;
+
+      if PRF = PRF_64MHz then
+         Address := Address + 1;
+      end if;
+
+      Read_OTP (Address => Address,
+                Word    => Word);
+
+      Tx_Power := Word_To_TX_POWER (Word);
+   end Read_OTP_Tx_Power_Level;
+
+   function To_Bits_8 (Config : in Tx_Power_Config_Type) return Bits_8
+     with SPARK_Mode => Off
+   --  SPARK mode is disabled as a workaround since GNATprove doesn't yet
+   --  support conversions between different fixed-point types.
+   is
+      type Extended_Fine_Tx_Power_Number is
+      delta Fine_Tx_Power_Number'Delta
+      range 0.0 .. Fine_Tx_Power_Number'Last * 2.0
+        with Small => Fine_Tx_Power_Number'Small;
+      --  Need a temporary type with twice the range to hold an intermediate
+      --  calculation.
+
+      Two : constant Extended_Fine_Tx_Power_Number := 2.0;
+      --  GNATprove doesn't support multiplications/divisions between
+      --  fixed point types and universal real. So this constant is used as a
+      --  workaround so that thed multiplication is between two fixed point
+      --  types.
+
+      Temp : Extended_Fine_Tx_Power_Number;
+
+      Coarse_Bits : Bits_3;
+      Fine_Bits   : Bits_5;
+
+   begin
+      if Config.Coarse_Gain_Enabled then
+         Coarse_Bits := 2#110# - Bits_3 (Bits_8 (Config.Coarse_Gain) / 3);
+      else
+         Coarse_Bits := 2#111#;
+      end if;
+
+      Temp := Extended_Fine_Tx_Power_Number (Config.Fine_Gain);
+      Temp := Temp * Two;
+      Fine_Bits := Bits_5 (Temp);
+
+      return (Bits_8 (Coarse_Bits) * 2**5) or Bits_8 (Fine_Bits);
+   end To_Bits_8;
+
+   function Fine_Gain (Tx_Power_Bits : in Bits_8) return Fine_Tx_Power_Number
+     with SPARK_Mode => Off
+   --  SPARK mode is disabled as a workaround since GNATprove doesn't yet
+   --  support conversions between different fixed-point types.
+   is
+      type Extended_Fine_Tx_Power_Number is
+      delta Fine_Tx_Power_Number'Delta
+      range 0.0 .. Fine_Tx_Power_Number'Last * 2.0
+        with Small => Fine_Tx_Power_Number'Small;
+      --  Need a temporary type with twice the range to hold an intermediate
+      --  calculation.
+
+      Two : constant Extended_Fine_Tx_Power_Number := 2.0;
+      --  GNATprove doesn't support multiplications/divisions between
+      --  fixed point types and universal real. So this constant is used as a
+      --  workaround so that thed multiplication is between two fixed point
+      --  types.
+
+      Temp : Extended_Fine_Tx_Power_Number;
+   begin
+      Temp := Extended_Fine_Tx_Power_Number (Tx_Power_Bits and 2#000_11111#);
+      Temp := Temp / Two;
+
+      return Fine_Tx_Power_Number (Temp);
+   end FIne_Gain;
+
+   function Coarse_Gain (Tx_Power_Bits : in Bits_8)
+                         return Coarse_Tx_Power_Number
+   is
+      Temp : Bits_8;
+   begin
+      if Is_Coarse_Gain_Enabled (Tx_Power_Bits) then
+         Temp := Tx_Power_Bits / 2**5;
+         return Coarse_Tx_Power_Number ((2#110# - Temp) * 3);
+      else
+         return 0.0;
+      end if;
+   end Coarse_Gain;
+
+   procedure Configure_Smart_Tx_Power (Boost_Normal : Tx_Power_Config_Type;
+                                       Boost_500us  : Tx_Power_Config_Type;
+                                       Boost_250us  : Tx_Power_Config_Type;
+                                       Boost_125us  : Tx_Power_Config_Type)
+   is
+      SYS_CFG_Reg : SYS_CFG_Type;
+
+   begin
+      TX_POWER.Write (TX_POWER_Type'(BOOSTNORM => To_Bits_8 (Boost_Normal),
+                                     BOOSTP500 => To_Bits_8 (Boost_500us),
+                                     BOOSTP250 => To_Bits_8 (Boost_250us),
+                                     BOOSTP125 => To_Bits_8 (Boost_125us)));
+
+      SYS_CFG.Read (SYS_CFG_Reg);
+      SYS_CFG_Reg.DIS_STXP := 0; --  Enable smart Tx power
+      SYS_CFG.Write (SYS_CFG_Reg);
+   end Configure_Smart_Tx_Power;
+
+   procedure Configure_Manual_Tx_Power (Boost_SHR : Tx_Power_Config_Type;
+                                        Boost_PHR : Tx_Power_Config_Type)
+   is
+      SYS_CFG_Reg : SYS_CFG_Type;
+
+   begin
+      TX_POWER.Write (TX_POWER_Type'(BOOSTNORM => 16#22#,
+                                     BOOSTP500 => To_Bits_8 (Boost_PHR),
+                                     BOOSTP250 => To_Bits_8 (Boost_SHR),
+                                     BOOSTP125 => 16#0E#));
+
+      SYS_CFG.Read (SYS_CFG_Reg);
+      SYS_CFG_Reg.DIS_STXP := 1; --  Disable smart Tx power
+      SYS_CFG.Write (SYS_CFG_Reg);
+   end Configure_Manual_Tx_Power;
+
    procedure Set_Tx_Data (Data   : in Types.Byte_Array;
                           Offset : in Natural)
    is
    begin
-
       DW1000.Register_Driver.Write_Register
         (Register_ID => Registers.TX_BUFFER_Reg_ID,
          Sub_Address => Types.Bits_15 (Offset),
          Data        => Data);
-
    end Set_Tx_Data;
 
    procedure Set_Tx_Frame_Length (Length : in Natural;
