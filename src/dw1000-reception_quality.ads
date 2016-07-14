@@ -40,7 +40,8 @@ is
    --  Apply the correction to the RXPACC value.
    --
    --  The preamble accumulation count (RXPACC) value may include SFD symbols
-   --  in the count. This
+   --  in the count. This function removes SFD symbols from the preamble
+   --  symbol count in RXPACC, and returns the adjusted RXPACC value.
    --
    --  Note: This function does not support user-defined SFD sequences. It only
    --  supports the standard and DecaWave defined SFD sequences. The specific

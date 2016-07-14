@@ -77,6 +77,20 @@ is
    end To_Coarse_System_Time;
 
 
+   function To_Antenna_Delay_Time (Bits : in Bits_16)
+                                   return Antenna_Delay_Time
+     with SPARK_Mode => Off
+   --  SPARK mode is disabled as a workaround because GNATprove does not
+   --  support an operation mixing two different fixed-point types.
+   is
+      type Fixed_16 is delta 1.0 range 0.0 .. 2.0**16 - 1.0
+        with Size => 16,
+        Small => 1.0;
+   begin
+      return Antenna_Delay_Time (Fixed_16 (Bits) * Fine_System_Time'Delta);
+   end To_Antenna_Delay_Time;
+
+
    function Calculate_Span (Start_Time : in Fine_System_Time;
                             End_Time   : in Fine_System_Time)
                             return System_Time_Span

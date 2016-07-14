@@ -64,6 +64,18 @@ with DW1000.Types; use DW1000.Types;
 --  Coarse_System_Time to the Bits_40 type. The To_Fine_System_Time and
 --  To_Coarse_System_Time functions convert from the Bits_40 representation to
 --  the Fine_System_Time and Coarse_System_Time types respectively.
+--
+--  Furthermore, the antenna delay is also measured in units of
+--  15.65 picoseconds, but only has a 16-bit range (compared to the 40-bit
+--  timestamps with a much bigger range). The antenna delay is represented
+--  as the type Antenna_Delay_Time, which is a subtype of Fine_System_Time
+--  with a maximum value of about 1.0256 microseconds.
+--
+--  For the antenna delay there are two conversion functions: To_Bits_16 and
+--  To_Antenna_Delay_Time. The To_Bits_16 function converts from the
+--  Antenna_Delay_Time type to its 16-bit representation. The
+--  To_Antenna_Delay_Time function converts the other way; from the 16-bit
+--  representation to the Antenna_Delay_Time type.
 package DW1000.System_Time
 with SPARK_Mode => On
 is
@@ -132,6 +144,9 @@ is
    type System_Time_Span is new Fine_System_Time
    range Fine_System_Time'Range;
 
+   subtype Antenna_Delay_Time is Fine_System_Time
+   range 0.0 .. (Fine_System_Time'Delta * 65536) - Fine_System_Time'Delta;
+
    function To_Bits_40 (Time : in Fine_System_Time) return Bits_40
      with SPARK_Mode => On;
    --  Convert a System_Time value to its equivalent Bits_40 representation.
@@ -149,6 +164,10 @@ is
    --
    --  Note that for registers using a coarse time the 9 least significant bits
    --  are 0.
+
+
+   function To_Bits_16 (Time : in Antenna_Delay_Time) return Bits_16;
+   --  Convert a Antenna_Delay_Time value to its 16-bit integer representation.
 
 
    function To_Fine_System_Time (Bits : in Bits_40) return Fine_System_Time;
@@ -174,6 +193,10 @@ is
    --
    --  This function rounds down to the nearest multiple of (approx.) 8.013
    --  nanoseconds.
+
+   function To_Antenna_Delay_Time (Bits : in Bits_16)
+                                   return Antenna_Delay_Time;
+   --  Convert a 16-bit antenna delay register value to Antenna_Delay_Time.
 
 
    function System_Time_Offset (Time : in Fine_System_Time;
@@ -300,6 +323,12 @@ private
 
    function To_Bits_40 (Time : in Coarse_System_Time) return Bits_40
    is (Bits_40 (Time * (499200000.0 * 128.0)))
+   with SPARK_Mode => Off;
+   --  SPARK mode is disabled as a workaround because GNATprove does not
+   --  support an operation mixing fixed point and universal real types.
+
+   function To_Bits_16 (Time : in Antenna_Delay_Time) return Bits_16
+   is (Bits_16 (Time * (499200000.0 * 128.0)))
    with SPARK_Mode => Off;
    --  SPARK mode is disabled as a workaround because GNATprove does not
    --  support an operation mixing fixed point and universal real types.

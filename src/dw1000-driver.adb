@@ -24,6 +24,8 @@ with Ada.Unchecked_Conversion;
 with DW1000.Constants;       use DW1000.Constants;
 with DW1000.Registers;       use DW1000.Registers;
 with DW1000.Register_Driver;
+with Interfaces;             use Interfaces;
+
 
 package body DW1000.Driver
 with SPARK_Mode => On
@@ -320,45 +322,44 @@ is
       EUI.Write ( (EUI => EUID) );
    end Write_EUID;
 
-   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
+   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
    is
       TX_ANTD_Reg : TX_ANTD_Type;
 
    begin
       TX_ANTD.Read (TX_ANTD_Reg);
 
-      Antenna_Delay := To_Fine_System_Time (Bits_40 (TX_ANTD_Reg.TX_ANTD));
+      Antenna_Delay := To_Antenna_Delay_Time (TX_ANTD_Reg.TX_ANTD);
    end Read_Tx_Antenna_Delay;
 
 
 
-   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Fine_System_Time)
+   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
    is
    begin
       TX_ANTD.Write
-        ( (TX_ANTD => Bits_16 (To_Bits_40 (Antenna_Delay) and 16#FFFF#)) );
+        ( (TX_ANTD => To_Bits_16 (Antenna_Delay)) );
    end Write_Tx_Antenna_Delay;
 
 
 
-   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
+   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
    is
       LDE_RXANTD_Reg : LDE_RXANTD_Type;
 
    begin
       LDE_RXANTD.Read (LDE_RXANTD_Reg);
 
-      Antenna_Delay :=
-        To_Fine_System_Time (Bits_40 (LDE_RXANTD_Reg.LDE_RXANTD));
+      Antenna_Delay := To_Antenna_Delay_Time (LDE_RXANTD_Reg.LDE_RXANTD);
    end Read_Rx_Antenna_Delay;
 
 
 
-   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Fine_System_Time)
+   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
    is
    begin
       LDE_RXANTD.Write
-        ( (LDE_RXANTD => Bits_16 (To_Bits_40(Antenna_Delay) and 16#FFFF#)) );
+        ( (LDE_RXANTD => To_Bits_16 (Antenna_Delay)) );
    end Write_Rx_Antenna_Delay;
 
 
@@ -503,7 +504,7 @@ is
       begin
          for I in Natural range 0 .. SFD'Length - 1 loop
             if SFD (SFD'First + I) /= '0' then
-               Result := Result or Bits_8 (2**I);
+               Result := Result or Shift_Left (Bits_8 (1), I);
             end if;
          end loop;
 
@@ -518,13 +519,11 @@ is
          Result : Bits_8 := 0;
 
       begin
-         if SFD'Length > 0 then
-            for I in Natural range 0 .. SFD'Length - 1 loop
-               if SFD (SFD'First + I) = '-' then
-                  Result := Result or Bits_8 (2**I);
-               end if;
-            end loop;
-         end if;
+         for I in Natural range 0 .. SFD'Length - 1 loop
+            if SFD (SFD'First + I) = '-' then
+               Result := Result or Shift_Left (Bits_8 (1), I);
+            end if;
+         end loop;
 
          return Result;
       end Polarity;
@@ -590,9 +589,9 @@ is
             39 => Polarity  (Rx_SFD (Rx_SFD'First + 48 .. Rx_SFD'First + 55)),
             40 => Polarity  (Rx_SFD (Rx_SFD'First + 56 .. Rx_SFD'Last)),
             others => 0);
-
-
       end if;
+
+      USR_SFD.Write (USR_SFD_Reg);
 
    end Configure_Non_Standard_SFD;
 
@@ -668,6 +667,25 @@ is
 
       Tx_Power := Word_To_TX_POWER (Word);
    end Read_OTP_Tx_Power_Level;
+
+   procedure Read_OTP_Antenna_Delay
+     (Antenna_Delay_16_MHz : out Antenna_Delay_Time;
+      Antenna_Delay_64_MHz : out Antenna_Delay_Time)
+   is
+      Word : Bits_32;
+      Lo   : Bits_16;
+      Hi   : Bits_16;
+
+   begin
+      Read_OTP (Address => OTP_ADDR_ANTENNA_DELAY,
+                Word    => Word);
+
+      Lo := Bits_16 (Word and 16#FFFF#);
+      Hi := Bits_16 (Shift_Right (Word, 16) and 16#FFFF#);
+
+      Antenna_Delay_16_MHz := To_Antenna_Delay_Time (Lo);
+      Antenna_Delay_64_MHz := To_Antenna_Delay_Time (Hi);
+   end Read_OTP_Antenna_Delay;
 
    function To_Bits_8 (Config : in Tx_Power_Config_Type) return Bits_8
      with SPARK_Mode => Off

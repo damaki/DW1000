@@ -221,6 +221,15 @@ is
                                              Channel,
                                              PRF));
 
+   procedure Read_OTP_Antenna_Delay
+     (Antenna_Delay_16_MHz : out Antenna_Delay_Time;
+      Antenna_Delay_64_MHz : out Antenna_Delay_Time)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                 Antenna_Delay_16_MHz    => DW1000.BSP.Device_State,
+                 Antenna_Delay_64_MHz    => DW1000.BSP.Device_State);
+
+
    function To_Bits_8 (Config : in Tx_Power_Config_Type) return Bits_8;
    --  Convert a Tx power configuration to its Bits_8 representation for use
    --  when writing to the TX_POWER register.
@@ -325,7 +334,7 @@ is
      Depends => (DW1000.BSP.Device_State => + EUID);
    --  Write the extended unique identifier (EUID).
 
-   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
+   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => ((DW1000.BSP.Device_State,
                  Antenna_Delay) => DW1000.BSP.Device_State);
@@ -335,7 +344,7 @@ is
    --  time and time stamps, i.e. 499.2 MHz * 128, so the least significant
    --  bit is approximately 15.65 picoseconds.
 
-   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Fine_System_Time)
+   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                              Antenna_Delay)),
@@ -352,7 +361,7 @@ is
    --  @param Antenna_Delay The antenna delay. The maximum allowed value is
    --     1025.625 nanoseconds.
 
-   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Fine_System_Time)
+   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => ((DW1000.BSP.Device_State,
                  Antenna_Delay) => DW1000.BSP.Device_State);
@@ -362,7 +371,7 @@ is
    --  time and time stamps, i.e. 499.2 MHz * 128, so the least significant
    --  bit is approximately 15.65 picoseconds.
 
-   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Fine_System_Time)
+   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                              Antenna_Delay)),
