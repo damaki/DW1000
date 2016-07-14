@@ -72,6 +72,43 @@ with System;
 --  Note that some configuration parameters use values that are defined in the
 --  package DW1000.Driver.
 --
+--  If the transmitter is to be used, then the transmit power must be
+--  configured to ensure that the DW1000 transmits at a suitable power level
+--  within the -41.3 dBm/MHz regulatory limit. The transmit power depends on
+--  the UWB channel and PRF that has been configured, as well as the specific
+--  RF circuitry and antenna that is being used.
+--
+--  Furthermore, the DW1000 supports two modes of transmit power: manual
+--  transmit power and smart transmit power. In the manual transmit power mode
+--  the power for the SHR and PHR portions of the physical frame are configured
+--  independently. In the smart transmit power mode different levels of
+--  transmit power can be configured for different physical frame lengths;
+--  shorter frames can be configured to transmit at a higher power.
+--
+--  The power level is configured using a combination of a coarse gain and fine
+--  gain values. The coarse gain permits the range 0.0 .. 18.0 dB in steps of
+--  3 dB, and the fine gain permits the range 0.0 .. 15.5 dB in steps of
+--- 0.5 dB. The coarse gain output can also be disabled.
+--
+--  Below is an example of configuring the DW1000 to operate in manual
+--  transmit power mode, with the SHR and PHR portions of the frame configured
+--  to transmit with a total gain of 19.5 dBm:
+--
+--     DecaDriver.Transmitter.Configure_Tx_Power
+--       (Smart_Tx_Power_Enabled => False,
+--        Boost_SHR => (Coarse_Gain_Enabled => True,
+--                      Coarse_Gain         => 9.0,
+--                      Fine_Gain           => 10.5),
+--        Boost_PHR => (Coarse_Gain_Enabled => True,
+--                      Coarse_Gain         => 9.0,
+--                      Fine_Gain           => 10.5));
+--
+--  Since the transmit power is different for each hardware design this driver
+--  cannot automatically configure the correct transmit power. The host
+--  application must define the power to use for each UWB channel and PRF.
+--  The package EVB1000_Tx_Power defines reference values, suitable for use
+--  with the DecaWave EVB1000 evaluation boards using the 0 dBi antenna.
+--
 --  Once the driver is initialized and configured then packets can be sent
 --  and received. Sending a packet is split into the following steps:
 --    1. Write the data into the DW1000 transmit buffer.
