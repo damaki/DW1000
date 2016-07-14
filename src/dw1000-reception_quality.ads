@@ -112,4 +112,28 @@ is
    --  @return The estimated first path power in dBm. The theoretical range
    --     is -218.07 dBm to -12.67 dBm.
 
+
+   function Transmitter_Clock_Offset (RXTOFS  : in Bits_19;
+                                      RXTTCKI : in Bits_32) return Float;
+   --  Calculate the clock offset between the receiver's and transmitter's
+   --  clocks.
+   --
+   --  Since the transmitter and receiver radios are clocked by their own
+   --  crystals, there can be a slight variation between the crystals'
+   --  frequencies. This function provides a measure of the offset
+   --  between this receiver and the remote transmitter clocks.
+   --
+   --  @param RXTOFS The value of the RXTOFS field from the RX_TTCKO register.
+   --
+   --  @param RXTTCKI The value of the RXTTCKI field from the RX_TTCKI
+   --     register.
+   --
+   --  @return The computed clock offset. A positive value indicates that the
+   --     transmitter's clock is running faster than the receiver's clock, and
+   --     a negative value indicates that the transmitter's clock is running
+   --     slower than the receiver's clock. For example, a value of 7.014E-06
+   --     indicates that the transmitter is faster by 7 ppm. Likewise, a value
+   --     of -5.045E-06 indicates that the transmitter's clock is slower by
+   --     5 ppm.
+
 end DW1000.Reception_Quality;

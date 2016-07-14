@@ -240,4 +240,39 @@ is
 
    end First_Path_Signal_Power;
 
+
+   function Transmitter_Clock_Offset (RXTOFS  : in Bits_19;
+                                      RXTTCKI : in Bits_32) return Float
+   is
+      Offset   : Long_Float;
+      Interval : Long_Float;
+   begin
+      --  RXTOFS is a 19-bit signed quantity. The MSB is the sign bit.
+      if RXTOFS < 2**18 then
+         --  Positive quantity
+         Offset := Long_Float (RXTOFS);
+      else
+         --  Negative quantity
+         Offset := -Long_Float ((not RXTOFS) + 1);
+
+         pragma Assert (Offset >= -2.0**18 and Offset <= -1.0);
+      end if;
+
+      --  RXTTCKI takes one of two values (Section 7.2.21 of the User Manual):
+      --     16#01F00000# for a 16 MHz PRF
+      --     16#01FC0000# for a 64 MHz PRF
+      --  Based on this assumption, we can constrain the potential range of
+      --  Interval to prove absence of overflow and range errors.
+      Interval := Long_Float (RXTTCKI and 16#01FC0000#);
+
+      pragma Assert_And_Cut (Offset in -2.0**18 .. 2.0**18 - 1.0
+                             and Interval in 0.0 | 262144.0 .. 33292288.0);
+
+      if Interval /= 0.0 then
+         return Float (Offset / Interval);
+      else
+         return 0.0;
+      end if;
+   end Transmitter_Clock_Offset;
+
 end DW1000.Reception_Quality;

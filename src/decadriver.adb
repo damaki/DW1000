@@ -131,22 +131,32 @@ is
    end First_Path_Signal_Power;
 
 
+   function Transmitter_Clock_Offset (Frame_Info : in Frame_Info_Type)
+                                      return Float
+   is
+   begin
+      return Transmitter_Clock_Offset
+        (RXTOFS  => Frame_Info.RX_TTCKO_Reg.RXTOFS,
+         RXTTCKI => Frame_Info.RX_TTCKI_Reg.RXTTCKI);
+   end Transmitter_Clock_Offset;
+
+
    protected body Receiver_Type
    is
       entry Wait (Frame      : in out DW1000.Types.Byte_Array;
                   Size       :    out Frame_Length_Number;
                   Frame_Info :    out Frame_Info_Type;
-                  Error      :    out Rx_Errors;
+                  Status     :    out Rx_Status_Type;
                   Overrun    :    out Boolean)
         when Frame_Ready
       is
       begin
          Size       := Frame_Queue (Queue_Head).Size;
          Frame_Info := Frame_Queue (Queue_Head).Frame_Info;
-         Error      := Frame_Queue (Queue_Head).Error;
+         Status     := Frame_Queue (Queue_Head).Status;
          Overrun    := Frame_Queue (Queue_Head).Overrun;
 
-         if Error = No_Error then
+         if Status = No_Error then
             if Frame'Length >= Size then
                Frame (Frame'First .. Frame'First + Integer (Size - 1))
                  := Frame_Queue (Queue_Head).Frame (1 .. Size);
@@ -263,7 +273,7 @@ is
                     Frame_Queue (Next_Idx).Frame (1 .. Frame_Length));
 
                Frame_Queue (Next_Idx).Size    := Frame_Length;
-               Frame_Queue (Next_Idx).Error   := No_Error;
+               Frame_Queue (Next_Idx).Status  := No_Error;
                Frame_Queue (Next_Idx).Overrun := Overrun_Occurred;
 
                Overrun_Occurred := False;
@@ -276,6 +286,12 @@ is
 
                DW1000.Registers.RX_TIME.Read
                  (Frame_Queue (Next_Idx).Frame_Info.RX_TIME_Reg);
+
+               DW1000.Registers.RX_TTCKI.Read
+                 (Frame_Queue (Next_Idx).Frame_Info.RX_TTCKI_Reg);
+
+               DW1000.Registers.RX_TTCKO.Read
+                 (Frame_Queue (Next_Idx).Frame_Info.RX_TTCKO_Reg);
 
                declare
                   Byte : Byte_Array (1 .. 1);
@@ -306,7 +322,7 @@ is
          DW1000.Driver.Toggle_Host_Side_Rx_Buffer_Pointer;
       end Notify_Frame_Received;
 
-      procedure Notify_Receive_Error (Error : in Rx_Errors)
+      procedure Notify_Receive_Error (Error : in Rx_Status_Type)
       is
          Next_Idx     : Rx_Frame_Queue_Index;
 
@@ -320,7 +336,7 @@ is
             Rx_Count := Rx_Count + 1;
 
             Frame_Queue (Next_Idx).Size    := 0;
-            Frame_Queue (Next_Idx).Error   := Error;
+            Frame_Queue (Next_Idx).Status   := Error;
             Frame_Queue (Next_Idx).Overrun := Overrun_Occurred;
             Overrun_Occurred := False;
          end if;

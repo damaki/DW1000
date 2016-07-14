@@ -257,7 +257,7 @@ is
 
    subtype Frame_Length_Number is Natural range 0 .. 1024;
 
-   type Rx_Errors is (No_Error,
+   type Rx_Status_Type is (No_Error,
                       Frame_Timeout,
                       Preamble_Timeout,
                       SFD_Timeout,
@@ -269,6 +269,8 @@ is
       RX_FINFO_Reg     : RX_FINFO_Type;
       RX_FQUAL_Reg     : RX_FQUAL_Type;
       RXPACC_NOSAT_Reg : RXPACC_NOSAT_Type;
+      RX_TTCKI_Reg     : RX_TTCKI_Type;
+      RX_TTCKO_Reg     : RX_TTCKO_Type;
       SFD_LENGTH       : Bits_8;
       Non_Standard_SFD : Boolean;
    end record;
@@ -292,14 +294,34 @@ is
      with Post => First_Path_Signal_Power'Result in -218.07 .. -12.66;
    --  Get the estimated first path power in dBm.
 
+   function Transmitter_Clock_Offset (Frame_Info : in Frame_Info_Type)
+                                      return Float;
+   --  Calculate the clock offset between the receiver's and transmitter's
+   --  clocks.
+   --
+   --  Since the transmitter and receiver radios are clocked by their own
+   --  crystals, there can be a slight variation between the crystals'
+   --  frequencies. This function provides a measure of the offset
+   --  between this receiver and the remote transmitter clocks.
+   --
+   --  @param Frame_Info The frame information record for the received frame.
+   --
+   --  @return The computed clock offset. A positive value indicates that the
+   --     transmitter's clock is running faster than the receiver's clock, and
+   --     a negative value indicates that the transmitter's clock is running
+   --     slower than the receiver's clock. For example, a value of 7.014E-06
+   --     indicates that the transmitter is faster by 7 ppm. Likewise, a value
+   --     of -5.045E-06 indicates that the transmitter's clock is slower by
+   --     5 ppm.
+
    type Rx_Frame_Type is record
       Size       : Frame_Length_Number;
       Frame      : Byte_Array (Frame_Length_Number);
       Frame_Info : Frame_Info_Type;
-      Error      : Rx_Errors;
+      Status      : Rx_Status_Type;
       Overrun    : Boolean;
    end record
-     with Dynamic_Predicate => (if Rx_Frame_Type.Error = No_Error
+     with Dynamic_Predicate => (if Rx_Frame_Type.Status = No_Error
                                 then Rx_Frame_Type.Size > 0
                                 else (Rx_Frame_Type.Size = 0));
 
@@ -333,16 +355,16 @@ is
       entry Wait (Frame      : in out Byte_Array;
                   Size       :    out Frame_Length_Number;
                   Frame_Info :    out Frame_Info_Type;
-                  Error      :    out Rx_Errors;
+                  Status     :    out Rx_Status_Type;
                   Overrun    :    out Boolean)
       with Depends => (Frame         => + Receiver_Type,
                        Frame_Info    => Receiver_Type,
                        Size          => Receiver_Type,
                        Receiver_Type => Receiver_Type,
-                       Error         => Receiver_Type,
+                       Status         => Receiver_Type,
                        Overrun       => Receiver_Type),
         Pre => Frame'Length > 0,
-        Post => (if Error = No_Error
+        Post => (if Status = No_Error
                  then Size in 1 .. DW1000.Constants.RX_BUFFER_Length
                  else Size = 0);
       --  Waits for a frame to be received, or an error. When a frame is
@@ -351,18 +373,50 @@ is
       --  Size arguments.
       --
       --  If any of the enabled errors occurs (e.g. an FCS error is detected)
-      --  then the Error argument is set to specify the type of receive error
+      --  then the Status argument is set to specify the type of receive error
       --  that occurred, Size is set to 0, and the contents of the Frame array
       --  are unmodified.
       --
-      --  If no error occurs (Error is set to No_Error) then the frame contents
-      --  are copied to the Frame array, and Size is set to the length of the
-      --  frame (in bytes). If the Frame array is too small to store the
+      --  If no error occurs (Status is set to No_Error) then the frame
+      --  contents are copied to the Frame array, and Size is set to the length
+      --  of the frame (in bytes). If the Frame array is too small to store the
       --  received frame then the frame's contents are truncated, but the Size
       --  argument still reflects the frame's true size.
       --
       --  If the Frame array is larger than the received frame then the extra
       --  bytes in the Frame array are unmodified.
+      --
+      --  When a valid frame is successfully received information about the
+      --  received frame is copied to the Frame_Info output parameter. This
+      --  information can be used to calculate various values about the
+      --  received frame, such as the estimated receive signal power and the
+      --  clock offset between the transmitter and receiver.
+      --
+      --  @param Frame If a frame has been successfully received
+      --     (Status = No_Error) then the contents of the frame are copied to
+      --     this array. If this array is too small to store the entire
+      --     frame then the frame is truncated.
+      --
+      --  @param Size The length of the received frame in bytes. If the frame
+      --     was received successfully then this value is a natural number
+      --     (a frame length of 0 is possible). Otherwise, if an error occurred
+      --     then this value is set to 0 always.
+      --
+      --  @param Frame_Info When a frame is successfully received information
+      --     about the received frame is stored in this output parameter, and
+      --     can be used to calculate various information about the frame, such
+      --     as the estimated receive signal power, and the clock offset
+      --     between the transmitter and receiver.
+      --
+      --  @param Status Indicates whether or not a frame was successfully
+      --     received. If a frame was successfully received then this parameter
+      --     is set to No_Error. Otherwise, if an error occurred then Status
+      --     indicates the cause of the error (e.g. an invalid FCS).
+      --
+      --  @param Overrun Indicates whether or not an overrun condition has
+      --     occurred. This output parameter is set to True when one or more
+      --     frames have been dropped before the reception of this frame, due
+      --     to insufficient buffer space.
 
       function Pending_Frames_Count return Natural
         with Post => Pending_Frames_Count'Result <= 2;
@@ -563,7 +617,7 @@ is
       --  when the DW1000 signals that a frame has been received. This
       --  procedure should not be called by the user.
 
-      procedure Notify_Receive_Error (Error : in Rx_Errors)
+      procedure Notify_Receive_Error (Error : in Rx_Status_Type)
         with Depends => (Receiver_Type => + Error),
         Pre => Error /= No_Error;
 
@@ -572,28 +626,33 @@ is
         := (others => (Size       => 0,
                        Frame      => (others => 0),
                        Frame_Info => Frame_Info_Type'
-                         (RX_TIME_Reg      => RX_TIME_Type'(RX_STAMP => 0,
-                                                            FP_INDEX => 0,
-                                                            FP_AMPL1 => 0,
-                                                            RX_RAWST => 0),
-                          RX_FINFO_Reg     => RX_FINFO_Type'(RXFLEN   => 0,
-                                                             RXFLE    => 0,
-                                                             RXNSPL   => 0,
-                                                             RXBR     => 0,
-                                                             RNG      => 0,
-                                                             RXPRF    => 0,
-                                                             RXPSR    => 0,
-                                                             RXPACC   => 0,
-                                                             Reserved => 0),
-                          RX_FQUAL_Reg     => RX_FQUAL_Type'(STD_NOISE => 0,
-                                                             FP_AMPL2  => 0,
-                                                             FP_AMPL3  => 0,
-                                                             CIR_PWR   => 0),
-                          RXPACC_NOSAT_Reg =>
-                            RXPACC_NOSAT_Type'(RXPACC_NOSAT => 0),
+                         (RX_TIME_Reg      => (RX_STAMP => 0,
+                                               FP_INDEX => 0,
+                                               FP_AMPL1 => 0,
+                                               RX_RAWST => 0),
+                          RX_FINFO_Reg     => (RXFLEN   => 0,
+                                               RXFLE    => 0,
+                                               RXNSPL   => 0,
+                                               RXBR     => 0,
+                                               RNG      => 0,
+                                               RXPRF    => 0,
+                                               RXPSR    => 0,
+                                               RXPACC   => 0,
+                                               Reserved => 0),
+                          RX_FQUAL_Reg     => (STD_NOISE => 0,
+                                               FP_AMPL2  => 0,
+                                               FP_AMPL3  => 0,
+                                               CIR_PWR   => 0),
+                          RXPACC_NOSAT_Reg => (RXPACC_NOSAT => 0),
+                          RX_TTCKI_Reg     => (RXTTCKI => 0),
+                          RX_TTCKO_Reg     => (RXTOFS     => 0,
+                                               RSMPDEL    => 0,
+                                               RCPHASE    => 0,
+                                               Reserved_1 => 0,
+                                               Reserved_2 => 0),
                           SFD_LENGTH       => 0,
                           Non_Standard_SFD => False),
-                       Error      => No_Error,
+                       Status      => No_Error,
                        Overrun    => False));
       --  Cyclic buffer for storing received frames, read from the DW1000.
 
