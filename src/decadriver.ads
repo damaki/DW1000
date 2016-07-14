@@ -21,7 +21,6 @@
 -------------------------------------------------------------------------------
 
 with Ada.Real_Time;
-with Ada.Interrupts;
 with DecaDriver_Config;
 with DW1000.Constants;
 with DW1000.Driver;          use DW1000.Driver;
@@ -29,7 +28,6 @@ with DW1000.BSP;
 with DW1000.Register_Types;  use DW1000.Register_Types;
 with DW1000.System_Time;     use DW1000.System_Time;
 with Dw1000.Types;           use DW1000.Types;
-with System;
 
 --  @summary
 --  High-level Ravenscar driver for typical usage of the DW1000.

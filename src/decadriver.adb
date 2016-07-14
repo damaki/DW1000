@@ -20,7 +20,6 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with DW1000.Constants;
 with DW1000.Reception_Quality; use DW1000.Reception_Quality;
 with DW1000.Registers;
 with DW1000.Register_Driver;

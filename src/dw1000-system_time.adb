@@ -73,7 +73,7 @@ is
       --  set to 0.
 
    begin
-      return Coarse_System_Time (Fixed_31 (MSB) * Coarse_System_Time'Delta);
+      return Coarse_System_Time (MSB * Coarse_System_Time'Delta);
    end To_Coarse_System_Time;
 
 

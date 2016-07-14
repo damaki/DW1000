@@ -24,7 +24,6 @@ with Ada.Unchecked_Conversion;
 with DW1000.Constants;       use DW1000.Constants;
 with DW1000.Registers;       use DW1000.Registers;
 with DW1000.Register_Driver;
-with Interfaces;             use Interfaces;
 
 
 package body DW1000.Driver
@@ -206,9 +205,6 @@ is
 
    procedure Enable_Clocks (Clock : in Clocks)
    is
-      use type Bits_3;
-      use type Bits_4;
-
       PMSC_CTRL0_Reg : PMSC_CTRL0_Type;
 
    begin
@@ -823,8 +819,6 @@ is
 
    procedure Start_Tx_Immediate (Rx_After_Tx : in Boolean)
    is
-      use type Types.Bits_1;
-
       SYS_CTRL_Reg   : SYS_CTRL_Type;
 
    begin
@@ -848,8 +842,6 @@ is
    procedure Start_Tx_Delayed (Rx_After_Tx : in     Boolean;
                                Result      :    out Result_Type)
    is
-      use type Types.Bits_1;
-
       SYS_CTRL_Reg   : SYS_CTRL_Type;
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
@@ -999,8 +991,6 @@ is
 
    procedure Check_Overrun (Overrun : out Boolean)
    is
-      use type Types.Bits_1;
-
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
    begin
@@ -1088,8 +1078,6 @@ is
 
    procedure Sync_Rx_Buffer_Pointers
    is
-      use type Types.Bits_1;
-
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
    begin
@@ -1106,8 +1094,6 @@ is
 
    procedure Start_Rx_Immediate
    is
-      use type Types.Bits_1;
-
       SYS_CTRL_Reg   : SYS_CTRL_Type;
 
    begin
@@ -1134,8 +1120,6 @@ is
 
    procedure Start_Rx_Delayed (Result  : out Result_Type)
    is
-      use type Types.Bits_1;
-
       SYS_CTRL_Reg   : SYS_CTRL_Type;
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
