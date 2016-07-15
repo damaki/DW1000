@@ -453,6 +453,18 @@ is
          Tx_Idle := not (Result = DW1000.Driver.Success);
       end Start_Tx_Delayed;
 
+      procedure Read_Tx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
+      is
+      begin
+         DW1000.Driver.Read_Tx_Adjusted_Timestamp (Timestamp);
+      end Read_Tx_Adjusted_Timestamp;
+
+      procedure Read_Tx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
+      is
+      begin
+         DW1000.Driver.Read_Tx_Raw_Timestamp (Timestamp);
+      end Read_Tx_Raw_Timestamp;
+
       procedure Notify_Tx_Complete
       is
       begin

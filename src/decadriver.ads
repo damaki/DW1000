@@ -805,6 +805,28 @@ is
          "potentially blocking operation in protected operation",
          "Procedures in DW1000.BSP are not blocking");
 
+
+      procedure Read_Tx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                    Timestamp               => DW1000.BSP.Device_State,
+                    Transmitter_Type        => Transmitter_Type);
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation",
+         "Procedures in DW1000.BSP are not blocking");
+
+
+      procedure Read_Tx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
+                    Timestamp               => DW1000.BSP.Device_State,
+                    Transmitter_Type        => Transmitter_Type);
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation",
+         "Procedures in DW1000.BSP are not blocking");
+
       procedure Notify_Tx_Complete;
       --  Notify the driver that the transmit is complete.
       --
