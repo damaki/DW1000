@@ -170,22 +170,22 @@ is
    protected body Receiver_Type
    is
       entry Wait (Frame      : in out DW1000.Types.Byte_Array;
-                  Size       :    out Frame_Length_Number;
+                  Length     :    out Frame_Length_Number;
                   Frame_Info :    out Frame_Info_Type;
                   Status     :    out Rx_Status_Type;
                   Overrun    :    out Boolean)
         when Frame_Ready
       is
       begin
-         Size       := Frame_Queue (Queue_Head).Size;
+         Length     := Frame_Queue (Queue_Head).Length;
          Frame_Info := Frame_Queue (Queue_Head).Frame_Info;
          Status     := Frame_Queue (Queue_Head).Status;
          Overrun    := Frame_Queue (Queue_Head).Overrun;
 
          if Status = No_Error then
-            if Frame'Length >= Size then
-               Frame (Frame'First .. Frame'First + Integer (Size - 1))
-                 := Frame_Queue (Queue_Head).Frame (1 .. Size);
+            if Frame'Length >= Length then
+               Frame (Frame'First .. Frame'First + Integer (Length - 1))
+                 := Frame_Queue (Queue_Head).Frame (1 .. Length);
 
             else
                Frame := Frame_Queue (Queue_Head).Frame (1 .. Frame'Length);
@@ -281,7 +281,13 @@ is
          Frame_Length := Natural (RX_FINFO_Reg.RXFLEN) +
                          Natural (RX_FINFO_Reg.RXFLE) * 2**7;
 
-         pragma Assert (Frame_Length <= DW1000.Constants.RX_BUFFER_Length);
+         --  If a frame is received whose length is larger than the configured
+         --  maximum frame size, then truncate the frame length.
+         if Frame_Length > Frame_Length_Number'Last then
+            Frame_Length := Frame_Length_Number'Last;
+         end if;
+
+         pragma Assert (Frame_Length in Frame_Length_Number);
 
          if Frame_Length > 0 then
             if Rx_Count >= Frame_Queue'Length then
@@ -298,7 +304,7 @@ is
                   Data        =>
                     Frame_Queue (Next_Idx).Frame (1 .. Frame_Length));
 
-               Frame_Queue (Next_Idx).Size    := Frame_Length;
+               Frame_Queue (Next_Idx).Length  := Frame_Length;
                Frame_Queue (Next_Idx).Status  := No_Error;
                Frame_Queue (Next_Idx).Overrun := Overrun_Occurred;
 
@@ -361,7 +367,7 @@ is
 
             Rx_Count := Rx_Count + 1;
 
-            Frame_Queue (Next_Idx).Size       := 0;
+            Frame_Queue (Next_Idx).Length     := 0;
             Frame_Queue (Next_Idx).Status     := Error;
             Frame_Queue (Next_Idx).Overrun    := Overrun_Occurred;
             Frame_Queue (Next_Idx).Frame_Info := Null_Frame_Info;

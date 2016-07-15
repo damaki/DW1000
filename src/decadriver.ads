@@ -145,14 +145,14 @@ with Interfaces;             use Interfaces;
 --
 --     declare
 --        Frame_Data : DW1000.Types.Byte_Array (DecaDriver.Frame_Length_Number);
---        Frame_Size : DW1000.Types.Frame_Length_Number;
+--        Length     : DW1000.Types.Frame_Length_Number;
 --        Timestamp  : DW1000.System_Time.Fine_System_Time;
 --        Error      : DecaDriver.Rx_Errors;
 --        Overrun    : Boolean;
 --     begin
 --        DecaDriver.Receiver.Start_Rx_Immediate;
 --        DecaDriver.Receiver.Wait (Frame     => Frame_Data,
---                                  Size      => Frame_Size,
+--                                  Length    => Length,
 --                                  Timestamp => Timestamp,
 --                                  Error     => Error,
 --                                  Overrun   => Overrun);
@@ -195,7 +195,7 @@ with Interfaces;             use Interfaces;
 --
 --     declare
 --        Frame_Data : DW1000.Types.Byte_Array (DecaDriver.Frame_Length_Number);
---        Frame_Size : DW1000.Types.Frame_Length_Number;
+--        Length     : DW1000.Types.Frame_Length_Number;
 --        Rx_Time    : DW1000.System_Time.Fine_System_Time;
 --        Error      : DecaDriver.Rx_Errors;
 --        Overrun    : Boolean;
@@ -206,7 +206,7 @@ with Interfaces;             use Interfaces;
 --        --  Wait for a packet
 --        DecaDriver.Receiver.Start_Rx_Immediate;
 --        DecaDriver.Receiver.Wait (Frame     => Frame_Data,
---                                  Size      => Frame_Size,
+--                                  Length    => Length,
 --                                  Timestamp => Rx_Time,
 --                                  Error     => Error,
 --                                  Overrun   => Overrun);
@@ -214,8 +214,8 @@ with Interfaces;             use Interfaces;
 --        if Error = DecaDriver.No_Error then
 --           --  Compute the transmit time (10 ms after the receive time)
 --           Tx_Time :=
---              DW1000.System_Time.To_Coarse_System_Time (
---                 DW1000.System_Time.System_Time_Offset (Rx_Time, 0.01));
+--              DW1000.System_Time.To_Coarse_System_Time
+--                 (DW1000.System_Time.System_Time_Offset (Rx_Time, 0.01));
 --
 --           -- Configure the time at which the transmitter should be enabled
 --           DecaDriver.Transmitter.Set_Delayed_Tx_Time (Time => Tx_Time);
@@ -254,7 +254,8 @@ is
       SFD_Timeout         : DW1000.Driver.SFD_Timeout_Number;
    end record;
 
-   subtype Frame_Length_Number is Natural range 0 .. 1024;
+   subtype Frame_Length_Number is Natural
+   range 0 .. DecaDriver_Config.Maximum_Receive_Frame_Length;
 
    type Rx_Status_Type is (No_Error,
                       Frame_Timeout,
@@ -314,16 +315,16 @@ is
    --     5 ppm.
 
    type Rx_Frame_Type is record
-      Size       : Frame_Length_Number;
+      Length     : Frame_Length_Number;
       Frame      : Byte_Array (Frame_Length_Number);
       Frame_Info : Frame_Info_Type;
       Status     : Rx_Status_Type;
       Overrun    : Boolean;
    end record
      with Dynamic_Predicate =>
-       (if Rx_Frame_Type.Status /= No_Error then Rx_Frame_Type.Size = 0);
+       (if Rx_Frame_Type.Status /= No_Error then Rx_Frame_Type.Length = 0);
 
-   type Rx_Frame_Queue_Index is mod DecaDriver_Config.Receiver_Queue_Size;
+   type Rx_Frame_Queue_Index is mod DecaDriver_Config.Receiver_Queue_Length;
 
    type Rx_Frame_Queue_Type is
      array (Rx_Frame_Queue_Index)
@@ -351,13 +352,13 @@ is
      with Interrupt_Priority => DecaDriver_Config.Driver_Priority
    is
       entry Wait (Frame      : in out Byte_Array;
-                  Size       :    out Frame_Length_Number;
+                  Length     :    out Frame_Length_Number;
                   Frame_Info :    out Frame_Info_Type;
                   Status     :    out Rx_Status_Type;
                   Overrun    :    out Boolean)
       with Depends => (Frame         => + Receiver_Type,
                        Frame_Info    => Receiver_Type,
-                       Size          => Receiver_Type,
+                       Length        => Receiver_Type,
                        Receiver_Type => Receiver_Type,
                        Status        => Receiver_Type,
                        Overrun       => Receiver_Type),
@@ -367,25 +368,25 @@ is
            --  If the Frame array is bigger than the received frame then
            --  the elements at the end of the Frame array are unmodified.
              (for all I in 0 .. Frame'Length - 1 =>
-                (if I >= Size
+                (if I >= Length
                  then Frame (Frame'First + I) =
                      Frame'Old (Frame'First + I)))
-           else Size = 0 and Frame = Frame'Old);
+           else Length = 0 and Frame = Frame'Old);
       --  Waits for a frame to be received, or an error. When a frame is
       --  received (or if one has been previously received and is waiting to be
       --  read) then the frame's content and size are copied to the Frame and
-      --  Size arguments.
+      --  Length arguments.
       --
       --  If any of the enabled errors occurs (e.g. an FCS error is detected)
       --  then the Status argument is set to specify the type of receive error
-      --  that occurred, Size is set to 0, and the contents of the Frame array
-      --  are unmodified.
+      --  that occurred, Length is set to 0, and the contents of the Frame
+      --  array are unmodified.
       --
       --  If no error occurs (Status is set to No_Error) then the frame
-      --  contents are copied to the Frame array, and Size is set to the length
-      --  of the frame (in bytes). If the Frame array is too small to store the
-      --  received frame then the frame's contents are truncated, but the Size
-      --  argument still reflects the frame's true size.
+      --  contents are copied to the Frame array, and Length is set to the
+      --  length of the frame (in bytes). If the Frame array is too small to
+      --  store the received frame then the frame's contents are truncated, but
+      --  the Length argument still reflects the frame's true size.
       --
       --  If the Frame array is larger than the received frame then the extra
       --  bytes in the Frame array are unmodified.
@@ -401,7 +402,7 @@ is
       --     this array. If this array is too small to store the entire
       --     frame then the frame is truncated.
       --
-      --  @param Size The length of the received frame in bytes. If the frame
+      --  @param Length The length of the received frame in bytes. If the frame
       --     was received successfully then this value is a natural number
       --     (a frame length of 0 is possible). Otherwise, if an error occurred
       --     then this value is set to 0 always.
@@ -627,7 +628,7 @@ is
 
    private
       Frame_Queue : Rx_Frame_Queue_Type
-        := (others => (Size       => 0,
+        := (others => (Length     => 0,
                        Frame      => (others => 0),
                        Frame_Info => Frame_Info_Type'
                          (RX_TIME_Reg      => (RX_STAMP => 0,
