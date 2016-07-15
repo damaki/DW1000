@@ -146,10 +146,21 @@ is
 
    subtype Antenna_Delay_Time is Fine_System_Time
    range 0.0 .. (Fine_System_Time'Delta * 65536) - Fine_System_Time'Delta;
+   --  Type to represent an antenna delay time.
+
+   type Frame_Wait_Timeout_Time is
+   delta 512.0 / 499200000
+   range 0.0 .. ((2.0**16 - 1.0) * 512.0) / 499200000
+     with Small => 2.0**(-24);
+   --  Type to represent the frame wait timeout.
+   --
+   --  The range of this type is 0.0 .. 0.067215385, i.e. the maximum value
+   --  is 67.215385 milliseconds.
 
    function To_Bits_40 (Time : in Fine_System_Time) return Bits_40
      with SPARK_Mode => On;
-   --  Convert a System_Time value to its equivalent Bits_40 representation.
+   --  Convert a Fine_System_Time value to its equivalent Bits_40
+   --  representation.
    --
    --  Note that is a surjective function, i.e. some values of System_Time
    --  map to the same Bits_40 value. This is due System_Time supporting a
@@ -166,8 +177,21 @@ is
    --  are 0.
 
 
+   function To_Bits_40 (Span : in System_Time_Span) return Bits_40
+   is (To_Bits_40 (Fine_System_Time (Span)));
+   --  Convert a System_Time_Span value to its equivalent Bits_40
+   --  representation.
+   --
+   --  System_Time_Span has the same resolution as Fine_System_Time, so the
+   --  LSB in the Bits_40 representation is approx. 15.65 picoseconds.
+
+
    function To_Bits_16 (Time : in Antenna_Delay_Time) return Bits_16;
-   --  Convert a Antenna_Delay_Time value to its 16-bit integer representation.
+   --  Convert a Antenna_Delay_Time value to its 16-bit representation.
+
+
+   function To_Bits_16 (Time : in Frame_Wait_Timeout_Time) return Bits_16;
+   --  Convert a Frame_Wait_Timeout_Time to its 16-bit representation.
 
 
    function To_Fine_System_Time (Bits : in Bits_40) return Fine_System_Time;
@@ -193,6 +217,11 @@ is
    --
    --  This function rounds down to the nearest multiple of (approx.) 8.013
    --  nanoseconds.
+
+   function To_System_Time_Span (Bits : in Bits_40) return System_Time_Span
+   is (System_Time_Span (To_Fine_System_Time (Bits)));
+   --  Convert a 40-bit time span to the equivalent System_Time_Span value.
+
 
    function To_Antenna_Delay_Time (Bits : in Bits_16)
                                    return Antenna_Delay_Time;
@@ -329,6 +358,12 @@ private
 
    function To_Bits_16 (Time : in Antenna_Delay_Time) return Bits_16
    is (Bits_16 (Time * (499200000.0 * 128.0)))
+   with SPARK_Mode => Off;
+   --  SPARK mode is disabled as a workaround because GNATprove does not
+   --  support an operation mixing fixed point and universal real types.
+
+   function To_Bits_16 (Time : in Frame_Wait_Timeout_Time) return Bits_16
+   is (Bits_16 (Time * (512.0 / 499200000.0)))
    with SPARK_Mode => Off;
    --  SPARK mode is disabled as a workaround because GNATprove does not
    --  support an operation mixing fixed point and universal real types.
