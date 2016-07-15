@@ -28,6 +28,7 @@ with DW1000.BSP;
 with DW1000.Register_Types;  use DW1000.Register_Types;
 with DW1000.System_Time;     use DW1000.System_Time;
 with Dw1000.Types;           use DW1000.Types;
+with Interfaces;             use Interfaces;
 
 --  @summary
 --  High-level Ravenscar driver for typical usage of the DW1000.
@@ -316,12 +317,11 @@ is
       Size       : Frame_Length_Number;
       Frame      : Byte_Array (Frame_Length_Number);
       Frame_Info : Frame_Info_Type;
-      Status      : Rx_Status_Type;
+      Status     : Rx_Status_Type;
       Overrun    : Boolean;
    end record
-     with Dynamic_Predicate => (if Rx_Frame_Type.Status = No_Error
-                                then Rx_Frame_Type.Size > 0
-                                else (Rx_Frame_Type.Size = 0));
+     with Dynamic_Predicate =>
+       (if Rx_Frame_Type.Status /= No_Error then Rx_Frame_Type.Size = 0);
 
    type Rx_Frame_Queue_Index is mod DecaDriver_Config.Receiver_Queue_Size;
 
@@ -359,12 +359,18 @@ is
                        Frame_Info    => Receiver_Type,
                        Size          => Receiver_Type,
                        Receiver_Type => Receiver_Type,
-                       Status         => Receiver_Type,
+                       Status        => Receiver_Type,
                        Overrun       => Receiver_Type),
         Pre => Frame'Length > 0,
-        Post => (if Status = No_Error
-                 then Size in 1 .. DW1000.Constants.RX_BUFFER_Length
-                 else Size = 0);
+        Post =>
+          (if Status = No_Error then
+           --  If the Frame array is bigger than the received frame then
+           --  the elements at the end of the Frame array are unmodified.
+             (for all I in 0 .. Frame'Length - 1 =>
+                (if I >= Size
+                 then Frame (Frame'First + I) =
+                     Frame'Old (Frame'First + I)))
+           else Size = 0 and Frame = Frame'Old);
       --  Waits for a frame to be received, or an error. When a frame is
       --  received (or if one has been previously received and is waiting to be
       --  read) then the frame's content and size are copied to the Frame and

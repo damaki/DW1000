@@ -23,7 +23,6 @@
 with DW1000.Reception_Quality; use DW1000.Reception_Quality;
 with DW1000.Registers;
 with DW1000.Register_Driver;
-with Interfaces;               use Interfaces;
 
 package body DecaDriver
 with SPARK_Mode => On
@@ -56,6 +55,34 @@ is
            22 => Bits_16 (0.22 * 2**16),
            23 => Bits_16 (0.19 * 2**16),
            24 => Bits_16 (0.22 * 2**16));
+
+   Null_Frame_Info : constant Frame_Info_Type
+     := (RX_TIME_Reg      => (RX_STAMP => 0,
+                              FP_INDEX => 0,
+                              FP_AMPL1 => 0,
+                              RX_RAWST => 0),
+         RX_FINFO_Reg     => (RXFLEN   => 0,
+                              RXFLE    => 0,
+                              RXNSPL   => 0,
+                              RXBR     => 0,
+                              RNG      => 0,
+                              RXPRF    => 0,
+                              RXPSR    => 0,
+                              RXPACC   => 0,
+                              Reserved => 0),
+         RX_FQUAL_Reg     => (STD_NOISE => 0,
+                              FP_AMPL2  => 0,
+                              FP_AMPL3  => 0,
+                              CIR_PWR   => 0),
+         RXPACC_NOSAT_Reg => (RXPACC_NOSAT => 0),
+         RX_TTCKI_Reg     => (RXTTCKI => 0),
+         RX_TTCKO_Reg     => (RXTOFS     => 0,
+                              RSMPDEL    => 0,
+                              RCPHASE    => 0,
+                              Reserved_1 => 0,
+                              Reserved_2 => 0),
+         SFD_LENGTH       => 64,
+         Non_Standard_SFD => False);
 
 
    function Receive_Timestamp (Frame_Info : in Frame_Info_Type)
@@ -334,9 +361,10 @@ is
 
             Rx_Count := Rx_Count + 1;
 
-            Frame_Queue (Next_Idx).Size    := 0;
-            Frame_Queue (Next_Idx).Status   := Error;
-            Frame_Queue (Next_Idx).Overrun := Overrun_Occurred;
+            Frame_Queue (Next_Idx).Size       := 0;
+            Frame_Queue (Next_Idx).Status     := Error;
+            Frame_Queue (Next_Idx).Overrun    := Overrun_Occurred;
+            Frame_Queue (Next_Idx).Frame_Info := Null_Frame_Info;
             Overrun_Occurred := False;
          end if;
 
