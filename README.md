@@ -174,7 +174,7 @@ procedure Example
               null                    => Ada.Real_Time.Clock_Time)
 is
    Frame_Data   : Byte_Array(1 .. 127) := (others => 0);
-   Frame_Size   : DecaDriver.Frame_Length_Number;
+   Frame_Length : DecaDriver.Frame_Length_Number;
    Rx_Timestamp : DW1000.System_Time.Fine_System_Time;
    Rx_Error     : DecaDriver.Rx_Errors;
    Rx_Overrun   : Boolean;
@@ -202,7 +202,7 @@ begin
       DecaDriver.Receiver.Start_Rx_Immediate;
       
       DecaDriver.Receiver.Wait (Frame     => Frame_Data,
-                                Size      => Frame_Size,
+                                Length    => Frame_Length,
                                 Timestamp => Rx_Timestamp,
                                 Error     => Rx_Error,
                                 Overrun   => Rx_Overrun);
