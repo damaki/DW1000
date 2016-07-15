@@ -681,6 +681,9 @@ is
       is
       begin
          DW1000.Driver.Force_Tx_Rx_Off;
+
+         --  The transmitter is now idle.
+         Transmitter.Notify_Tx_Complete;
       end Force_Tx_Rx_Off;
 
       function Get_Part_ID return Bits_32
