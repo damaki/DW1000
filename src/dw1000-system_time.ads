@@ -146,7 +146,7 @@ is
 
    subtype Antenna_Delay_Time is Fine_System_Time
    range 0.0 .. (Fine_System_Time'Delta * 65536) - Fine_System_Time'Delta;
-   --  Type to represent an antenna delay time.
+   --  Type to represent an antenna delay time.5
 
    type Frame_Wait_Timeout_Time is
    delta 512.0 / 499200000

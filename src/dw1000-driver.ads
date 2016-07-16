@@ -897,7 +897,7 @@ is
    --  This procedure configures the following registers:
    --    * SYS_CFG
 
-   procedure Set_Rx_Timeout (Timeout : in Types.Bits_16)
+   procedure Set_Rx_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Timeout);
    --  Configure the receive timeout.
@@ -906,13 +906,18 @@ is
    --  If no complete frame is received within the configured Rx timeout
    --  then the receiver is automatically disabled.
    --
-   --  The Rx timeout can be disabled by setting the Timeout to 0.
+   --  The Rx timeout can be disabled by setting the Timeout to 0.0.
    --
-   --  The Rx timeout is measured in units of 499.2 MHz / 512, i.e. the least
-   --  significant bit is approximately 1.026 us.
+   --  The Rx timeout is measured in units of 499.2 MHz / 512, i.e. in units
+   --  of approximately 1.026 us. The maximum timeout is approximately
+   --  67.215385 ms.
    --
    --  This procedure configures the following registers:
    --    * SYS_CFG
+   --
+   --  @param Timeout The maximum time (in seconds) to wait for a frame.
+   --     E.g. a value of 0.001 is 1 millisecond. The maximum permitted value
+   --     is 0.067_215_385, i.e. a little over 67 milliseconds.
 
    procedure Set_Preamble_Detect_Timeout (Timeout : in Types.Bits_16)
      with Global => (In_Out => DW1000.BSP.Device_State),

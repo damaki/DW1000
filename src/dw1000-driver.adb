@@ -1202,17 +1202,17 @@ is
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Rx_Double_Buffer;
 
-   procedure Set_Rx_Timeout (Timeout : in Types.Bits_16)
+   procedure Set_Rx_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
 
-      if Timeout > 0 then
+      if Timeout > 0.0 then
          SYS_CFG_Reg.RXWTOE := 1;
 
-         RX_FWTO.Write ( (RXFWTO => Timeout) );
+         RX_FWTO.Write ( (RXFWTO => To_Bits_16 (Timeout)) );
 
       else
          SYS_CFG_Reg.RXWTOE := 0;
@@ -1220,7 +1220,7 @@ is
       end if;
 
       SYS_CFG.Write (SYS_CFG_Reg);
-   end Set_Rx_Timeout;
+   end Set_Rx_Frame_Wait_Timeout;
 
    procedure Set_Preamble_Detect_Timeout (Timeout : in Types.Bits_16)
    is

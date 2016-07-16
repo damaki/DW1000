@@ -579,6 +579,16 @@ is
          "Procedures in DW1000.BSP are not blocking");
 
 
+      procedure Set_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => + Timeout,
+                    Receiver_Type           => Receiver_Type);
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation",
+         "Procedures in DW1000.BSP are not blocking");
+
+
       procedure Start_Rx_Immediate
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
