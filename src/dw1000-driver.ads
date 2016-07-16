@@ -334,6 +334,35 @@ is
      Depends => (DW1000.BSP.Device_State => + EUID);
    --  Write the extended unique identifier (EUID).
 
+   procedure Read_PAN_ID (PAN_ID : out Bits_16)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => ((DW1000.BSP.Device_State, PAN_ID) => DW1000.BSP.Device_State);
+
+   procedure Write_PAN_ID (PAN_ID : in Bits_16)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + PAN_ID);
+
+   procedure Read_Short_Address (Short_Address : out Bits_16)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => ((DW1000.BSP.Device_State,
+                 Short_Address) => DW1000.BSP.Device_State);
+
+   procedure Write_Short_Address (Short_Address : in Bits_16)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + Short_Address);
+
+   procedure Read_PAN_ID_And_Short_Address (PAN_ID        : out Bits_16;
+                                            Short_Address : out Bits_16)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => ((DW1000.BSP.Device_State,
+                 PAN_ID,
+                 Short_Address) => DW1000.BSP.Device_State);
+
+   procedure Write_PAN_ID_And_Short_Address (PAN_ID        : in Bits_16;
+                                             Short_Address : in Bits_16)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + (PAN_ID, Short_Address));
+
    procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => ((DW1000.BSP.Device_State,

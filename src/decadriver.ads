@@ -962,12 +962,33 @@ is
          "Procedures in DW1000.BSP are not blocking");
 
       procedure Force_Tx_Rx_Off
-        with Global => (In_Out => DW1000.BSP.Device_State),
+        with Global => (In_Out => (DW1000.BSP.Device_State, Transmitter)),
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
-                    Driver_Type             => Driver_Type);
+                    Driver_Type             => Driver_Type,
+                    Transmitter             => Transmitter);
       --  Switch off the transmitter and receiver.
       --
       --  This will abort any reception or transmission currently in progress.
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation",
+         "Procedures in DW1000.BSP are not blocking");
+
+      procedure Set_PAN_ID (PAN_ID : in Bits_16)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                                PAN_ID),
+                    Driver_Type             => Driver_Type);
+      pragma Annotate
+        (GNATprove, False_Positive,
+         "potentially blocking operation in protected operation",
+         "Procedures in DW1000.BSP are not blocking");
+
+      procedure Set_Short_Address (Short_Address : in Bits_16)
+        with Global => (In_Out => DW1000.BSP.Device_State),
+        Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                                Short_Address),
+                    Driver_Type             => Driver_Type);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",

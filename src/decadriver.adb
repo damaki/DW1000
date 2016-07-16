@@ -704,6 +704,18 @@ is
          Transmitter.Notify_Tx_Complete;
       end Force_Tx_Rx_Off;
 
+      procedure Set_PAN_ID (PAN_ID : in Bits_16)
+      is
+      begin
+         DW1000.Driver.Write_PAN_ID (PAN_ID);
+      end Set_PAN_ID;
+
+      procedure Set_Short_Address (Short_Address : in Bits_16)
+      is
+      begin
+         DW1000.Driver.Write_Short_Address (Short_Address);
+      end Set_Short_Address;
+
       function Get_Part_ID return Bits_32
       is
       begin

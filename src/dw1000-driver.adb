@@ -318,6 +318,63 @@ is
       EUI.Write ( (EUI => EUID) );
    end Write_EUID;
 
+   procedure Read_PAN_ID (PAN_ID : out Bits_16)
+   is
+      PANADR_Reg : PANADR_Type;
+
+   begin
+      PANADR.Read (PANADR_Reg);
+      PAN_ID := PANADR_Reg.PAN_ID;
+   end Read_PAN_ID;
+
+   procedure Write_PAN_ID (PAN_ID : in Bits_16)
+   is
+      PANADR_Reg : PANADR_Type;
+
+   begin
+      PANADR.Read (PANADR_Reg);
+      PANADR_Reg.PAN_ID := PAN_ID;
+      PANADR.Write (PANADR_Reg);
+   end Write_PAN_ID;
+
+   procedure Read_Short_Address (Short_Address : out Bits_16)
+   is
+      PANADR_Reg : PANADR_Type;
+
+   begin
+      PANADR.Read (PANADR_Reg);
+      Short_Address := PANADR_Reg.SHORT_ADDR;
+   end Read_Short_Address;
+
+   procedure Write_Short_Address (Short_Address : in Bits_16)
+   is
+      PANADR_Reg : PANADR_Type;
+
+   begin
+      PANADR.Read (PANADR_Reg);
+      PANADR_Reg.SHORT_ADDR := Short_Address;
+      PANADR.Write (PANADR_Reg);
+   end Write_Short_Address;
+
+   procedure Read_PAN_ID_And_Short_Address (PAN_ID        : out Bits_16;
+                                            Short_Address : out Bits_16)
+   is
+      PANADR_Reg : PANADR_Type;
+
+   begin
+      PANADR.Read (PANADR_Reg);
+      PAN_ID        := PANADR_Reg.PAN_ID;
+      Short_Address := PANADR_Reg.SHORT_ADDR;
+   end Read_PAN_ID_And_Short_Address;
+
+   procedure Write_PAN_ID_And_Short_Address (PAN_ID        : in Bits_16;
+                                             Short_Address : in Bits_16)
+   is
+   begin
+      PANADR.Write ( (PAN_ID     => PAN_ID,
+                      SHORT_ADDR => Short_Address) );
+   end Write_PAN_ID_And_Short_Address;
+
    procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
    is
       TX_ANTD_Reg : TX_ANTD_Type;
