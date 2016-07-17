@@ -242,7 +242,7 @@ is
 
 
    function Transmitter_Clock_Offset (RXTOFS  : in Bits_19;
-                                      RXTTCKI : in Bits_32) return Float
+                                      RXTTCKI : in Bits_32) return Long_Float
    is
       Offset   : Long_Float;
       Interval : Long_Float;
@@ -251,11 +251,24 @@ is
       if RXTOFS < 2**18 then
          --  Positive quantity
          Offset := Long_Float (RXTOFS);
+
+      elsif RXTOFS = 2**18 then
+         --  Special case for the most negative number
+         --  (closest to negative infinity).
+         --  Normally, this value would indicate -2.0**18, however, we must
+         --  constrain the range of Offset to -(2.0**18 - 1.0) so that we can
+         --  prove that Offset / Interval >= -1.0.
+         --
+         --  If Offset is allowed to have the value -2.0**18 then it is not
+         --  possible for GNATprove to prove that Offset / Interval >= -1.0
+         --  (presumably the rounding may cause the proof to fail for -1.0)
+         Offset := -(2.0**18 - 1.0);
+
       else
          --  Negative quantity
          Offset := -Long_Float ((not RXTOFS) + 1);
 
-         pragma Assert (Offset >= -2.0**18 and Offset <= -1.0);
+         pragma Assert (Offset >= -(2.0**18 - 1.0) and Offset <= -1.0);
       end if;
 
       --  RXTTCKI takes one of two values (Section 7.2.21 of the User Manual):
@@ -265,11 +278,17 @@ is
       --  Interval to prove absence of overflow and range errors.
       Interval := Long_Float (RXTTCKI and 16#01FC0000#);
 
-      pragma Assert_And_Cut (Offset in -2.0**18 .. 2.0**18 - 1.0
-                             and Interval in 0.0 | 262144.0 .. 33292288.0);
+      pragma Assert_And_Cut
+        (Offset in -(2.0**18 - 1.0) .. 2.0**18 - 1.0
+         and then Interval in 0.0 | 2.0**18 .. 16#01FC0000.0#
+         and then
+           (if Interval /= 0.0 then Offset > -Interval and Offset < Interval));
 
       if Interval /= 0.0 then
-         return Float (Offset / Interval);
+         pragma Assert (if Offset < 0.0  then Offset / Interval >= -1.0);
+         pragma Assert (if Offset >= 0.0 then Offset / Interval <= 1.0);
+
+         return Offset / Interval;
       else
          return 0.0;
       end if;
