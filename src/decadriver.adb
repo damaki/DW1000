@@ -158,7 +158,7 @@ is
 
 
    function Transmitter_Clock_Offset (Frame_Info : in Frame_Info_Type)
-                                      return Float
+                                      return Long_Float
    is
    begin
       return Transmitter_Clock_Offset

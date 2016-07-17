@@ -295,7 +295,8 @@ is
    --  Get the estimated first path power in dBm.
 
    function Transmitter_Clock_Offset (Frame_Info : in Frame_Info_Type)
-                                      return Float;
+                                      return Long_Float
+     with Post => Transmitter_Clock_Offset'Result in -1.0 .. 1.0;
    --  Calculate the clock offset between the receiver's and transmitter's
    --  clocks.
    --
