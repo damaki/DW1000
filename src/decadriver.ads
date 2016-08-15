@@ -425,7 +425,8 @@ is
       --     to insufficient buffer space.
 
       function Pending_Frames_Count return Natural
-        with Post => Pending_Frames_Count'Result <= 2;
+        with Post => (Pending_Frames_Count'Result <=
+                        DecaDriver_Config.Receiver_Queue_Length);
       --  Returns the number of received frames that are waiting to be read.
 
       procedure Discard_Pending_Frames
