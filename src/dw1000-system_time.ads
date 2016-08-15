@@ -244,9 +244,8 @@ is
 
    function System_Time_Offset (Time : in Coarse_System_Time;
                                 Span : in System_Time_Span)
-                                return Coarse_System_Time
-   is (To_Coarse_System_Time (System_Time_Offset (To_Fine_System_Time (Time),
-                                                  Span)));
+                                return Fine_System_Time
+   is (System_Time_Offset (To_Fine_System_Time (Time), Span));
 
 
    function Calculate_Span (Start_Time : in Fine_System_Time;
