@@ -70,12 +70,27 @@ is
       STM32.EXTI.EXTI_Periph.PR.PR.Arr (5) := 1;
    end Acknowledge_DW1000_IRQ;
 
+   procedure Disable_DW1000_IRQ
+   is
+   begin
+      STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5) := 0;
+   end Disable_DW1000_IRQ;
+
+
+   procedure Enable_DW1000_IRQ
+   is
+   begin
+      STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5) := 1;
+   end Enable_DW1000_IRQ;
+
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
                                Data   : in DW1000.Types.Byte_Array)
    is
       use type STM32.Bit;
 
    begin
+
+      Disable_DW1000_IRQ;
 
       Select_Device;
 
@@ -104,6 +119,8 @@ is
 
       Deselect_Device;
 
+      Enable_DW1000_IRQ;
+
    end Write_Transaction;
 
    procedure Read_Transaction(Header : in     DW1000.Types.Byte_Array;
@@ -112,6 +129,8 @@ is
       use type STM32.Bit;
 
    begin
+      Disable_DW1000_IRQ;
+
       Select_Device;
 
       --  Send header
@@ -140,6 +159,8 @@ is
       end loop;
 
       Deselect_Device;
+
+      Enable_DW1000_IRQ;
 
    end Read_Transaction;
 

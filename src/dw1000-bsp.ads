@@ -49,6 +49,18 @@ is
    --- Failure to call this procedure from the interrupt handler may result in
    --  an infinite interrupt loop.
 
+   procedure Disable_DW1000_IRQ
+     with Global => (In_Out => Device_State);
+   --  Disables the DW1000 IRQ to prevent the DW1000 interrupt from being
+   --  triggered.
+   --
+   --  Any IRQs requested after calling this function should be held pending
+   --  until Enable_DW1000_IRQ is called.
+
+   procedure Enable_DW1000_IRQ
+     with Global => (In_Out => Device_State);
+   --  Enables the DW1000 IRQ.
+
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
                                Data   : in DW1000.Types.Byte_Array)
      with Global => (In_Out => Device_State),
@@ -58,7 +70,7 @@ is
    --  Perform a "write" transaction to the DW1000.
    --
    --  This procedure executes a write transaction by performing the following
-   --  steps:
+   --  steps:z
    --     1. Select the DW1000 on the SPI bus.
    --     2. Send the transaction header bytes (1 .. 3 bytes) via the SPI
    --        interface.
