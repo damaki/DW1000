@@ -49,12 +49,6 @@ is
       use type Types.Bits_15;
 
    begin
-      --  The IRQ is disabled during the SPI transaction to prevent the DW1000
-      --  interrupt from being serviced in the middle of the SPI transaction.
-      --  This ensures that the ISR is able to safely access the DW1000 SPI
-      --  interface without corrupting an in-progress transaction.
-      BSP.Disable_DW1000_IRQ;
-
       if Sub_Address = 0 then
          declare
             Header : constant Non_Indexed_Header := Non_Indexed_Header'
@@ -95,8 +89,6 @@ is
          end;
 
       end if;
-
-      BSP.Enable_DW1000_IRQ;
    end Read_Register;
 
    procedure Write_Register(Register_ID : in DW1000.Types.Bits_6;
@@ -106,8 +98,6 @@ is
       use type Types.Bits_15;
 
    begin
-      BSP.Disable_DW1000_IRQ;
-
       if Sub_Address = 0 then
          declare
             Header : constant Non_Indexed_Header := Non_Indexed_Header'
@@ -147,8 +137,6 @@ is
                                   Data   => Data);
          end;
       end if;
-
-      BSP.Enable_DW1000_IRQ;
    end Write_Register;
 
 end DW1000.Register_Driver;

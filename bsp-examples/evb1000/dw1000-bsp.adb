@@ -24,6 +24,7 @@ with Interfaces;  use Interfaces;
 with STM32.AFIO;
 with STM32.EXTI;
 with STM32.GPIO;
+with STM32.NVIC;
 with STM32.RCC;
 with STM32.SPI;
 
@@ -73,14 +74,16 @@ is
    procedure Disable_DW1000_IRQ
    is
    begin
-      STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5) := 0;
+      --  Disable IRQ #25 (EXTI9_5_Interrupt)
+      STM32.NVIC.NVIC_Periph.ICER0 := 16#0200_0000#;
    end Disable_DW1000_IRQ;
 
 
    procedure Enable_DW1000_IRQ
    is
    begin
-      STM32.EXTI.EXTI_Periph.IMR.MR.Arr (5) := 1;
+      --  Enable IRQ #25 (EXTI9_5_Interrupt)
+      STM32.NVIC.NVIC_Periph.ISER0 := 16#0200_0000#;
    end Enable_DW1000_IRQ;
 
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
@@ -89,8 +92,6 @@ is
       use type STM32.Bit;
 
    begin
-
-      Disable_DW1000_IRQ;
 
       Select_Device;
 
@@ -118,8 +119,6 @@ is
       end loop;
 
       Deselect_Device;
-
-      Enable_DW1000_IRQ;
 
    end Write_Transaction;
 
