@@ -531,6 +531,61 @@ is
         ((TC_PGDELAY => TC_PGDELAY_Values (Positive (Channel))));
    end Configure_TC;
 
+   procedure Configure_TX_FCTRL (Frame_Length        : in Natural;
+                                 Tx_Data_Rate        : in Data_Rates;
+                                 Tx_PRF              : in PRF_Type;
+                                 Ranging             : in Boolean;
+                                 Preamble_Length     : in Preamble_Lengths;
+                                 Tx_Buffer_Offset    : in Natural;
+                                 Inter_Frame_Spacing : in Natural)
+   is
+   begin
+      TX_FCTRL.Write
+        ((TFLEN    => Bits_7 (Frame_Length mod 128),
+          TFLE     => Bits_3 (Frame_Length / 128),
+          R        => 0,
+          TXBR     => Bits_2 (Data_Rates'Pos (Tx_Data_Rate)),
+          TR       => (if Ranging then 1 else 0),
+          TXPRF    => (if Tx_PRF = PRF_16MHz
+                       then 2#01# else 2#10#),
+          TXPSR    =>
+             (case Preamble_Length is
+                 when PLEN_64 | PLEN_128 | PLEN_256 | PLEN_512 => 2#01#,
+                 when PLEN_1024 | PLEN_1536 | PLEN_2048        => 2#10#,
+                 when others                                   => 2#11#),
+          PE       =>
+            (case Preamble_Length is
+                when PLEN_64 | PLEN_1024 | PLEN_4096 => 2#00#,
+                when PLEN_128 | PLEN_1536            => 2#01#,
+                when PLEN_256 | PLEN_2048            => 2#10#,
+                when others                          => 2#11#),
+          TXBOFFS  => Bits_10 (Tx_Buffer_Offset),
+          IFSDELAY => Bits_8 (Inter_Frame_Spacing)));
+   end Configure_TX_FCTRL;
+
+   procedure Configure_CHAN_CTRL
+     (Tx_Channel              : in Channel_Number;
+      Rx_Channel              : in Channel_Number;
+      Use_DecaWave_SFD        : in Boolean;
+      Use_Tx_User_Defined_SFD : in Boolean;
+      Use_Rx_User_Defined_SFD : in Boolean;
+      Rx_PRF                  : in PRF_Type;
+      Tx_Preamble_Code        : in Preamble_Code_Number;
+      Rx_Preamble_Code        : in Preamble_Code_Number)
+   is
+   begin
+      CHAN_CTRL.Write ((TX_CHAN  => Bits_4 (Tx_Channel),
+                        RX_CHAN  => Bits_4 (Rx_Channel),
+                        DWSFD    => (if Use_DecaWave_SFD then 1 else 0),
+                        RXPRF    => (if Rx_PRF = PRF_16MHz
+                                     then 2#01# else 2#10#),
+                        TNSSFD   => (if Use_Tx_User_Defined_SFD then 1 else 0),
+                        RNSSFD   => (if Use_Rx_User_Defined_SFD then 1 else 0),
+                        TX_PCODE => Bits_5 (Tx_Preamble_Code),
+                        RX_PCODE => Bits_5 (Rx_Preamble_Code),
+                        Reserved => 0));
+   end Configure_CHAN_CTRL;
+
    procedure Configure_Nonstandard_SFD_Length (Data_Rate : in Data_Rates)
    is
       USR_SFD_Reg : Register_Types.USR_SFD_Type;

@@ -487,6 +487,52 @@ is
      Depends => (DW1000.BSP.Device_State => + Channel);
    --  Configure the transmit calibration (TC) block for the specified channel.
 
+   procedure Configure_TX_FCTRL (Frame_Length        : in Natural;
+                                 Tx_Data_Rate        : in Data_Rates;
+                                 Tx_PRF              : in PRF_Type;
+                                 Ranging             : in Boolean;
+                                 Preamble_Length     : in Preamble_Lengths;
+                                 Tx_Buffer_Offset    : in Natural;
+                                 Inter_Frame_Spacing : in Natural)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                             Frame_Length,
+                                             Tx_Data_Rate,
+                                             Tx_PRF,
+                                             Ranging,
+                                             Preamble_Length,
+                                             Tx_Buffer_Offset,
+                                             Inter_Frame_Spacing)),
+     Pre =>
+       (Frame_Length < Constants.TX_BUFFER_Length
+        and then Tx_Buffer_Offset < Constants.TX_BUFFER_Length
+        and then Frame_Length + Tx_Buffer_Offset <= Constants.TX_BUFFER_Length
+        and then Inter_Frame_Spacing < 256);
+
+
+   procedure Configure_CHAN_CTRL
+     (Tx_Channel              : in Channel_Number;
+      Rx_Channel              : in Channel_Number;
+      Use_DecaWave_SFD        : in Boolean;
+      Use_Tx_User_Defined_SFD : in Boolean;
+      Use_Rx_User_Defined_SFD : in Boolean;
+      Rx_PRF                  : in PRF_Type;
+      Tx_Preamble_Code        : in Preamble_Code_Number;
+      Rx_Preamble_Code        : in Preamble_Code_Number)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                             Tx_Channel,
+                                             Rx_Channel,
+                                             Use_DecaWave_SFD,
+                                             Use_Tx_User_Defined_SFD,
+                                             Use_Rx_User_Defined_SFD,
+                                             Rx_PRF,
+                                             Tx_Preamble_Code,
+                                             Rx_Preamble_Code)),
+     Pre => ((if Use_Tx_User_Defined_SFD then not Use_DecaWave_SFD)
+             and (if Use_Rx_User_Defined_SFD then not Use_DecaWave_SFD));
+
+
    procedure Configure_Nonstandard_SFD_Length (Data_Rate : in Data_Rates)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Data_Rate);
