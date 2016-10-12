@@ -86,6 +86,22 @@ is
       STM32.NVIC.NVIC_Periph.ISER0 := 16#0200_0000#;
    end Enable_DW1000_IRQ;
 
+
+   procedure Use_Slow_SPI_Clock
+   is
+   begin
+      --  Use /32 prescaler (72 MHz / 32 = 2.25 MHz clock)
+      STM32.SPI.SPI1_Periph.CR1.BR := 2#100#;
+   end Use_Slow_SPI_Clock;
+
+
+   procedure Use_Fast_SPI_Clock
+   is
+   begin
+      --  Use /4 prescaler (72 MHz / 4 = 18 MHz clock)
+      STM32.SPI.SPI1_Periph.CR1.BR := 2#001#;
+   end Use_Fast_SPI_Clock;
+
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
                                Data   : in DW1000.Types.Byte_Array)
    is
@@ -189,7 +205,7 @@ begin
      STM32.SPI.CR1_Register'(CPHA           => 0,
                              CPOL           => 0,
                              MSTR           => 1,
-                             BR             => 2#011#, --  /32 prescaler
+                             BR             => 2#100#, --  /32 prescaler
                              SPE            => 0,
                              LSBFIRST       => 0, --  MSB first
                              SSI            => 1,
