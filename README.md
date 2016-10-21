@@ -38,7 +38,7 @@ bare-board Ada runtimes. In particular, the following features are used:
     the full Ravenscar runtimes.
 
 Typically, this means that a full Ravenscar runtime is required as a minimum,
-such as: [ravenscar-full-stm32f105](https://github.com/damaki/ravenscar-full-stm32f105).
+such as: [ravenscar-full-evb1000](https://github.com/damaki/ravenscar-full-evb1000).
 
 ## 3.2 Porting the BSP
 
@@ -80,7 +80,7 @@ evaluation board then there are the following two SPARK and Ada projects on
 GitHub which are useful:
   * [EVB1000](https://github.com/damaki/EVB1000): SPARK drivers for the LCD, LED,
     and switch peripherals on the EVB1000. 
-  * [Ravenscar-full-stm32f105](https://github.com/damaki/ravenscar-full-stm32f105):
+  * [Ravenscar-full-evb1000](https://github.com/damaki/ravenscar-full-evb1000):
     a full Ravenscar runtime for the STM32F105 ARM Cortex-M3 microcontroller,
     configured for the EVB1000.
 
