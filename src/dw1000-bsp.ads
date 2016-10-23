@@ -62,14 +62,16 @@ is
    --  Enables the DW1000 IRQ.
 
 
-   procedure Use_Slow_SPI_Clock;
+   procedure Use_Slow_SPI_Clock
+     with Global => (In_Out => Device_State);
    --  Switch the BSP to use a slow SPI clock speed (no faster than 3 MHz).
    --
    --  The slow SPI clock speed should be used when the DW1000 is in the INIT
    --  state.
 
 
-   procedure Use_Fast_SPI_Clock;
+   procedure Use_Fast_SPI_Clock
+     with Global => (In_Out => Device_State);
    --  Switch the BSP to use a faster SPI clock speed (no faster than 20 MHz).
    --
    --  The fast SPI clock speed can be used when the DW1000 has left the INIT
