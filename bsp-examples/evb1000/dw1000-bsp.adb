@@ -108,6 +108,7 @@ is
       use type STM32.Bit;
 
    begin
+      Disable_DW1000_IRQ;
 
       Select_Device;
 
@@ -135,6 +136,8 @@ is
       end loop;
 
       Deselect_Device;
+
+      Enable_DW1000_IRQ;
 
    end Write_Transaction;
 
