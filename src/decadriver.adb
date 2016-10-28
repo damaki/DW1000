@@ -813,19 +813,23 @@ is
             SYS_STATUS_Clear.RXRFSL := 1;
          end if;
 
-         if SYS_STATUS_Reg.RXDFR = 1 then
+         if SYS_STATUS_Reg.RXFCG = 1 then
+            Receiver.Notify_Frame_Received;
+            SYS_STATUS_Clear.RXFCG := 1;
 
-            if SYS_STATUS_Reg.RXFCG = 1 then
-               Receiver.Notify_Frame_Received;
-               SYS_STATUS_Clear.RXFCG := 1;
+            --  Clear RX flags
+            SYS_STATUS_Clear.RXDFR   := 1;
+            SYS_STATUS_Clear.RXPRD   := 1;
+            SYS_STATUS_Clear.RXSFDD  := 1;
+            SYS_STATUS_Clear.LDEDONE := 1;
+            SYS_STATUS_Clear.RXPHD   := 1;
+         end if;
 
-            elsif SYS_STATUS_Reg.RXFCE = 1 then
-               if Detect_FCS_Error then
-                  Receiver.Notify_Receive_Error (FCS_Error);
-               end if;
-               SYS_STATUS_Clear.RXFCE := 1;
-
+         if SYS_STATUS_Reg.RXFCE = 1 then
+            if Detect_FCS_Error then
+               Receiver.Notify_Receive_Error (FCS_Error);
             end if;
+            SYS_STATUS_Clear.RXFCE := 1;
 
             --  Clear RX flags
             SYS_STATUS_Clear.RXDFR   := 1;
