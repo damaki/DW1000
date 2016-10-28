@@ -258,11 +258,12 @@ is
    range 0 .. DecaDriver_Config.Maximum_Receive_Frame_Length;
 
    type Rx_Status_Type is (No_Error,
-                      Frame_Timeout,
-                      Preamble_Timeout,
-                      SFD_Timeout,
-                      RS_Error,
-                      FCS_Error);
+                           Frame_Timeout,
+                           Preamble_Timeout,
+                           SFD_Timeout,
+                           PHR_Error,
+                           RS_Error,
+                           FCS_Error);
 
    type Frame_Info_Type is record
       RX_TIME_Reg      : RX_TIME_Type;

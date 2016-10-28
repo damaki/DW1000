@@ -799,6 +799,13 @@ is
             SYS_STATUS_Clear.RXSFDTO := 1;
          end if;
 
+         if SYS_STATUS_Reg.RXPHE = 1 then
+            if Detect_PHR_Error then
+               Receiver.Notify_Receive_Error (PHR_Error);
+            end if;
+            SYS_STATUS_Clear.RXPHE := 1;
+         end if;
+
          if SYS_STATUS_Reg.RXRFSL = 1 then
             if Detect_RS_Error then
                Receiver.Notify_Receive_Error (RS_Error);
