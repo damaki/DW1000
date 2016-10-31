@@ -211,6 +211,12 @@ is
          Rx_Count := 0;
       end Discard_Pending_Frames;
 
+      procedure Set_FCS_Check_Enabled (Enabled : in Boolean)
+      is
+      begin
+         DW1000.Driver.Set_FCS_Check_Enabled (Enabled);
+      end Set_FCS_Check_Enabled;
+
       procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
       is
       begin
@@ -549,6 +555,7 @@ is
          SYS_MASK_Reg.MRXRFSL  := 1;
          SYS_MASK_Reg.MRXFCE   := 1;
          SYS_MASK_Reg.MRXFCG   := 1; --  Always detect frame received
+         SYS_MASK_Reg.MRXDFR   := 1;
          SYS_MASK_Reg.MTXFRS   := 1; --  Always detect frame sent
          DW1000.Registers.SYS_MASK.Write (SYS_MASK_Reg);
 
@@ -813,7 +820,7 @@ is
             SYS_STATUS_Clear.RXRFSL := 1;
          end if;
 
-         if SYS_STATUS_Reg.RXFCG = 1 then
+         if SYS_STATUS_Reg.RXFCG = 1 or SYS_STATUS_Reg.RXDFR = 1 then
             Receiver.Notify_Frame_Received;
             SYS_STATUS_Clear.RXFCG := 1;
 

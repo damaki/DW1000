@@ -587,6 +587,28 @@ is
    --  @param Enabled When set to True frame filtering is enabled. Otherwise,
    --     it is disabled.
 
+   procedure Set_FCS_Check_Enabled (Enabled : in Boolean)
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => + Enabled);
+   --  Enable or disable the automatic frame check sequence (FCS) on received
+   --  frames.
+   --
+   --  By default, the DW1000 automatically checks the 16-bit CRC FCS on each
+   --  received frame. The last two octets in the received frame are assumed
+   --  as the 16-bit CRC, and is compared against the actual FCS computed
+   --  against all but the last two octets in the received frame.
+   --
+   --  If the DW1000 detects that the actual FCS does not match the FCS in the
+   --  received frame, then it generates an FCS error. If double-buffered mode
+   --  is enabled then the received frame is discarded and the buffer re-used
+   --  for the next received frame.
+   --
+   --  This procedure enables or disables the FCS check.
+   --
+   --  @param Enabled When True (default after DW1000 reset) the DW1000 will
+   --     check the FCS of each received frame. Set this to false to disable
+   --     the FCS check for each packet.
+
    procedure Configure_Frame_Filtering (Behave_As_Coordinator : in Boolean;
                                         Allow_Beacon_Frame    : in Boolean;
                                         Allow_Data_Frame      : in Boolean;

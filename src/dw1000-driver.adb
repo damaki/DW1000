@@ -712,6 +712,15 @@ is
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Frame_Filtering_Enabled;
 
+   procedure Set_FCS_Check_Enabled (Enabled : in Boolean)
+   is
+      SYS_CFG_Reg : SYS_CFG_Type;
+   begin
+      SYS_CFG.Read (SYS_CFG_Reg);
+      SYS_CFG_Reg.DIS_FCE := (if Enabled then 0 else 1);
+      SYS_CFG.Write (SYS_CFG_Reg);
+   end Set_FCS_Check_Enabled;
+
    procedure Configure_Frame_Filtering (Behave_As_Coordinator   : in Boolean;
                                         Allow_Beacon_Frame      : in Boolean;
                                         Allow_Data_Frame        : in Boolean;
