@@ -548,7 +548,7 @@ is
          SYS_MASK_Reg.MRXPHE   := 1;
          SYS_MASK_Reg.MRXRFSL  := 1;
          SYS_MASK_Reg.MRXFCE   := 1;
-         SYS_MASK_Reg.MRXDFR   := 1; --  Always detect frame received
+         SYS_MASK_Reg.MRXFCG   := 1; --  Always detect frame received
          SYS_MASK_Reg.MTXFRS   := 1; --  Always detect frame sent
          DW1000.Registers.SYS_MASK.Write (SYS_MASK_Reg);
 
