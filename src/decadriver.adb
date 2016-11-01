@@ -609,7 +609,7 @@ is
            (PRF                => Config.PRF,
             Data_Rate          => Config.Data_Rate,
             Tx_Preamble_Length => Config.Tx_Preamble_Length,
-            PAC                => Config.Tx_PAC,
+            PAC                => Config.Rx_PAC,
             SFD_Timeout        => SFD_Timeout,
             Nonstandard_SFD    => Config.Use_Nonstandard_SFD);
 

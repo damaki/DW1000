@@ -245,7 +245,7 @@ is
       Channel             : DW1000.Driver.Channel_Number;
       PRF                 : DW1000.Driver.PRF_Type;
       Tx_Preamble_Length  : DW1000.Driver.Preamble_Lengths;
-      Tx_PAC              : DW1000.Driver.Preamble_Acq_Chunk_Length;
+      Rx_PAC              : DW1000.Driver.Preamble_Acq_Chunk_Length;
       Tx_Preamble_Code    : DW1000.Driver.Preamble_Code_Number;
       Rx_Preamble_Code    : DW1000.Driver.Preamble_Code_Number;
       Use_Nonstandard_SFD : Boolean;
