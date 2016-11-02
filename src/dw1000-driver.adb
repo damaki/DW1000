@@ -128,6 +128,9 @@ is
    -- This value for AGC_TUNE2 is given by the user manual
    AGC_TUNE2_Value : constant Types.Bits_32 := 16#2502A907#;
 
+   -- This value for AGC_TUNE3 is given by the user manual
+   AGC_TUNE3_Value : constant Types.Bits_16 := 16#0035#;
+
    -- These values for TC_PGDELAY are given by the user manual
    TC_PGDELAY_Values : constant array (Positive range 1 .. 7) of Bits_8
      := (1 => 16#C9#,
@@ -520,6 +523,11 @@ is
       AGC_TUNE1.Write
         (AGC_TUNE1_Type'
            (AGC_TUNE1 => AGC_TUNE1_Values (PRF))
+        );
+
+      AGC_TUNE3.Write
+        (AGC_TUNE3_Type'
+           (AGC_TUNE3 => AGC_TUNE3_Value)
         );
 
    end Configure_AGC;
