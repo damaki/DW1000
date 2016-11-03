@@ -875,6 +875,11 @@ is
    --  Turning off the tranceiver will cancel any pending receive or
    --  transmit operation.
 
+   procedure Reset_Rx
+     with Global => (In_Out => DW1000.BSP.Device_State),
+     Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State);
+   --  Perform a soft reset of the receiver only.
+
    procedure Toggle_Host_Side_Rx_Buffer_Pointer
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State);

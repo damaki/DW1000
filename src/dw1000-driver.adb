@@ -1196,6 +1196,24 @@ is
 
    end Force_Tx_Rx_Off;
 
+   procedure Reset_Rx
+   is
+      PMSC_CTRL0_Reg : PMSC_CTRL0_Type;
+
+   begin
+      --  Initiate a soft reset of the receiver only.
+      --  The DW1000 User Manual, Section 7.2.50.1, for the SOFTRESET bits
+      --  states "To apply a receiver-only soft reset, clear and set bit 28
+      --  only."
+      PMSC_CTRL0.Read (PMSC_CTRL0_Reg);
+
+      PMSC_CTRL0_Reg.SOFTRESET := 2#1110#;
+      PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
+
+      PMSC_CTRL0_Reg.SOFTRESET := 2#1111#;
+      PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
+   end Reset_Rx;
+
    procedure Toggle_Host_Side_Rx_Buffer_Pointer
    is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
