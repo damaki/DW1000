@@ -792,7 +792,14 @@ is
 
          DW1000.Registers.SYS_STATUS.Read (SYS_STATUS_Reg);
 
+         --  The DW1000 User Manual, Section 4.1.6, states that after certain
+         --  types of errors the receiver should be reset to ensure that the
+         --  next good frame has the correct timestamp. To handle this, we
+         --  use the Reset_Rx procedure.
+
          if SYS_STATUS_Reg.RXRFTO = 1 then
+            DW1000.Driver.Reset_Rx;
+
             if Detect_Frame_Timeout then
                Receiver.Notify_Receive_Error (Frame_Timeout);
             end if;
@@ -807,6 +814,8 @@ is
          end if;
 
          if SYS_STATUS_Reg.RXPHE = 1 then
+            DW1000.Driver.Reset_Rx;
+
             if Detect_PHR_Error then
                Receiver.Notify_Receive_Error (PHR_Error);
             end if;
@@ -814,6 +823,8 @@ is
          end if;
 
          if SYS_STATUS_Reg.RXRFSL = 1 then
+            DW1000.Driver.Reset_Rx;
+
             if Detect_RS_Error then
                Receiver.Notify_Receive_Error (RS_Error);
             end if;
