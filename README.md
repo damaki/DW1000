@@ -24,6 +24,9 @@ To use the driver, include the contents of the ``src`` directory into your
 project, and provide an implementation of ``dw1000-bsp.adb`` for your target
 hardware (more on this below in 3.2).
 
+Check out the [Wiki](https://github.com/damaki/DW1000/wiki) for more information
+on using the driver.
+
 ## 3.1 Prerequisites
 
 Parts of the driver require certain runtime features that are not available on all
