@@ -30,33 +30,6 @@ is
 
    Default_SFD_Timeout : constant DW1000.Driver.SFD_Timeout_Number := 16#1041#;
 
-   LDE_Replica_Coeffs : constant
-     array (DW1000.Driver.Preamble_Code_Number) of Bits_16
-       := (1  => Bits_16 (0.35 * 2**16),
-           2  => Bits_16 (0.35 * 2**16),
-           3  => Bits_16 (0.32 * 2**16),
-           4  => Bits_16 (0.26 * 2**16),
-           5  => Bits_16 (0.27 * 2**16),
-           6  => Bits_16 (0.18 * 2**16),
-           7  => Bits_16 (0.50 * 2**16),
-           8  => Bits_16 (0.32 * 2**16),
-           9  => Bits_16 (0.16 * 2**16),
-           10 => Bits_16 (0.20 * 2**16),
-           11 => Bits_16 (0.23 * 2**16),
-           12 => Bits_16 (0.24 * 2**16),
-           13 => Bits_16 (0.23 * 2**16),
-           14 => Bits_16 (0.21 * 2**16),
-           15 => Bits_16 (0.27 * 2**16),
-           16 => Bits_16 (0.21 * 2**16),
-           17 => Bits_16 (0.20 * 2**16),
-           18 => Bits_16 (0.21 * 2**16),
-           19 => Bits_16 (0.21 * 2**16),
-           20 => Bits_16 (0.28 * 2**16),
-           21 => Bits_16 (0.23 * 2**16),
-           22 => Bits_16 (0.22 * 2**16),
-           23 => Bits_16 (0.19 * 2**16),
-           24 => Bits_16 (0.22 * 2**16));
-
    protected body Driver
    is
 
@@ -140,20 +113,13 @@ is
 
       procedure Configure (Config : in Configuration_Type)
       is
-         LDE_REPC_Reg  : DW1000.Register_Types.LDE_REPC_Type;
-
          SFD_Timeout : DW1000.Driver.SFD_Timeout_Number;
 
       begin
 
-         LDE_REPC_Reg.LDE_REPC := LDE_Replica_Coeffs (Config.Rx_Preamble_Code);
-
          --  110 kbps data rate has special handling
          if Config.Data_Rate = DW1000.Driver.Data_Rate_110k then
             SYS_CFG_Reg.RXM110K := 1;
-
-            LDE_REPC_Reg.LDE_REPC := LDE_REPC_Reg.LDE_REPC / 8;
-
          else
             SYS_CFG_Reg.RXM110K := 0;
          end if;
@@ -163,9 +129,10 @@ is
            Bits_2 (DW1000.Driver.Physical_Header_Modes'Pos (Config.PHR_Mode));
 
          DW1000.Registers.SYS_CFG.Write (SYS_CFG_Reg);
-         DW1000.Registers.LDE_REPC.Write (LDE_REPC_Reg);
 
-         DW1000.Driver.Configure_LDE (Config.PRF);
+         DW1000.Driver.Configure_LDE (Config.PRF,
+                                      Config.Rx_Preamble_Code,
+                                      Config.Data_Rate);
          DW1000.Driver.Configure_PLL (Config.Channel);
          DW1000.Driver.Configure_RF (Config.Channel);
 

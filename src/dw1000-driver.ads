@@ -417,15 +417,21 @@ is
    --  @param Antenna_Delay The antenna delay. The maximum allowed value is
    --     1025.625 nanoseconds.
 
-   procedure Configure_LDE (PRF : in PRF_Type)
+   procedure Configure_LDE (PRF              : in PRF_Type;
+                            Rx_Preamble_Code : in Preamble_Code_Number;
+                            Data_Rate        : in Data_Rates)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State, PRF));
+     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
+                                             PRF,
+                                             Rx_Preamble_Code,
+                                             Data_Rate));
    --  Configures the LDE subsystem for the specified pulse repetition
-   --  frequency (PRF).
+   --  frequency (PRF), receiver preamble code, and data rate.
    --
    --  This procedure configures the following registers:
    --    * LDE_CFG1
    --    * LDE_CFG2
+   --    * LDE_REPC
 
    procedure Configure_PLL (Channel : in Channel_Number)
      with Global => (In_Out => DW1000.BSP.Device_State),

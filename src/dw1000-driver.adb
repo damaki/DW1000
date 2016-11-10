@@ -40,6 +40,33 @@ is
      := (PRF_16MHz => 16#1607#,
          PRF_64MHz => 16#0607#);
 
+   LDE_Replica_Coeffs : constant
+     array (Preamble_Code_Number) of Bits_16
+       := (1  => Bits_16 (0.35 * 2**16),
+           2  => Bits_16 (0.35 * 2**16),
+           3  => Bits_16 (0.32 * 2**16),
+           4  => Bits_16 (0.26 * 2**16),
+           5  => Bits_16 (0.27 * 2**16),
+           6  => Bits_16 (0.18 * 2**16),
+           7  => Bits_16 (0.50 * 2**16),
+           8  => Bits_16 (0.32 * 2**16),
+           9  => Bits_16 (0.16 * 2**16),
+           10 => Bits_16 (0.20 * 2**16),
+           11 => Bits_16 (0.23 * 2**16),
+           12 => Bits_16 (0.24 * 2**16),
+           13 => Bits_16 (0.23 * 2**16),
+           14 => Bits_16 (0.21 * 2**16),
+           15 => Bits_16 (0.27 * 2**16),
+           16 => Bits_16 (0.21 * 2**16),
+           17 => Bits_16 (0.20 * 2**16),
+           18 => Bits_16 (0.21 * 2**16),
+           19 => Bits_16 (0.21 * 2**16),
+           20 => Bits_16 (0.28 * 2**16),
+           21 => Bits_16 (0.23 * 2**16),
+           22 => Bits_16 (0.22 * 2**16),
+           23 => Bits_16 (0.19 * 2**16),
+           24 => Bits_16 (0.22 * 2**16));
+
    -- These values for FS_PLLCFG are given by the user manual
    FS_PLLCFG_Values : constant array (Positive range 1 .. 7) of Types.Bits_32
      := (1   => 16#09000407#,
@@ -419,11 +446,29 @@ is
    end Write_Rx_Antenna_Delay;
 
 
-   procedure Configure_LDE (PRF : in PRF_Type)
+   procedure Configure_LDE (PRF              : in PRF_Type;
+                            Rx_Preamble_Code : in Preamble_Code_Number;
+                            Data_Rate        : in Data_Rates)
    is
+      REPC_Coeff : Bits_16;
+
    begin
       LDE_CFG1.Write (LDE_CFG1_Value);
       LDE_CFG2.Write (LDE_CFG2_Type'(LDE_CFG2 => LDE_CFG2_Values (PRF)));
+
+      REPC_Coeff := LDE_Replica_Coeffs (Rx_Preamble_Code);
+
+      if Data_Rate = Data_Rate_110k then
+         --  110 k data rate has special handling
+         LDE_REPC.Write
+           (LDE_REPC_Type'
+              (LDE_REPC => REPC_Coeff / 8));
+
+      else
+         LDE_REPC.Write
+           (LDE_REPC_Type'
+              (LDE_REPC => REPC_Coeff));
+      end if;
 
    end Configure_LDE;
 
