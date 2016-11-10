@@ -167,7 +167,7 @@ is
    end Transmitter_Clock_Offset;
 
 
-   protected body Receiver_Type
+   protected body Receiver
    is
       entry Wait (Frame      : in out DW1000.Types.Byte_Array;
                   Length     :    out Frame_Length_Number;
@@ -389,10 +389,10 @@ is
          Frame_Ready := True;
       end Notify_Receive_Error;
 
-   end Receiver_Type;
+   end Receiver;
 
 
-   protected body Transmitter_Type
+   protected body Transmitter
    is
 
       entry Wait_For_Tx_Complete
@@ -483,12 +483,12 @@ is
          Tx_Idle := True;
       end Notify_Tx_Complete;
 
-   end Transmitter_Type;
+   end Transmitter;
 
 
-   --  Driver_Type body
+   --  Driver body
 
-   protected body Driver_Type
+   protected body Driver
    is
 
       procedure Initialize (Load_Antenna_Delay   : in Boolean;
@@ -876,6 +876,6 @@ is
 
       end DW1000_IRQ;
 
-   end Driver_Type;
+   end Driver;
 
 end DecaDriver;

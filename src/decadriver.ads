@@ -347,10 +347,10 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- Receiver_Type
+   -- Receiver
    ----------------------------------------------------------------------------
 
-   protected type Receiver_Type
+   protected Receiver
      with Interrupt_Priority => DecaDriver_Config.Driver_Priority
    is
       entry Wait (Frame      : in out Byte_Array;
@@ -358,12 +358,12 @@ is
                   Frame_Info :    out Frame_Info_Type;
                   Status     :    out Rx_Status_Type;
                   Overrun    :    out Boolean)
-      with Depends => (Frame         => + Receiver_Type,
-                       Frame_Info    => Receiver_Type,
-                       Length        => Receiver_Type,
-                       Receiver_Type => Receiver_Type,
-                       Status        => Receiver_Type,
-                       Overrun       => Receiver_Type),
+      with Depends => (Frame         => + Receiver,
+                       Frame_Info    => Receiver,
+                       Length        => Receiver,
+                       Receiver => Receiver,
+                       Status        => Receiver,
+                       Overrun       => Receiver),
         Pre => Frame'Length > 0,
         Post =>
           (if Status = No_Error then
@@ -431,14 +431,14 @@ is
       --  Returns the number of received frames that are waiting to be read.
 
       procedure Discard_Pending_Frames
-        with Depends => (Receiver_Type => Receiver_Type);
+        with Depends => (Receiver => Receiver);
       --  Discard any pending frames that have been received, but have not yet
       --  been read.
 
       procedure Set_FCS_Check_Enabled (Enabled : in Boolean)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Enabled,
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -465,7 +465,7 @@ is
       procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Enabled,
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       --  Enable or disable frame filtering.
       --
       --  Frame filtering allows the DW1000 to automatically reject frames
@@ -500,7 +500,7 @@ is
                                                 Allow_Reserved_Frame,
                                                 Allow_Frame_Type_4,
                                                 Allow_Frame_Type_5),
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       --  Configure which MAC frame types are automatically filtered by the
       --  DW1000.
       --
@@ -550,7 +550,7 @@ is
       procedure Set_Rx_Double_Buffer (Enabled : in Boolean)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Enabled,
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       --  Enable or disable the double-buffer mode of the receiver.
       pragma Annotate
         (GNATprove, False_Positive,
@@ -560,7 +560,7 @@ is
       procedure Set_Rx_Auto_Reenable (Enabled : in Boolean)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Enabled,
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       --  Enable or disable the Rx auto re-enable feature.
       --
       --  This feature has different behaviour depending on whether or not the
@@ -586,7 +586,7 @@ is
       procedure Set_Delayed_Rx_Time(Time : in Coarse_System_Time)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Time,
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       --  Set the time at which the receiver is turned on and the frame is
       --  sent, when using the delayed receive feature.
       --
@@ -612,7 +612,7 @@ is
       procedure Set_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Timeout,
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -622,7 +622,7 @@ is
       procedure Start_Rx_Immediate
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       --  Turn on the receiver immediately (without delay).
       pragma Annotate
         (GNATprove, False_Positive,
@@ -634,7 +634,7 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                     Result                  => DW1000.BSP.Device_State,
-                    Receiver_Type           => Receiver_Type);
+                    Receiver           => Receiver);
       --  Turn on the receiver at the configured delay time.
       --
       --  The time at which the receiver should be enabled is programmed
@@ -648,8 +648,8 @@ is
 
       procedure Notify_Frame_Received
         with Global => (In_Out => DW1000.BSP.Device_State),
-        Depends => (DW1000.BSP.Device_State => + Receiver_Type,
-                    Receiver_Type           => + DW1000.BSP.Device_State);
+        Depends => (DW1000.BSP.Device_State => + Receiver,
+                    Receiver           => + DW1000.BSP.Device_State);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -663,7 +663,7 @@ is
       --  procedure should not be called by the user.
 
       procedure Notify_Receive_Error (Error : in Rx_Status_Type)
-        with Depends => (Receiver_Type => + Error),
+        with Depends => (Receiver => + Error),
         Pre => Error /= No_Error;
 
    private
@@ -705,15 +705,15 @@ is
       Rx_Count         : Natural              := 0;
       Overrun_Occurred : Boolean              := False;
       Frame_Ready      : Boolean              := False;
-   end Receiver_Type;
+   end Receiver;
 
 
 
    ----------------------------------------------------------------------------
-   --  Transmitter_Type
+   --  Transmitter
    ----------------------------------------------------------------------------
 
-   protected type Transmitter_Type
+   protected Transmitter
      with Interrupt_Priority => DecaDriver_Config.Driver_Priority
    is
 
@@ -732,7 +732,7 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Config),
-                    Transmitter_Type        => Transmitter_Type);
+                    Transmitter        => Transmitter);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -744,7 +744,7 @@ is
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Data,
                                                 Offset),
-                    Transmitter_Type        => Transmitter_Type),
+                    Transmitter        => Transmitter),
         Pre => (Data'Length in 1 .. 1024 and then
                 Offset < 1024            and then
                 Data'Length + Offset <= 1024);
@@ -759,7 +759,7 @@ is
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Length,
                                                 Offset),
-                    Transmitter_Type        => Transmitter_Type),
+                    Transmitter        => Transmitter),
         Pre => (Length in 1 .. DW1000.Constants.TX_BUFFER_Length and then
                 Offset < DW1000.Constants.TX_BUFFER_Length       and then
                 Length + Offset <= DW1000.Constants.TX_BUFFER_Length);
@@ -771,7 +771,7 @@ is
       procedure Set_Delayed_Tx_Time(Time : in Coarse_System_Time)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Time,
-                    Transmitter_Type        => Transmitter_Type);
+                    Transmitter        => Transmitter);
       --  Set the time at which the transmitter is turned on and the frame is
       --  sent, when using the delayed transmit feature.
       --
@@ -798,7 +798,7 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Rx_After_Tx),
-                    Transmitter_Type        => Transmitter_Type);
+                    Transmitter        => Transmitter);
       --  Start a transmission of a packet immediate (without a delay).
       --
       --  The packet data is set by calling Set_Tx_Data to program the data
@@ -823,7 +823,7 @@ is
                                                 Rx_After_Tx),
                     Result                  => (DW1000.BSP.Device_State,
                                                 Rx_After_Tx),
-                    Transmitter_Type        => (Transmitter_Type,
+                    Transmitter        => (Transmitter,
                                                 DW1000.BSP.Device_State,
                                                 Rx_After_Tx));
       --  Start a delayed transmission of a packet.
@@ -850,7 +850,7 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                     Timestamp               => DW1000.BSP.Device_State,
-                    Transmitter_Type        => Transmitter_Type);
+                    Transmitter        => Transmitter);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -861,7 +861,7 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                     Timestamp               => DW1000.BSP.Device_State,
-                    Transmitter_Type        => Transmitter_Type);
+                    Transmitter        => Transmitter);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -877,19 +877,14 @@ is
       Tx_Idle : Boolean := True;
       --  True when the transmitter is idle, False otherwise.
 
-   end Transmitter_Type;
-
-
-   Receiver    : Receiver_Type;
-   Transmitter : Transmitter_Type;
-
+   end Transmitter;
 
 
    ----------------------------------------------------------------------------
-   --  Driver_Type
+   --  Driver
    ----------------------------------------------------------------------------
 
-   protected type Driver_Type
+   protected Driver
      with Interrupt_Priority => DecaDriver_Config.Driver_Priority
    is
 
@@ -899,11 +894,11 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State,
                         Input  => Ada.Real_Time.Clock_Time),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                                Driver_Type,
+                                                Driver,
                                                 Load_Antenna_Delay,
                                                 Load_XTAL_Trim,
                                                 Load_UCode_From_ROM),
-                    Driver_Type             => + (DW1000.BSP.Device_State,
+                    Driver             => + (DW1000.BSP.Device_State,
                                                   Load_Antenna_Delay,
                                                   Load_XTAL_Trim,
                                                   Load_UCode_From_ROM),
@@ -936,8 +931,8 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Config,
-                                                Driver_Type),
-                    Driver_Type             => + Config),
+                                                Driver),
+                    Driver             => + Config),
         Post => (PHR_Mode = Config.PHR_Mode);
       --  Configure the DW1000 for a specific channel, PRF, preamble, etc...
       pragma Annotate
@@ -958,7 +953,7 @@ is
                                                 PHR_Error,
                                                 RS_Error,
                                                 FCS_Error),
-                    Driver_Type             => (Driver_Type,
+                    Driver             => (Driver,
                                                 Frame_Timeout,
                                                 SFD_Timeout,
                                                 PHR_Error,
@@ -994,7 +989,7 @@ is
       procedure Force_Tx_Rx_Off
         with Global => (In_Out => (DW1000.BSP.Device_State, Transmitter)),
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
-                    Driver_Type             => Driver_Type,
+                    Driver             => Driver,
                     Transmitter             => Transmitter);
       --  Switch off the transmitter and receiver.
       --
@@ -1008,7 +1003,7 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 PAN_ID),
-                    Driver_Type             => Driver_Type);
+                    Driver             => Driver);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -1018,7 +1013,7 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Short_Address),
-                    Driver_Type             => Driver_Type);
+                    Driver             => Driver);
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -1028,7 +1023,7 @@ is
       function Get_Lot_ID  return Bits_32;
 
       function PHR_Mode return DW1000.Driver.Physical_Header_Modes
-        With Depends => (PHR_Mode'Result => Driver_Type);
+        With Depends => (PHR_Mode'Result => Driver);
 
    private
 
@@ -1038,15 +1033,15 @@ is
                               Receiver,
                               Transmitter)),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                                Driver_Type,
+                                                Driver,
                                                 Receiver),
-                    Driver_Type             => Driver_Type,
+                    Driver             => Driver,
                     Transmitter             => (DW1000.BSP.Device_State,
                                                 Transmitter,
-                                                Driver_Type),
+                                                Driver),
                     Receiver                => (DW1000.BSP.Device_State,
                                                 Receiver,
-                                                Driver_Type));
+                                                Driver));
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
@@ -1100,8 +1095,6 @@ is
       Detect_RS_Error       : Boolean := False;
       Detect_FCS_Error      : Boolean := False;
 
-   end Driver_Type;
-
-   Driver : Driver_Type;
+   end Driver;
 
 end DecaDriver;
