@@ -31,7 +31,7 @@ on using the driver.
 
 Parts of the driver require certain runtime features that are not available on all
 bare-board Ada runtimes. In particular, the following features are used:
-  * Protected objects are used by the ``DecaDriver`` package. This requires
+  * Protected objects are used by the ``DecaDriver``. This requires
     an Ada runtime supporting tasking (e.g. a Ravenscar runtime).
   * The ``Ada.Real_Time.Clock`` function is used by the ``DW1000.Driver``
     package. This feature is also supported in Ravenscar runtimes.
@@ -96,6 +96,9 @@ Here's some examples of SPARK code using the driver:
 ```Ada
 with Ada.Real_Time;    use Ada.Real_Time;
 with DecaDriver;
+with DecaDriver.Core;
+with DecaDriver.Rx;
+with DecaDriver.Tx;
 with DW1000.BSP;
 with DW1000.Driver;    use DW1000.Driver;
 with DW1000.Types;     use DW1000.Types;
@@ -105,18 +108,18 @@ procedure Example
   with SPARK_Mode => On,
   Global => (Input  =>  Ada.Real_Time.Clock_Time,
              In_Out => (DW1000.BSP.Device_State,
-                        DecaDriver.Driver,
-                        DecaDriver.Transmitter)),
-  Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                          DecaDriver.Driver),
-              DecaDriver.Transmitter  => DecaDriver.Transmitter,
-              DecaDriver.Driver       => (DecaDriver.Driver,
-                                          DW1000.BSP.Device_State),
-              null                    => Ada.Real_Time.Clock_Time)
+                        DecaDriver.Core.Driver,
+                        DecaDriver.Tx.Transmitter)),
+  Depends => (DW1000.BSP.Device_State   => (DW1000.BSP.Device_State,
+                                            DecaDriver.Core.Driver),
+              DecaDriver.Tx.Transmitter => DecaDriver.Tx.Transmitter,
+              DecaDriver.Core.Driver    => (DecaDriver.Core.Driver,
+                                            DW1000.BSP.Device_State),
+              null                      => Ada.Real_Time.Clock_Time)
 is
    Frame_Data : constant Byte_Array(1 .. 127) := (others => 16#AA#);
 
-   Config     : constant DecaDriver.Configuration_Type
+   Config     : constant DecaDriver.Core.Configuration_Type
      := (Channel             => 1,
          PRF                 => PRF_64MHz,
          Tx_Preamble_Length  => PLEN_1024,
@@ -129,26 +132,31 @@ is
          SFD_Timeout         => 1025 + 64 - 32);
 
 begin
-   DecaDriver.Driver.Initialize (Load_Antenna_Delay   => True,
-                                 Load_XTAL_Trim       => True,
-                                 Load_UCode_From_ROM  => True);
+   DecaDriver.Core.Driver.Initialize
+     (Load_Antenna_Delay   => True,
+      Load_XTAL_Trim       => True,
+      Load_UCode_From_ROM  => True);
 
-   DecaDriver.Driver.Configure (Config);
+   DecaDriver.Core.Driver.Configure (Config);
 
    --  The reference transmit power values for the DecaWave EVB1000 evalulation
    --  board are used to configure the transmit power level.
-   DecaDriver.Transmitter.Configure_Tx_Power
+   DecaDriver.Tx.Transmitter.Configure_Tx_Power
      (Smart_Tx_Power_Table (Positive (Config.Channel), Config.PRF));
 
    --  Continuously send packets
    loop
-      DecaDriver.Transmitter.Set_Tx_Data (Data   => Frame_Data,
-                                          Offset => 0);
-      DecaDriver.Transmitter.Set_Tx_Frame_Length (Length => Frame_Data'Length,
-                                                  Offset => 0);
-      DecaDriver.Transmitter.Start_Tx_Immediate (Rx_After_Tx => False);
+      DecaDriver.Tx.Transmitter.Set_Tx_Data
+        (Data   => Frame_Data,
+         Offset => 0);
+
+      DecaDriver.Tx.Transmitter.Set_Tx_Frame_Length
+        (Length => Frame_Data'Length,
+         Offset => 0);
+
+      DecaDriver.Tx.Transmitter.Start_Tx_Immediate (Rx_After_Tx => False);
       
-      DecaDriver.Transmitter.Wait_For_Tx_Complete;
+      DecaDriver.Tx.Transmitter.Wait_For_Tx_Complete;
    end loop;
 end Example;
 ```
@@ -158,6 +166,9 @@ end Example;
 ```Ada
 with Ada.Real_Time;      use Ada.Real_Time;
 with DecaDriver;
+with DecaDriver.Core;
+with DecaDriver.Rx;
+with DecaDriver.Tx;
 with DW1000.BSP;
 with DW1000.Driver;      use DW1000.Driver;
 with DW1000.System_Time;
@@ -167,48 +178,51 @@ procedure Example
   with SPARK_Mode => On,
   Global => (Input  =>  Ada.Real_Time.Clock_Time,
              In_Out => (DW1000.BSP.Device_State,
-                        DecaDriver.Driver,
-                        DecaDriver.Receiver)),
+                        DecaDriver.Core.Driver,
+                        DecaDriver.Rx.Receiver)),
   Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                           DecaDriver.Driver),
-              DecaDriver.Receiver     => DecaDriver.Receiver,
-              DecaDriver.Driver       => (DecaDriver.Driver,
+              DecaDriver.Rx.Receiver  => DecaDriver.Rx.Receiver,
+              DecaDriver.Core.Driver  => (DecaDriver.Core.Driver,
                                           DW1000.BSP.Device_State),
               null                    => Ada.Real_Time.Clock_Time)
 is
-   Frame_Data   : Byte_Array(1 .. 127) := (others => 0);
-   Frame_Length : DecaDriver.Frame_Length_Number;
-   Rx_Timestamp : DW1000.System_Time.Fine_System_Time;
-   Rx_Error     : DecaDriver.Rx_Errors;
-   Rx_Overrun   : Boolean;
+   Frame_Data    : Byte_Array(1 .. 127) := (others => 0);
+   Frame_Length  : DecaDriver.Frame_Length_Number;
+   Rx_Frame_Info : DecaDriver.Rx.Frame_Info_Type;
+   Rx_Error      : DecaDriver.Rx.Rx_Errors;
+   Rx_Overrun    : Boolean;
 
 begin
-   DecaDriver.Driver.Initialize (Load_Antenna_Delay   => True,
-                                 Load_XTAL_Trim       => True,
-                                 Load_UCode_From_ROM  => True);
+   DecaDriver.Core.Driver.Initialize
+     (Load_Antenna_Delay   => True,
+      Load_XTAL_Trim       => True,
+      Load_UCode_From_ROM  => True);
 
-   DecaDriver.Driver.Configure (DecaDriver.Configuration_Type'
-                                  (Channel             => 1,
-                                   PRF                 => PRF_64MHz,
-                                   Tx_Preamble_Length  => PLEN_1024,
-                                   Rx_PAC              => PAC_32,
-                                   Tx_Preamble_Code    => 9,
-                                   Rx_Preamble_Code    => 9,
-                                   Use_Nonstandard_SFD => False,
-                                   Data_Rate           => Data_Rate_110k,
-                                   PHR_Mode            => Standard_Frames,
-                                   SFD_Timeout         => 1025 + 64 - 32,
-                                   Enable_Smart_Power  => False));
+   DecaDriver.Core.Driver.Configure
+     (DecaDriver.Core.Configuration_Type'
+       (Channel             => 1,
+        PRF                 => PRF_64MHz,
+        Tx_Preamble_Length  => PLEN_1024,
+        Rx_PAC              => PAC_32,
+        Tx_Preamble_Code    => 9,
+        Rx_Preamble_Code    => 9,
+        Use_Nonstandard_SFD => False,
+        Data_Rate           => Data_Rate_110k,
+        PHR_Mode            => Standard_Frames,
+        SFD_Timeout         => 1025 + 64 - 32,
+        Enable_Smart_Power  => False));
 
    --  Continuously receive packets
    loop
-      DecaDriver.Receiver.Start_Rx_Immediate;
+      DecaDriver.Rx.Receiver.Start_Rx_Immediate;
       
-      DecaDriver.Receiver.Wait (Frame     => Frame_Data,
-                                Length    => Frame_Length,
-                                Timestamp => Rx_Timestamp,
-                                Error     => Rx_Error,
-                                Overrun   => Rx_Overrun);
+      DecaDriver.Rx.Receiver.Wait
+        (Frame      => Frame_Data,
+         Length     => Frame_Length,
+         Frame_Info => Rx_Frame_Info,
+         Error      => Rx_Error,
+         Overrun    => Rx_Overrun);
    end loop;
 end Example;
 ```
