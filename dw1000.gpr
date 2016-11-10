@@ -8,7 +8,7 @@ project Dw1000 is
    end Prove;
 
    package Builder is
-      for Default_Switches ("ada") use ("--RTS=ravenscar-full-stm32f105");
+      for Default_Switches ("ada") use ("--RTS=ravenscar-full-evb1000");
    end Builder;
 
    package Ide is
