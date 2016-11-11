@@ -35,8 +35,7 @@ is
                            SFD_LENGTH          : in Bits_8;
                            Non_Standard_SFD    : in Boolean) return Bits_12
      with Pre => (RXBR /= 2#11#
-                  and (if Non_Standard_SFD then SFD_LENGTH in 8 | 16
-                        else SFD_LENGTH = 8));
+                  and (if Non_Standard_SFD then SFD_LENGTH in 8 | 16));
    --  Apply the correction to the RXPACC value.
    --
    --  The preamble accumulation count (RXPACC) value may include SFD symbols
