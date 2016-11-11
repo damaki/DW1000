@@ -431,31 +431,10 @@ is
       Long_Frames : Boolean := False;
 
       SYS_CFG_Reg : SYS_CFG_Type := SYS_CFG_Type'
-        (FFEN       => 0,
-         FFBC       => 0,
-         FFAB       => 0,
-         FFAD       => 0,
-         FFAA       => 0,
-         FFAM       => 0,
-         FFAR       => 0,
-         FFA4       => 0,
-         FFA5       => 0,
-         HIRQ_POL   => 0,
-         SPI_EDGE   => 0,
-         DIS_FCE    => 0,
-         DIS_DRXB   => 0,
-         DIS_PHE    => 0,
-         DIS_RSDE   => 0,
-         FCS_INT2F  => 0,
+        (Reserved_1 => 0,
+         Reserved_2 => 0,
          PHR_MODE   => 0,
-         DIS_STXP   => 0,
-         RXM110K    => 0,
-         RXWTOE     => 0,
-         RXAUTR     => 0,
-         AUTOACK    => 0,
-         AACKPEND   => 0,
-         Reserved_1 => 0,
-         Reserved_2 => 0);
+         others     => 0);
 
       Use_OTP_XTAL_Trim     : Boolean := False;
       Use_OTP_Antenna_Delay : Boolean := False;

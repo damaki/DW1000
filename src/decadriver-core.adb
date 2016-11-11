@@ -286,42 +286,9 @@ is
          SYS_STATUS_Reg : DW1000.Register_Types.SYS_STATUS_Type;
 
          SYS_STATUS_Clear : DW1000.Register_Types.SYS_STATUS_Type
-           := (IRQS       => 0,
-               CPLOCK     => 0,
-               ESYNCR     => 0,
-               AAT        => 0,
-               TXFRB      => 0,
-               TXPRS      => 0,
-               TXPHS      => 0,
-               TXFRS      => 0,
-               RXPRD      => 0,
-               RXSFDD     => 0,
-               LDEDONE    => 0,
-               RXPHD      => 0,
-               RXPHE      => 0,
-               RXDFR      => 0,
-               RXFCG      => 0,
-               RXFCE      => 0,
-               RXRFSL     => 0,
-               RXRFTO     => 0,
-               LDEERR     => 0,
-               RXOVRR     => 0,
-               RXPTO      => 0,
-               GPIOIRQ    => 0,
-               SLP2INIT   => 0,
-               RFPLL_LL   => 0,
-               CLKPLL_LL  => 0,
-               RXSFDTO    => 0,
-               HPDWARN    => 0,
-               TXBERR     => 0,
-               AFFREJ     => 0,
-               HSRBP      => 0,
-               ICRBP      => 0,
-               RXRSCS     => 0,
-               RXPREJ     => 0,
-               TXPUTE     => 0,
-               Reserved_1 => 0,
-               Reserved_2 => 0);
+           := (Reserved_1 => 0,
+               Reserved_2 => 0,
+               others     => 0);
 
       begin
          DW1000.BSP.Acknowledge_DW1000_IRQ;
