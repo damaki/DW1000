@@ -439,11 +439,11 @@ is
       Use_OTP_XTAL_Trim     : Boolean := False;
       Use_OTP_Antenna_Delay : Boolean := False;
 
-      Detect_Frame_Timeout  : Boolean := False;
-      Detect_SFD_Timeout    : Boolean := False;
-      Detect_PHR_Error      : Boolean := False;
-      Detect_RS_Error       : Boolean := False;
-      Detect_FCS_Error      : Boolean := False;
+      Detect_Frame_Timeout  : Boolean := True;
+      Detect_SFD_Timeout    : Boolean := True;
+      Detect_PHR_Error      : Boolean := True;
+      Detect_RS_Error       : Boolean := True;
+      Detect_FCS_Error      : Boolean := True;
 
    end Driver;
 
