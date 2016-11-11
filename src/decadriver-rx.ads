@@ -25,7 +25,6 @@ with DW1000.BSP;
 with DW1000.Register_Types;  use DW1000.Register_Types;
 with DW1000.System_Time;     use DW1000.System_Time;
 with Dw1000.Types;           use DW1000.Types;
-with Interfaces;             use Interfaces;
 
 package DecaDriver.Rx
 with SPARK_Mode => On
@@ -92,7 +91,7 @@ is
 
    type Rx_Frame_Type is record
       Length     : Frame_Length_Number;
-      Frame      : Byte_Array (Frame_Length_Number);
+      Frame      : Byte_Array (1 .. Frame_Length_Number'Last);
       Frame_Info : Frame_Info_Type;
       Status     : Rx_Status_Type;
       Overrun    : Boolean;
@@ -141,15 +140,7 @@ is
                        Status        => Receiver,
                        Overrun       => Receiver),
         Pre => Frame'Length > 0,
-        Post =>
-          (if Status = No_Error then
-           --  If the Frame array is bigger than the received frame then
-           --  the elements at the end of the Frame array are unmodified.
-             (for all I in 0 .. Frame'Length - 1 =>
-                (if I >= Length
-                 then Frame (Frame'First + I) =
-                     Frame'Old (Frame'First + I)))
-           else Length = 0 and Frame = Frame'Old);
+        Post => (if Status /= No_Error then Length = 0);
       --  Waits for a frame to be received, or an error. When a frame is
       --  received (or if one has been previously received and is waiting to be
       --  read) then the frame's content and size are copied to the Frame and

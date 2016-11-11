@@ -79,7 +79,7 @@ is
       end if;
 
       SFD_LENGTH := Frame_Info.SFD_LENGTH;
-      if Frame_Info.Non_Standard_SFD or SFD_LENGTH not in 8 | 16 then
+      if Frame_Info.Non_Standard_SFD and SFD_LENGTH not in 8 | 16 then
          SFD_LENGTH := 8; --  default to length 8
       end if;
 
@@ -110,7 +110,7 @@ is
       end if;
 
       SFD_LENGTH := Frame_Info.SFD_LENGTH;
-      if not (SFD_LENGTH in 8 | 16) then
+      if Frame_Info.Non_Standard_SFD and SFD_LENGTH not in 8 | 16 then
          SFD_LENGTH := 8; --  default to length 8
       end if;
 
@@ -150,20 +150,31 @@ is
         when Frame_Ready
       is
       begin
+         pragma Assume (Frame_Ready,
+                        "barrier condition is true on entry");
+
+         pragma Assume ((if Frame_Ready then Rx_Count > 0),
+                        "Invariant for the Receiver protected object");
+
          Length     := Frame_Queue (Queue_Head).Length;
          Frame_Info := Frame_Queue (Queue_Head).Frame_Info;
          Status     := Frame_Queue (Queue_Head).Status;
          Overrun    := Frame_Queue (Queue_Head).Overrun;
 
          if Status = No_Error then
-            if Frame'Length >= Length then
-               Frame (Frame'First .. Frame'First + Integer (Length - 1))
-                 := Frame_Queue (Queue_Head).Frame (1 .. Length);
+            if Length > 0 then
+               if Frame'Length >= Length then
+                  Frame (Frame'First .. Frame'First + Integer (Length - 1))
+                    := Frame_Queue (Queue_Head).Frame (1 .. Length);
 
-            else
-               Frame := Frame_Queue (Queue_Head).Frame (1 .. Frame'Length);
+               else
+                  Frame := Frame_Queue (Queue_Head).Frame (1 .. Frame'Length);
 
+               end if;
             end if;
+
+         else
+            Length := 0;
          end if;
 
          Queue_Head  := Queue_Head + 1;
@@ -283,15 +294,15 @@ is
 
                Rx_Count := Rx_Count + 1;
 
+               Frame_Queue (Next_Idx).Status  := No_Error;
+               Frame_Queue (Next_Idx).Length  := Frame_Length;
+               Frame_Queue (Next_Idx).Overrun := Overrun_Occurred;
+
                DW1000.Register_Driver.Read_Register
                  (Register_ID => DW1000.Registers.RX_BUFFER_Reg_ID,
                   Sub_Address => 0,
                   Data        =>
                     Frame_Queue (Next_Idx).Frame (1 .. Frame_Length));
-
-               Frame_Queue (Next_Idx).Length  := Frame_Length;
-               Frame_Queue (Next_Idx).Status  := No_Error;
-               Frame_Queue (Next_Idx).Overrun := Overrun_Occurred;
 
                Overrun_Occurred := False;
 
