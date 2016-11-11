@@ -21,6 +21,7 @@
 -------------------------------------------------------------------------------
 
 with Ada.Numerics.Generic_Elementary_Functions;
+with Interfaces;                                use Interfaces;
 
 package body DW1000.Reception_Quality
 with SPARK_Mode => On

@@ -21,7 +21,6 @@
 -------------------------------------------------------------------------------
 
 with DW1000.Types; use DW1000.Types;
-with Interfaces;   use Interfaces;
 
 --  @summary
 --  Utility functions for measuring the quality of received frames.
