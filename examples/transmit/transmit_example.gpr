@@ -1,0 +1,27 @@
+project Transmit_Example is
+
+   for Source_Dirs use (".", "../../src", "../../bsp-examples/evb1000");
+   for Object_Dir use "build";
+
+   package Ide is
+      for Gnat use "arm-eabi-gnat";
+      for Gnatlist use "arm-eabi-gnatls";
+      for Debugger_Command use "arm-eabi-gdb";
+   end Ide;
+
+   package Builder is
+      for Default_Switches ("ada") use ("--RTS=ravenscar-full-evb1000", "-j4", "-g");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnatn", "-O2", "-ffunction-sections", "-fdata-sections", "-gnatp", "-g", "-gnat12");
+   end Compiler;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-g");
+   end Linker;
+
+   for Main use ("transmit_example.adb");
+
+end Transmit_Example;
+

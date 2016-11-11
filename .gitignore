@@ -1,2 +1,5 @@
 /tests/obj
 /obj
+/examples/transmit/build
+/examples/receive/build
+/examples/echo/build
