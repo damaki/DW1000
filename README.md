@@ -89,7 +89,11 @@ GitHub which are useful:
 
 # 4. Examples
 
-Here's some examples of SPARK code using the driver:
+Here's some examples of SPARK code using the driver.
+
+The [examples](https://github.com/damaki/DW1000/tree/master/examples)
+directory contains some buildable and runnable examples which are also
+analyzable with GNATprove.
 
 ## 4.1 Transmitting frames
 
