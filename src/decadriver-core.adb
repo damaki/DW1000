@@ -213,6 +213,23 @@ is
 
       end Configure;
 
+
+      procedure Configure_LEDs (Tx_LED_Enable    : in Boolean;
+                                Rx_LED_Enable    : in Boolean;
+                                Rx_OK_LED_Enable : in Boolean;
+                                SFD_LED_Enable   : in Boolean;
+                                Test_Flash       : in Boolean)
+      is
+      begin
+         DW1000.Driver.Configure_LEDs
+           (Tx_LED_Enable    => Tx_LED_Enable,
+            Rx_LED_Enable    => Rx_LED_Enable,
+            Rx_OK_LED_Enable => Rx_OK_LED_Enable,
+            SFD_LED_Enable   => SFD_LED_Enable,
+            Test_Flash       => Test_Flash);
+      end Configure_LEDs;
+
+
       procedure Configure_Errors (Frame_Timeout : in Boolean;
                                   SFD_Timeout   : in Boolean;
                                   PHR_Error     : in Boolean;
