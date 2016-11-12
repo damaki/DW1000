@@ -66,10 +66,18 @@ begin
          Use_Nonstandard_SFD => False,
          Data_Rate           => Data_Rate_110k,
          PHR_Mode            => Standard_Frames,
-         SFD_Timeout         => 1024 + 8));
+         SFD_Timeout         => 1024 + 64 + 1));
 
    --  We don't need to configure the transmit power in this example, because
    --  we don't transmit any frames!
+
+   --  Enable the LEDs controlled by the DW1000.
+   DecaDriver.Core.Driver.Configure_LEDs
+     (Tx_LED_Enable    => True,  --  Enable transmit LED
+      Rx_LED_Enable    => True,  --  Enable receive LED
+      Rx_OK_LED_Enable => False,
+      SFD_LED_Enable   => False,
+      Test_Flash       => True); --  Flash both LEDs once
 
    --  In this example we only want to receive valid packets without errors,
    --  so configure the DW1000 to automatically re-enable the receiver when

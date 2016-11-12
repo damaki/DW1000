@@ -63,12 +63,20 @@ begin
          Use_Nonstandard_SFD => False,
          Data_Rate           => Data_Rate_110k,
          PHR_Mode            => Standard_Frames,
-         SFD_Timeout         => 1024 + 8));
+         SFD_Timeout         => 1024 + 64 + 1));
 
    --  Configure the transmit power for the PRF and channel chosen.
    --  We use the reference values for the EVB1000 in this example.
    DecaDriver.Tx.Transmitter.Configure_Tx_Power
      (EVB1000_Tx_Power.Manual_Tx_Power_Table (1, PRF_64MHz));
+
+   --  Enable the LEDs controlled by the DW1000.
+   DecaDriver.Core.Driver.Configure_LEDs
+     (Tx_LED_Enable    => True,  --  Enable transmit LED
+      Rx_LED_Enable    => True,  --  Enable receive LED
+      Rx_OK_LED_Enable => False,
+      SFD_LED_Enable   => False,
+      Test_Flash       => True); --  Flash both LEDs once
 
    Now := Ada.Real_Time.Clock;
 

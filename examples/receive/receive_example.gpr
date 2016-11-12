@@ -2,11 +2,14 @@ project Receive_Example is
 
    for Source_Dirs use (".", "../../src", "../../bsp-examples/evb1000");
    for Object_Dir use "build";
+   for Main use ("receive_example.adb");
 
    package Ide is
       for Gnat use "arm-eabi-gnat";
       for Gnatlist use "arm-eabi-gnatls";
       for Debugger_Command use "arm-eabi-gdb";
+      for Program_Host use "localhost:4242";
+      for Communication_Protocol use "extended-remote";
    end Ide;
 
    package Builder is
@@ -18,10 +21,8 @@ project Receive_Example is
    end Compiler;
 
    package Linker is
-      for Default_Switches ("ada") use ("-g");
+      for Default_Switches ("ada") use ("-g", "-Wl,--gc-sections");
    end Linker;
-
-   for Main use ("receive_example.adb");
 
 end Receive_Example;
 
