@@ -52,4 +52,37 @@ is
    --     measurement contains a bias which must be removed to obtain a more
    --     accurate measurement.
 
+   function Compute_Distance
+     (Tag_Tx_Poll_Timestamp    : in Fine_System_Time;
+      Anchor_Rx_Poll_Timestamp : in Fine_System_Time;
+      Anchor_Tx_Resp_Timestamp : in Fine_System_Time;
+      Tag_Rx_Resp_Timestamp    : in Fine_System_Time;
+      Channel                  : in DW1000.Driver.Channel_Number;
+      PRF                      : in DW1000.Driver.PRF_Type) return Distance
+     with Global => null;
+   --  Compute the distance based on a single-sided ranging exchange, and
+   --  automatically remove ranging bias.
+   --
+   --  The distance measurement calculated by this function contains a bias
+   --  which can be removed to obtain a more accurate distance measurement.
+   --  The @Remove_Ranging_Bias@ function can be used to remove the bias.
+   --
+   --  @param Tag_Tx_Poll_Timestamp The timestamp of the Tag's local clock when
+   --     the Tag sent the poll message to the anchor.
+   --
+   --  @param Anchor_Rx_Poll_Timestamp The timestamp of the Anchor's local
+   --     clock when it received the poll message from the Tag.
+   --
+   --  @param Anchor_Tx_Poll_Timestamp The timstamp of the Anchor's local clock
+   --     when it sent the response message back to the Tag.
+   --
+   --  @param Tag_Rx_Resp_Timestamp The timestamp of the Tag's local clock when
+   --     it received the response from the Anchor.
+   --
+   --  @param Channel The UWB channel on which the ranging exchange took place.
+   --
+   --  @param PRF The PRF that was used for the ranging exchange.
+   --
+   --  @return The measured distance between the tag and anchor.
+
 end DW1000.Ranging.Single_Sided;

@@ -66,4 +66,29 @@ is
       return Biased_Distance (Result);
    end Compute_Distance;
 
+
+   function Compute_Distance
+     (Tag_Tx_Poll_Timestamp    : in Fine_System_Time;
+      Anchor_Rx_Poll_Timestamp : in Fine_System_Time;
+      Anchor_Tx_Resp_Timestamp : in Fine_System_Time;
+      Tag_Rx_Resp_Timestamp    : in Fine_System_Time;
+      Channel                  : in DW1000.Driver.Channel_Number;
+      PRF                      : in DW1000.Driver.PRF_Type) return Distance
+   is
+      Distance_With_Bias : Biased_Distance;
+
+   begin
+      Distance_With_Bias := Compute_Distance
+        (Tag_Tx_Poll_Timestamp    => Tag_Tx_Poll_Timestamp,
+         Anchor_Rx_Poll_Timestamp => Anchor_Rx_Poll_Timestamp,
+         Anchor_Tx_Resp_Timestamp => Anchor_Tx_Resp_Timestamp,
+         Tag_Rx_Resp_Timestamp    => Tag_Rx_Resp_Timestamp);
+
+      return Remove_Ranging_Bias
+        (Measured_Distance => Distance_With_Bias,
+         Channel           => Channel,
+         PRF               => PRF);
+   end Compute_Distance;
+
+
 end DW1000.Ranging.Single_Sided;
