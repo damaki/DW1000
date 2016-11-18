@@ -30,22 +30,6 @@ package DecaDriver.Tx
 with SPARK_Mode => On
 is
 
-   type Tx_Power_Config_Type (Smart_Tx_Power_Enabled : Boolean := True) is
-      record
-         case Smart_Tx_Power_Enabled is
-         when True =>
-            Boost_Normal : DW1000.Driver.Tx_Power_Config_Type;
-            Boost_500us  : DW1000.Driver.Tx_Power_Config_Type;
-            Boost_250us  : DW1000.Driver.Tx_Power_Config_Type;
-            Boost_125us  : DW1000.Driver.Tx_Power_Config_Type;
-
-         when False =>
-            Boost_SHR    : DW1000.Driver.Tx_Power_Config_Type;
-            Boost_PHR    : DW1000.Driver.Tx_Power_Config_Type;
-         end case;
-      end record;
-
-
    protected Transmitter
      with Interrupt_Priority => DecaDriver_Config.Driver_Priority
    is
@@ -61,7 +45,8 @@ is
       --
       --  Returns True when the transmitter is idle, and False otherwise.
 
-      procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
+      procedure Configure_Tx_Power
+        (Config : DW1000.Driver.Tx_Power_Config_Type)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Config),

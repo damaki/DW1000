@@ -20,7 +20,6 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with DecaDriver.Tx;
 with DW1000.Driver; use DW1000.Driver;
 
 --  @summary
@@ -55,7 +54,7 @@ is
    --  Values for the smart tx power mode.
    Smart_Tx_Power_Table : constant
      array (Positive range 1 .. 7, PRF_Type)
-     of DecaDriver.Tx.Tx_Power_Config_Type
+     of Tx_Power_Config_Type
        := (1 | 2 =>
                (PRF_16MHz =>
                     (Smart_Tx_Power_Enabled => True,
@@ -207,7 +206,7 @@ is
    --  Values for the manual tx power mode.
    Manual_Tx_Power_Table : constant
      array (Positive range 1 .. 7, PRF_Type)
-     of DecaDriver.Tx.Tx_Power_Config_Type
+     of Tx_Power_Config_Type
        := (1 | 2  =>
                (PRF_16MHz =>
                     (Smart_Tx_Power_Enabled => False,

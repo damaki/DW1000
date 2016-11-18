@@ -106,7 +106,7 @@ is
    type Fine_Tx_Power_Number is delta 0.5 range 0.0 .. 15.5
      with Small => 0.5;
 
-   type Tx_Power_Config_Type (Coarse_Gain_Enabled : Boolean := True) is record
+   type Tx_Power_Value (Coarse_Gain_Enabled : Boolean := True) is record
       Fine_Gain : Fine_Tx_Power_Number;
 
       case Coarse_Gain_Enabled is
@@ -116,6 +116,21 @@ is
             null;
       end case;
    end record;
+
+   type Tx_Power_Config_Type (Smart_Tx_Power_Enabled : Boolean := True) is
+      record
+         case Smart_Tx_Power_Enabled is
+         when True =>
+            Boost_Normal : Tx_Power_Value;
+            Boost_500us  : Tx_Power_Value;
+            Boost_250us  : Tx_Power_Value;
+            Boost_125us  : Tx_Power_Value;
+
+         when False =>
+            Boost_SHR    : Tx_Power_Value;
+            Boost_PHR    : Tx_Power_Value;
+         end case;
+      end record;
 
    function To_Positive (PAC : in Preamble_Acq_Chunk_Length) return Positive
    is (case PAC is
@@ -230,7 +245,7 @@ is
                  Antenna_Delay_64_MHz    => DW1000.BSP.Device_State);
 
 
-   function To_Bits_8 (Config : in Tx_Power_Config_Type) return Bits_8;
+   function To_Bits_8 (Config : in Tx_Power_Value) return Bits_8;
    --  Convert a Tx power configuration to its Bits_8 representation for use
    --  when writing to the TX_POWER register.
    --
@@ -275,54 +290,49 @@ is
    --  (only the fine gain is used). If the coarse gain is disabled, then this
    --  function always returns 0.0.
 
-   procedure Configure_Smart_Tx_Power (Boost_Normal : Tx_Power_Config_Type;
-                                       Boost_500us  : Tx_Power_Config_Type;
-                                       Boost_250us  : Tx_Power_Config_Type;
-                                       Boost_125us  : Tx_Power_Config_Type)
+   procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                             Boost_Normal,
-                                             Boost_500us,
-                                             Boost_250us,
-                                             Boost_125us));
-   --  Enable and configure smart Tx power levels.
+     Depends => (DW1000.BSP.Device_State => + Config);
+   --  Configure the transmit power of the DW1000 transmitter.
    --
-   --  See Section 7.2.31.2 of the DW1000 User Manual for more information
-   --  about smart Tx power boosting.
+   --  This procedure is used to configure both smart transmit power and
+   --  manual transmit power. The @Smart_Tx_Power_Enabled@ field of the
+   --  @Tx_Power_Config_Type@ record determines whether or not smart tx is
+   --  enabled or disabled.
    --
-   --  The default values for the arguments are the default power levels
-   --  described in the DW1000 User Manual for the TX_POWER register.
+   --  Depending on whether or not smart transmit power is enabled or disabled
+   --  the @Tx_Power_Config_Type@ record contains different fields.
    --
-   --  @param Boost_Normal The Tx power level (in dB) to use for frames that
-   --     do not fall within the criterea for power boost. For example, a
-   --     value of 7.5 means 7.5 dB.
+   --  An example of configuring a specific smart transmit power configuration
+   --  is demonstrated below:
    --
-   --  @param Boost_500us The Tx power boost level (in dB) to use for frames
-   --     at 6.8 Mbps whose duration is shorter than 0.5 ms (500 us).
+   --     Configure_Tx_Power (Tx_Power_Config_Type'
+   --       (Smart_Tx_Power_Enabled => True,
+   --        Boost_Normal           => (Coarse_Gain_Enabled => True,
+   --                                   Fine_Gain           => 10.5,
+   --                                   Coarse_Gain         => 9.0),
+   --        Boost_500us            => (Coarse_Gain_Enabled => True,
+   --                                   Fine_Gain           => 10.5,
+   --                                   Coarse_Gain         => 12.0),
+   --        Boost_250us            => (Coarse_Gain_Enabled => True,
+   --                                   Fine_Gain           => 10.5,
+   --                                   Coarse_Gain         => 15.0),
+   --        Boost_125us            => (Coarse_Gain_Enabled => True,
+   --                                   Fine_Gain           => 10.5,
+   --                                   Coarse_Gain         => 18.0)));
    --
-   --  @param Boost_256us The Tx power boost level (in dB) to use for frames
-   --     at 6.8 Mbps whose duration is shorter than 0.25 ms (250 us).
+   --  An example manual transmit power configuration is shown below:
    --
-   --  @param Boost_125us The Tx power boost level (in dB) to use for frames
-   --     at 6.8 Mbps whose duration is shorter than 0.125 ms (125 us).
-
-   procedure Configure_Manual_Tx_Power (Boost_SHR : Tx_Power_Config_Type;
-                                        Boost_PHR : Tx_Power_Config_Type)
-     with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                             Boost_SHR,
-                                             Boost_PHR));
-   --  Disable smart Tx power and configure manual Tx power levels.
+   --     Configure_Tx_Power (Tx_Power_Config_Type'
+   --       (Smart_Tx_Power_Enabled => False,
+   --        Boost_SHR              => (Coarse_Gain_Enabled => True,
+   --                                   Fine_Gain           => 3.5,
+   --                                   Coarse_Gain         => 9.0),
+   --        Boost_PHR              => (Coarse_Gain_Enabled => True,
+   --                                   Fine_Gain           => 3.5,
+   --                                   Coarse_Gain         => 9.0));
    --
-   --  See Section 7.2.31.3 of the DW1000 User Manual for more information
-   --  about manual Tx power control.
-   --
-   --  @param Boost_SFD The Tx power level (in dB) to use for the
-   --     synchronization header (SHR) portion of the physical frame.
-   --
-   --  @param Boost_PHR The Tx power level (in dB) to use for the physical
-   --     header (PHR) portion of the physical frame.
-
+   --  @param Config Record containing the transmit power configuration.
 
    procedure Read_EUID (EUID : out Bits_64)
      with Global => (In_Out => DW1000.BSP.Device_State),

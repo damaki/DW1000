@@ -857,7 +857,7 @@ is
       Antenna_Delay_64_MHz := To_Antenna_Delay_Time (Hi);
    end Read_OTP_Antenna_Delay;
 
-   function To_Bits_8 (Config : in Tx_Power_Config_Type) return Bits_8
+   function To_Bits_8 (Config : in Tx_Power_Value) return Bits_8
      with SPARK_Mode => Off
    --  SPARK mode is disabled as a workaround since GNATprove doesn't yet
    --  support conversions between different fixed-point types.
@@ -933,39 +933,33 @@ is
       end if;
    end Coarse_Gain;
 
-   procedure Configure_Smart_Tx_Power (Boost_Normal : Tx_Power_Config_Type;
-                                       Boost_500us  : Tx_Power_Config_Type;
-                                       Boost_250us  : Tx_Power_Config_Type;
-                                       Boost_125us  : Tx_Power_Config_Type)
+   procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
-      TX_POWER.Write (TX_POWER_Type'(BOOSTNORM => To_Bits_8 (Boost_Normal),
-                                     BOOSTP500 => To_Bits_8 (Boost_500us),
-                                     BOOSTP250 => To_Bits_8 (Boost_250us),
-                                     BOOSTP125 => To_Bits_8 (Boost_125us)));
+      if Config.Smart_Tx_Power_Enabled then
+         TX_POWER.Write
+           (TX_POWER_Type'
+              (BOOSTNORM => To_Bits_8 (Config.Boost_Normal),
+               BOOSTP500 => To_Bits_8 (Config.Boost_500us),
+               BOOSTP250 => To_Bits_8 (Config.Boost_250us),
+               BOOSTP125 => To_Bits_8 (Config.Boost_125us)));
+      else
+         TX_POWER.Write
+           (TX_POWER_Type'
+              (BOOSTNORM => 16#22#,
+               BOOSTP500 => To_Bits_8 (Config.Boost_PHR),
+               BOOSTP250 => To_Bits_8 (Config.Boost_SHR),
+               BOOSTP125 => 16#0E#));
+      end if;
 
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.DIS_STXP := 0; --  Enable smart Tx power
+      SYS_CFG_Reg.DIS_STXP := (if Config.Smart_Tx_Power_Enabled
+                               then 0   --  Don't disable smart tx power
+                               else 1); --  Disable smart tx power
       SYS_CFG.Write (SYS_CFG_Reg);
-   end Configure_Smart_Tx_Power;
-
-   procedure Configure_Manual_Tx_Power (Boost_SHR : Tx_Power_Config_Type;
-                                        Boost_PHR : Tx_Power_Config_Type)
-   is
-      SYS_CFG_Reg : SYS_CFG_Type;
-
-   begin
-      TX_POWER.Write (TX_POWER_Type'(BOOSTNORM => 16#22#,
-                                     BOOSTP500 => To_Bits_8 (Boost_PHR),
-                                     BOOSTP250 => To_Bits_8 (Boost_SHR),
-                                     BOOSTP125 => 16#0E#));
-
-      SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.DIS_STXP := 1; --  Disable smart Tx power
-      SYS_CFG.Write (SYS_CFG_Reg);
-   end Configure_Manual_Tx_Power;
+   end Configure_Tx_Power;
 
    procedure Set_Tx_Data (Data   : in Types.Byte_Array;
                           Offset : in Natural)

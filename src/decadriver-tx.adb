@@ -43,20 +43,11 @@ is
          return Tx_Idle;
       end Is_Tx_Complete;
 
-      procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
+      procedure Configure_Tx_Power
+        (Config : DW1000.Driver.Tx_Power_Config_Type)
       is
       begin
-         if Config.Smart_Tx_Power_Enabled then
-            DW1000.Driver.Configure_Smart_Tx_Power
-              (Boost_Normal => Config.Boost_Normal,
-               Boost_500us  => Config.Boost_500us,
-               Boost_250us  => Config.Boost_250us,
-               Boost_125us  => Config.Boost_125us);
-         else
-            DW1000.Driver.Configure_Manual_Tx_Power
-              (Boost_SHR => Config.Boost_SHR,
-               Boost_PHR => Config.Boost_PHR);
-         end if;
+         DW1000.Driver.Configure_Tx_Power (Config);
       end Configure_Tx_Power;
 
       procedure Set_Tx_Data (Data   : in DW1000.Types.Byte_Array;
