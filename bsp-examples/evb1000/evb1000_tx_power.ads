@@ -52,9 +52,7 @@ with SPARK_Mode => On
 is
 
    --  Values for the smart tx power mode.
-   Smart_Tx_Power_Table : constant
-     array (Positive range 1 .. 7, PRF_Type)
-     of Tx_Power_Config_Type
+   Smart_Tx_Power_Table : constant Tx_Power_Config_Table
        := (1 | 2 =>
                (PRF_16MHz =>
                     (Smart_Tx_Power_Enabled => True,
@@ -204,9 +202,7 @@ is
 
 
    --  Values for the manual tx power mode.
-   Manual_Tx_Power_Table : constant
-     array (Positive range 1 .. 7, PRF_Type)
-     of Tx_Power_Config_Type
+   Manual_Tx_Power_Table : constant Tx_Power_Config_Table
        := (1 | 2  =>
                (PRF_16MHz =>
                     (Smart_Tx_Power_Enabled => False,

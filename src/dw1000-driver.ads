@@ -132,6 +132,10 @@ is
          end case;
       end record;
 
+   type Tx_Power_Config_Table is
+     array (Positive range 1 .. 7, PRF_Type)
+     of Tx_Power_Config_Type;
+
    function To_Positive (PAC : in Preamble_Acq_Chunk_Length) return Positive
    is (case PAC is
           when PAC_8  => 8,
