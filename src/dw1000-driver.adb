@@ -1176,25 +1176,15 @@ is
       SYS_MASK.Write (SYS_MASK_Type'(Reserved_3 => 0,
                                      others     => 0));
 
-      -- Disable Tx
-      SYS_CTRL.Write (SYS_CTRL_Type'(SFCST      => 0,
-                                     TXSTRT     => 0,
-                                     TXDLYS     => 0,
-                                     CANSFCS    => 0,
-                                     TRXOFF     => 1,
-                                     WAIT4RESP  => 0,
-                                     RXENAB     => 0,
-                                     RXDLYE     => 0,
-                                     HRBPT      => 0,
+      -- Disable Tx/Rx
+      SYS_CTRL.Write (SYS_CTRL_Type'(TRXOFF     => 1,
                                      Reserved_1 => 0,
                                      Reserved_2 => 0,
-                                     Reserved_3 => 0));
+                                     Reserved_3 => 0,
+                                     others     => 0));
 
       -- Force transceiver off; don't want to see any new events.
-      SYS_STATUS.Write (SYS_STATUS_Type'(IRQS       => 0,
-                                         CPLOCK     => 0,
-                                         ESYNCR     => 0,
-                                         AAT        => 1,
+      SYS_STATUS.Write (SYS_STATUS_Type'(AAT        => 1,
                                          TXFRB      => 1,
                                          TXPRS      => 1,
                                          TXPHS      => 1,
@@ -1210,23 +1200,12 @@ is
                                          RXRFSL     => 1,
                                          RXRFTO     => 1,
                                          LDEERR     => 1,
-                                         RXOVRR     => 0,
                                          RXPTO      => 1,
-                                         GPIOIRQ    => 0,
-                                         SLP2INIT   => 0,
-                                         RFPLL_LL   => 0,
-                                         CLKPLL_LL  => 0,
                                          RXSFDTO    => 1,
-                                         HPDWARN    => 0,
-                                         TXBERR     => 0,
                                          AFFREJ     => 1,
-                                         HSRBP      => 0,
-                                         ICRBP      => 0,
-                                         RXRSCS     => 0,
-                                         RXPREJ     => 0,
-                                         TXPUTE     => 0,
                                          Reserved_1 => 0,
-                                         Reserved_2 => 0));
+                                         Reserved_2 => 0,
+                                         others     => 0));
 
       Sync_Rx_Buffer_Pointers;
 
