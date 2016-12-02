@@ -20,7 +20,8 @@
 -- IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with Interfaces;  use Interfaces;
+with Ada.Real_Time; use Ada.Real_Time;
+with Interfaces;    use Interfaces;
 with STM32.AFIO;
 with STM32.EXTI;
 with STM32.GPIO;
@@ -65,6 +66,12 @@ is
       STM32.GPIO.GPIOA_Periph.CRL.CNF0  := 2#01#; --  Floating input
    end Reset_DW1000;
 
+   procedure Get_Reset_State (State : out DW1000.Types.Bits_1)
+   is
+   begin
+      State := DW1000.Types.Bits_1 (STM32.GPIO.GPIOA_Periph.IDR.IDR.Arr(0));
+   end Get_Reset_State;
+
    procedure Acknowledge_DW1000_IRQ
    is
    begin
@@ -101,6 +108,25 @@ is
       --  Use /4 prescaler (72 MHz / 4 = 18 MHz clock)
       STM32.SPI.SPI1_Periph.CR1.BR := 2#001#;
    end Use_Fast_SPI_Clock;
+
+
+   procedure Assert_WAKEUP
+   is
+   begin
+      STM32.GPIO.GPIOB_Periph.BSRR.BS :=
+        STM32.GPIO.BSRR_BS_Field'(As_Array => True,
+                                  Arr      => (0 => 1, others => 0));
+   end Assert_WAKEUP;
+
+
+   procedure Deassert_WAKEUP
+   is
+   begin
+      STM32.GPIO.GPIOB_Periph.BSRR.BR :=
+        STM32.GPIO.BSRR_BR_Field'(As_Array => True,
+                                  Arr      => (0 => 1, others => 0));
+   end Deassert_WAKEUP;
+
 
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
                                Data   : in DW1000.Types.Byte_Array)
@@ -199,9 +225,11 @@ begin
    STM32.GPIO.GPIOA_Periph.CRL.CNF6  := 2#10#;
    STM32.GPIO.GPIOA_Periph.CRL.CNF7  := 2#10#;
 
-   Deselect_Device;
+   STM32.GPIO.GPIOB_Periph.CRL.MODE0 := 2#11#;
+   STM32.GPIO.GPIOB_Periph.CRL.CNF0  := 2#00#;
 
-   Reset_DW1000;
+   Deselect_Device;
+   Deassert_WAKEUP;
 
    --  Configure SPI
    STM32.SPI.SPI1_Periph.CR1 :=
@@ -234,5 +262,46 @@ begin
    STM32.EXTI.EXTI_Periph.EMR.MR.Arr (5)  := 0;
    STM32.EXTI.EXTI_Periph.RTSR.TR.Arr (5) := 1; --  Rising edge enabled
    STM32.EXTI.EXTI_Periph.FTSR.TR.Arr (5) := 0; --  Falling edge disabled
+
+   --  Device might be sleeping, so assert the WAKEUP pin to wake it.
+   --  WAKEUP pin must be asserted for at least 500 microseconds.
+   Assert_WAKEUP;
+   declare
+      use type DW1000.Types.Bits_1;
+
+      Now        : Ada.Real_Time.Time;
+      WAKEUP_End : Ada.Real_Time.Time;
+      RSTn_State : DW1000.Types.Bits_1;
+   begin
+      Now        := Ada.Real_Time.Clock;
+      WAKEUP_End := Now + Microseconds (500);
+
+      delay until WAKEUP_End;
+
+      Deassert_WAKEUP;
+
+      --  Reset the device. This only has an effect if the device wasn't asleep.
+      --  Since if the device was asleep then it is now in the WAKEUP state for
+      --  approx. 4 ms, and during this state it keeps the RSTn line low anyway.
+      Reset_DW1000;
+
+      --  Delay for 4 ms to allow the DW1000 to transition into the INIT state.
+      --  Otherwise, user code may not be able to communicate with the DW1000
+      --  if elaboration finishes within 4 ms and the user immediately tries to
+      --  use the DW1000, since it will still be in the WAKEUP state.
+      Now        := Ada.Real_Time.Clock;
+      WAKEUP_End := Now + Milliseconds (4);
+
+      loop
+         --  The DW1000 de-asserts the RSTn line when it exits the WAKEUP state
+         --  which lets us exit early.
+         Get_Reset_State (RSTn_State);
+         exit when RSTn_State = 1;
+
+         --  Otherwise, exit anyway after 4 ms.
+         Now := Ada.Real_Time.Clock;
+         exit when Now >= WAKEUP_End;
+      end loop;
+   end;
 
 end DW1000.BSP;

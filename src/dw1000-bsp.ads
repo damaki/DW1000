@@ -39,6 +39,19 @@ is
      Depends => (Device_State => null);
    --  Resets the DW1000 via the RSTn line.
 
+   procedure Get_Reset_State (State : out DW1000.Types.Bits_1)
+     with Global => (Input => Device_State),
+     Depends => (State => Device_State);
+   --  Read the current state of the RSTn line.
+   --
+   --  The State is 0 when the RSTn line is asserted (low), and 1 when the
+   --  RSTn line is de-asserted (high).
+   --
+   --  Reading the state of the RSTn is useful when waking up from the SLEEP
+   --  or DEEPSLEEP states, as the DW1000 asserts the RSTn line whilst it is in
+   --  the WAKEUP state. RSTn is de-asserted once it has entered the INIT
+   --  state.
+
    procedure Acknowledge_DW1000_IRQ
      with Global => (In_Out => Device_State);
    --  Acknowledge the IRQ request from the DW1000.
@@ -76,6 +89,24 @@ is
    --
    --  The fast SPI clock speed can be used when the DW1000 has left the INIT
    --  state.
+
+
+   procedure Assert_WAKEUP
+     with Global => (In_Out => Device_State);
+   --  Assert (set to high) the WAKEUP pin to the DW1000.
+   --
+   --  The WAKEUP pin must be asserted for at least 500 microseconds in order
+   --  to wake up the DW1000.
+   --
+   --  Once the WAKEUP line has been asserted for at least the minimum amount
+   --  of time then reading the state of the RSTn line can be used to determine
+   --  when the DW1000 has finished the WAKEUP state and has entered the INIT
+   --  state.
+
+
+   procedure Deassert_WAKEUP
+     with Global => (In_Out => Device_State);
+   -- De-assert (set to low) the WAKEUP pin to the DW1000.
 
 
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
