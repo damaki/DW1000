@@ -92,12 +92,11 @@ is
 
          --  Configure IRQs
          DW1000.Registers.SYS_MASK.Read (SYS_MASK_Reg);
+         SYS_MASK_Reg.MRXRFTO  := 1;
          SYS_MASK_Reg.MRXSFDTO := 1;
          SYS_MASK_Reg.MRXPHE   := 1;
          SYS_MASK_Reg.MRXRFSL  := 1;
-         SYS_MASK_Reg.MRXFCE   := 1;
-         SYS_MASK_Reg.MRXFCG   := 1; --  Always detect frame received
-         SYS_MASK_Reg.MRXDFR   := 1;
+         SYS_MASK_Reg.MRXDFR   := 1; --  Always detect frame received
          SYS_MASK_Reg.MTXFRS   := 1; --  Always detect frame sent
          DW1000.Registers.SYS_MASK.Write (SYS_MASK_Reg);
 
@@ -236,18 +235,7 @@ is
                                   RS_Error      : in Boolean;
                                   FCS_Error     : in Boolean)
       is
-         SYS_MASK_Reg : DW1000.Register_Types.SYS_MASK_Type;
-
       begin
-         --  Configure which interrupts are enabled
-         DW1000.Registers.SYS_MASK.Read (SYS_MASK_Reg);
-         SYS_MASK_Reg.MRXRFTO  := (if Frame_Timeout then 1 else 0);
-         SYS_MASK_Reg.MRXSFDTO := (if SFD_Timeout   then 1 else 0);
-         SYS_MASK_Reg.MRXPHE   := (if PHR_Error     then 1 else 0);
-         SYS_MASK_Reg.MRXRFSL  := (if RS_Error      then 1 else 0);
-         SYS_MASK_Reg.MRXFCE   := (if FCS_Error     then 1 else 0);
-         DW1000.Registers.SYS_MASK.Write (SYS_MASK_Reg);
-
          Detect_Frame_Timeout := Frame_Timeout;
          Detect_SFD_Timeout   := SFD_Timeout;
          Detect_PHR_Error     := PHR_Error;
@@ -322,6 +310,8 @@ is
 
             if Detect_Frame_Timeout then
                Rx.Receiver.Notify_Receive_Error (Rx.Frame_Timeout);
+            else
+               DW1000.Driver.Start_Rx_Immediate;
             end if;
             SYS_STATUS_Clear.RXRFTO := 1;
          end if;
@@ -329,6 +319,8 @@ is
          if SYS_STATUS_Reg.RXSFDTO = 1 then
             if Detect_SFD_Timeout then
                Rx.Receiver.Notify_Receive_Error (Rx.SFD_Timeout);
+            else
+               DW1000.Driver.Start_Rx_Immediate;
             end if;
             SYS_STATUS_Clear.RXSFDTO := 1;
          end if;
@@ -338,6 +330,8 @@ is
 
             if Detect_PHR_Error then
                Rx.Receiver.Notify_Receive_Error (Rx.PHR_Error);
+            else
+               DW1000.Driver.Start_Rx_Immediate;
             end if;
             SYS_STATUS_Clear.RXPHE := 1;
          end if;
@@ -347,30 +341,27 @@ is
 
             if Detect_RS_Error then
                Rx.Receiver.Notify_Receive_Error (Rx.RS_Error);
+            else
+               DW1000.Driver.Start_Rx_Immediate;
             end if;
             SYS_STATUS_Clear.RXRFSL := 1;
          end if;
 
-         if SYS_STATUS_Reg.RXFCG = 1 or SYS_STATUS_Reg.RXDFR = 1 then
-            Rx.Receiver.Notify_Frame_Received;
-            SYS_STATUS_Clear.RXFCG := 1;
-
-            --  Clear RX flags
-            SYS_STATUS_Clear.RXDFR   := 1;
-            SYS_STATUS_Clear.RXPRD   := 1;
-            SYS_STATUS_Clear.RXSFDD  := 1;
-            SYS_STATUS_Clear.LDEDONE := 1;
-            SYS_STATUS_Clear.RXPHD   := 1;
-         end if;
-
-         if SYS_STATUS_Reg.RXFCE = 1 then
-            if Detect_FCS_Error then
-               Rx.Receiver.Notify_Receive_Error (Rx.FCS_Error);
+         if SYS_STATUS_Reg.RXDFR = 1 then
+            if SYS_STATUS_Reg.RXFCE = 1 then
+               if Detect_FCS_Error then
+                  Rx.Receiver.Notify_Receive_Error (Rx.FCS_Error);
+               else
+                  DW1000.Driver.Start_Rx_Immediate;
+               end if;
+            else
+               Rx.Receiver.Notify_Frame_Received;
             end if;
-            SYS_STATUS_Clear.RXFCE := 1;
 
             --  Clear RX flags
             SYS_STATUS_Clear.RXDFR   := 1;
+            SYS_STATUS_Clear.RXFCG   := 1;
+            SYS_STATUS_Clear.RXFCE   := 1;
             SYS_STATUS_Clear.RXPRD   := 1;
             SYS_STATUS_Clear.RXSFDD  := 1;
             SYS_STATUS_Clear.LDEDONE := 1;

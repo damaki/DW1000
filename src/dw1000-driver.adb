@@ -992,7 +992,7 @@ is
 
    begin
       SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => (if Auto_Append_FCS then 1 else 0),
+        (SFCST      => (if Auto_Append_FCS then 0 else 1),
          TXSTRT     => 1,
          TXDLYS     => 0, --  No delay
          CANSFCS    => 0,
