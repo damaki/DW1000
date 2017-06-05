@@ -758,9 +758,10 @@ is
         and then Data'Length + Offset <= DW1000.Constants.RX_BUFFER_Length);
    --  Read the received frame from the Rx buffer.
 
-   procedure Start_Tx_Immediate (Rx_After_Tx : in Boolean)
+   procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
+                                 Auto_Append_FCS : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Rx_After_Tx);
+     Depends => (DW1000.BSP.Device_State => + (Rx_After_Tx, Auto_Append_FCS));
 
    procedure Start_Tx_Delayed (Rx_After_Tx : in     Boolean;
                                Result      :    out Result_Type)

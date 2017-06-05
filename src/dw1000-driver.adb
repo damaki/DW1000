@@ -985,13 +985,14 @@ is
 
    end Set_Tx_Frame_Length;
 
-   procedure Start_Tx_Immediate (Rx_After_Tx : in Boolean)
+   procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
+                                 Auto_Append_FCS : in Boolean)
    is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
 
    begin
       SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => 0,
+        (SFCST      => (if Auto_Append_FCS then 1 else 0),
          TXSTRT     => 1,
          TXDLYS     => 0, --  No delay
          CANSFCS    => 0,

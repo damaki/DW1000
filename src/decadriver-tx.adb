@@ -72,10 +72,11 @@ is
          DW1000.Driver.Set_Delayed_Tx_Rx_Time (Time);
       end Set_Delayed_Tx_Time;
 
-      procedure Start_Tx_Immediate (Rx_After_Tx : in     Boolean)
+      procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
+                                    Auto_Append_FCS : in Boolean)
       is
       begin
-         DW1000.Driver.Start_Tx_Immediate (Rx_After_Tx);
+         DW1000.Driver.Start_Tx_Immediate (Rx_After_Tx, Auto_Append_FCS);
          Tx_Idle := False;
       end Start_Tx_Immediate;
 

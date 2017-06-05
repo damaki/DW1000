@@ -112,10 +112,12 @@ is
          "Procedures in DW1000.BSP are not blocking");
 
 
-      procedure Start_Tx_Immediate (Rx_After_Tx : in     Boolean)
+      procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
+                                    Auto_Append_FCS : in Boolean)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                                Rx_After_Tx),
+                                                Rx_After_Tx,
+                                                Auto_Append_FCS),
                     Transmitter        => Transmitter);
       --  Start a transmission of a packet immediate (without a delay).
       --
@@ -127,6 +129,10 @@ is
       --
       --  If Rx_After_Tx is set to True then the receiver is automatically
       --  enabled after the transmission is completed.
+      --
+      --  If Auto_Append_FCS is set to True then the DW1000 will automatically
+      --  calculate and append the 2-byte frame check sequence (FCS) to the
+      --  transmitted frame.
       pragma Annotate
         (GNATprove, False_Positive,
          "potentially blocking operation in protected operation",
