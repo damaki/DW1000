@@ -97,5 +97,7 @@ is
 
    subtype Bits_64 is Interfaces.Unsigned_64;
 
-   type Byte_Array is array (Natural range <>) of Bits_8;
+   subtype Index is Natural range 0 .. Natural'Last - 1;
+
+   type Byte_Array is array (Index range <>) of Bits_8;
 end DW1000.Types;
