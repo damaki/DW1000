@@ -47,7 +47,7 @@ with DW1000.Driver; use DW1000.Driver;
 --
 --  The values in this package were calculated from Section 7.2.31.4 in the
 --  DW1000 User Manual.
-package EVB1000_Tx_Power
+package Tx_Power
 with SPARK_Mode => On
 is
 
@@ -290,4 +290,4 @@ is
                                                 Coarse_Gain         => 0.0)))
           );
 
-end EVB1000_Tx_Power;
+end Tx_Power;
