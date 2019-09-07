@@ -30,7 +30,7 @@ with DW1000.Types;
 --  must be implemented by the user for their target board.
 package DW1000.BSP
 with SPARK_Mode => On,
-  Abstract_State => (Device_State with External),
+  Abstract_State => (Device_State with Synchronous, External),
   Initializes    => Device_State
 is
 

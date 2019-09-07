@@ -43,7 +43,7 @@ pragma Restrictions (No_Elaboration_Code);
 pragma Ada_2012;
 pragma Style_Checks (Off);
 
-with Interfaces;
+with Interfaces;  use Interfaces;
 with System;
 
 --  nRF52832 reference description for radio MCU with ARM 32-bit Cortex-M4
