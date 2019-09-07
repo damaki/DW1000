@@ -80,11 +80,20 @@ package DW1000.System_Time
 with SPARK_Mode => On
 is
 
+   Chipping_Rate_Hz : constant := 499_200_000.0;
+   --  DW1000 system clocks are referenced to the 499.2 MHz chipping rate
+   --  defined in the IEEE 802.15.4-2011 standard.
+
+   System_Time_Clock_Hz : constant := Chipping_Rate_Hz * 128.0;
+   --  System time and time stamps are based on time units which are at
+   --  63.8976 GHz (499.2 MHz * 128). This yields a resolution of
+   --  approximately 15.65 picoseconds.
+
    type Fine_System_Time is
-   delta 1.0 / (499_200_000.0 * 128.0)
-   range 0.0 .. (2.0**40 - 1.0) / (499_200_000.0 * 128.0)
-     with Small => 1.0 / (499_200_000.0 * 128.0);
-   --  Type for representing the DW1000 fine grained system time in seconds,
+   delta 1.0 / System_Time_Clock_Hz
+   range 0.0 .. (2.0**40 - 1.0) / System_Time_Clock_Hz
+     with Small => 1.0 / System_Time_Clock_Hz;
+   --  Type for representing the DW1000 fine-grained system time in seconds,
    --  with a precision of at least 15.65 picoseconds.
    --
    --  The DW1000 uses Bits_40 to represent timestamp values (e.g. system time,
@@ -101,16 +110,16 @@ is
    --  circumstances.
 
    type Coarse_System_Time is
-   delta 512.0 / (499_200_000.0 * 128.0)
-   range 0.0 .. (2.0**40 - 1.0) / (499_200_000.0 * 128.0)
-     with Small => 512.0 / (499_200_000.0 * 128.0);
-   --  Type for representing the DW1000 coarse grained system time in seconds,
+   delta 512.0 / System_Time_Clock_Hz
+   range 0.0 .. (2.0**40 - 1.0) / System_Time_Clock_Hz
+     with Small => 512.0 / System_Time_Clock_Hz;
+   --  Type for representing the DW1000 coarsely-grained system time in seconds,
    --  with a precision of at least 8.013 nanoseconds.
    --
    --  The DW1000 uses Bits_40 to represent the system time counter and the
    --  delayed tx/rx times, but ignores the low 9 order bits giving an
    --  effective precision of 8.013 nanoseconds (512x less precise than the
-   --  fine grained system time used for the transmit and receive timestamps).
+   --  fine-grained system time used for the transmit and receive timestamps).
    --
    --  The Coarse_System_Time is used for the System Time Counter, and the
    --  delayed tx/rx times.
@@ -128,8 +137,8 @@ is
    --  Type to represent an antenna delay time.
 
    type Frame_Wait_Timeout_Time is
-   delta 512.0 / 499_200_000.0
-   range 0.0 .. ((2.0**16 - 1.0) * 512.0) / 499_200_000.0
+   delta 512.0 / Chipping_Rate_Hz
+   range 0.0 .. ((2.0**16 - 1.0) * 512.0) / Chipping_Rate_Hz
      with Small => 512.0 / 499_200_000.0;
    --  Type to represent the frame wait timeout.
    --
