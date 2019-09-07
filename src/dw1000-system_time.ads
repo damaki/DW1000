@@ -188,28 +188,11 @@ is
    --  time and rx/tx timestamp values. This function converts the 40-bit
    --  integer representation to the System_Time fixed-point representation.
 
-   function To_Fine_System_Time (Time : in Coarse_System_Time)
-                                 return Fine_System_Time is
-     (Fine_System_Time (Time))
-       with Inline,
-       Global => null;
-   --  Convert Coarse_System_Time to the equivalent Fine_System_Time value.
-
    function To_Coarse_System_Time (Bits : in Bits_40)
                                    return Coarse_System_Time
      with Inline,
      Global => null;
    --  Convert a 40-bit register value to Coarse_System_Time.
-
-   function To_Coarse_System_Time (Time : in Fine_System_Time)
-                                   return Coarse_System_Time is
-      (Coarse_System_Time (Time))
-       with Inline,
-       Global => null;
-   --  Convert a fine system time to a coarse system time.
-   --
-   --  This function rounds down to the nearest multiple of (approx.) 8.013
-   --  nanoseconds.
 
    function To_System_Time_Span (Bits : in Bits_40) return System_Time_Span
    is (System_Time_Span (To_Fine_System_Time (Bits)))
@@ -242,7 +225,7 @@ is
    function System_Time_Offset (Time : in Coarse_System_Time;
                                 Span : in System_Time_Span)
                                 return Fine_System_Time
-   is (System_Time_Offset (To_Fine_System_Time (Time), Span));
+   is (System_Time_Offset (Fine_System_Time (Time), Span));
 
 
    function Calculate_Span (Start_Time : in Fine_System_Time;
@@ -257,8 +240,8 @@ is
    function Calculate_Span (Start_Time : in Coarse_System_Time;
                             End_Time   : in Coarse_System_Time)
                             return System_Time_Span
-   is (Calculate_Span (To_Fine_System_Time (Start_Time),
-                       To_Fine_System_Time (End_Time)));
+   is (Calculate_Span (Fine_System_Time (Start_Time),
+                       Fine_System_Time (End_Time)));
    --  Calculate the time span between two points in time.
    --
    --  Note that since the DW1000 system time wraps-around after about every
@@ -269,7 +252,7 @@ is
    function Calculate_Span (Start_Time : in Fine_System_Time;
                             End_Time   : in Coarse_System_Time)
                             return System_Time_Span
-   is (Calculate_Span (Start_Time, To_Fine_System_Time (End_Time)));
+   is (Calculate_Span (Start_Time, Fine_System_Time (End_Time)));
    --  Calculate the time span between two points in time.
    --
    --  Note that since the DW1000 system time wraps-around after about every
@@ -280,7 +263,7 @@ is
    function Calculate_Span (Start_Time : in Coarse_System_Time;
                             End_Time   : in Fine_System_Time)
                             return System_Time_Span
-   is (Calculate_Span (To_Fine_System_Time (Start_Time), End_Time));
+   is (Calculate_Span (Fine_System_Time (Start_Time), End_Time));
    --  Calculate the time span between two points in time.
    --
    --  Note that since the DW1000 system time wraps-around after about every
