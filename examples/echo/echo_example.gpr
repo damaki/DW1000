@@ -1,8 +1,10 @@
 project Echo_Example is
 
-   for Source_Dirs use (".", "../../src", "../../bsp-examples/evb1000");
    for Object_Dir use "build";
    for Main use ("echo_example.adb");
+   type BSP_Type is
+      ("DWM1001", "EVB1000");
+   BSP : BSP_Type := external ("BSP", "DWM1001");
 
    package Ide is
       for Gnat use "arm-eabi-gnat";
@@ -13,7 +15,13 @@ project Echo_Example is
    end Ide;
 
    package Builder is
-      for Default_Switches ("ada") use ("--RTS=ravenscar-full-evb1000", "-j4", "-g");
+      case BSP is
+         when "EVB1000" =>
+            for Default_Switches ("ada") use ("--RTS=ravenscar-full-evb1000", "-j0", "-g");
+
+         when "DWM1001" =>
+            for Default_Switches ("ada") use ("--RTS=ravenscar-full-nrf52832", "-j0", "-g");
+      end case;
    end Builder;
 
    package Compiler is
@@ -23,6 +31,14 @@ project Echo_Example is
    package Linker is
       for Default_Switches ("ada") use ("-g", "-Wl,--gc-sections");
    end Linker;
+
+   case BSP is
+      when "EVB1000" =>
+         for Source_Dirs use (".", "../../src", "../../bsp-examples/evb1000");
+
+      when "DWM1001" =>
+         for Source_Dirs use (".", "../../src", "../../bsp-examples/dwm1001");
+   end case;
 
 end Echo_Example;
 
