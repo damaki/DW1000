@@ -51,10 +51,6 @@ is
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Config),
                     Transmitter        => Transmitter);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Tx_Data (Data   : in Byte_Array;
                              Offset : in Natural)
@@ -66,10 +62,6 @@ is
         Pre => (Data'Length in 1 .. 1024 and then
                 Offset < 1024            and then
                 Data'Length + Offset <= 1024);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Tx_Frame_Length (Length : in Natural;
                                      Offset : in Natural)
@@ -81,10 +73,6 @@ is
         Pre => (Length < DW1000.Constants.TX_BUFFER_Length and then
                 Offset < DW1000.Constants.TX_BUFFER_Length and then
                 Length + Offset <= DW1000.Constants.TX_BUFFER_Length);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Delayed_Tx_Time(Time : in Coarse_System_Time)
         with Global => (In_Out => DW1000.BSP.Device_State),
@@ -106,10 +94,6 @@ is
       --  WARNING: The receiver and transmitter both share the same tx time
       --  register. So calling this procedure will overwrite any delayed
       --  receive time.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
 
       procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
@@ -133,10 +117,6 @@ is
       --  If Auto_Append_FCS is set to True then the DW1000 will automatically
       --  calculate and append the 2-byte frame check sequence (FCS) to the
       --  transmitted frame.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
 
       procedure Start_Tx_Delayed
@@ -164,21 +144,12 @@ is
       --  Note that the time at which the packet should be transmitted must be
       --  set before calling Start_Tx_Delayed, by using the Set_Tx_Time
       --  procedure.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
-
 
       procedure Read_Tx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                     Timestamp               => DW1000.BSP.Device_State,
                     Transmitter        => Transmitter);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
 
       procedure Read_Tx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
@@ -186,10 +157,6 @@ is
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                     Timestamp               => DW1000.BSP.Device_State,
                     Transmitter        => Transmitter);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Notify_Tx_Complete;
       --  Notify the driver that the transmit is complete.

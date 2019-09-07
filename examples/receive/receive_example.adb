@@ -27,7 +27,6 @@ with DecaDriver.Rx;
 with DW1000.BSP;
 with DW1000.Driver;   use DW1000.Driver;
 with DW1000.Types;
-with EVB1000_Tx_Power;
 
 --  This simple example demonstrates using the DW1000 to receive packets.
 procedure Receive_Example

@@ -1,28 +1,45 @@
 project Transmit_Example is
 
-   for Source_Dirs use (".", "../../src", "../../bsp-examples/evb1000");
    for Object_Dir use "build";
    for Main use ("transmit_example.adb");
+   for Target use "arm-eabi";
+   type BSP_Type is
+      ("EVB1000", "DWM1001");
+   BSP : BSP_Type := external ("BSP", "DWM1001");
 
    package Ide is
-      for Gnat use "arm-eabi-gnat";
-      for Gnatlist use "arm-eabi-gnatls";
-      for Debugger_Command use "arm-eabi-gdb";
-      for Program_Host use "localhost:4242";
+      for Program_Host use "localhost:2331";
       for Communication_Protocol use "extended-remote";
    end Ide;
 
    package Builder is
-      for Default_Switches ("ada") use ("--RTS=ravenscar-full-evb1000", "-j4", "-g");
+      case BSP is
+         when "EVB1000" =>
+            for Default_Switches ("ada") use ("--RTS=ravenscar-full-evb1000", "-j4", "-g");
+
+         when "DWM1001" =>
+            for Default_Switches ("ada") use ("--RTS=ravenscar-full-nrf52832", "-j4", "-g");
+      end case;
    end Builder;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatn", "-O2", "-ffunction-sections", "-fdata-sections", "-gnatp", "-g", "-gnat12");
+      for Default_Switches ("ada") use ("-gnatn", "-ffunction-sections", "-fdata-sections", "-gnatp", "-g", "-gnat12");
    end Compiler;
 
    package Linker is
       for Default_Switches ("ada") use ("-g", "-Wl,--gc-sections");
    end Linker;
+
+   case BSP is
+
+      when "EVB1000" =>
+         for Runtime ("ada") use "ravenscar-full-evb1000";
+         for Source_Dirs use (".", "../../src", "../../bsp-examples/evb1000");
+
+      when "DWM1001" =>
+         for Runtime ("ada") use "ravenscar-full-nrf52832";
+         for Source_Dirs use (".", "../../src", "../../bsp-examples/dwm1001");
+   end case;
 
 end Transmit_Example;
 

@@ -29,6 +29,16 @@ with STM32.NVIC;
 with STM32.RCC;
 with STM32.SPI;
 
+--  BSP implementation for the EVB1000 eval board.
+--
+--  This BSP is designed for a Ravenscar runtime, and makes use of a protected
+--  object to satisfy the Synchronous requirement of the abstract Device_State.
+--  The use of a protected object protects against races between tasks
+--  and the DW1000 IRQ, which both may attempt to access the SPI bus.
+--
+--  To adapt this runtime for a ZFP profile (where protected objects are
+--  prohibited) another mechanim must be used. For example, interrupts may
+--  be disabled during SPI transactions.
 package body DW1000.BSP
 with SPARK_Mode => Off
 is

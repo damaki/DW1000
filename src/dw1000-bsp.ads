@@ -30,7 +30,7 @@ with DW1000.Types;
 --  must be implemented by the user for their target board.
 package DW1000.BSP
 with SPARK_Mode => On,
-  Abstract_State => (Device_State with External),
+  Abstract_State => (Device_State with Synchronous, External),
   Initializes    => Device_State
 is
 
@@ -91,22 +91,19 @@ is
    --  state.
 
 
-   procedure Assert_WAKEUP
+   procedure Wakeup (Wait_For_INIT : in Boolean)
      with Global => (In_Out => Device_State);
-   --  Assert (set to high) the WAKEUP pin to the DW1000.
+   --  Perform the Wakeup sequence.
    --
-   --  The WAKEUP pin must be asserted for at least 500 microseconds in order
-   --  to wake up the DW1000.
+   --  This asserts the WAKEUP condition for a minimum of 500 microseconds.
    --
-   --  Once the WAKEUP line has been asserted for at least the minimum amount
-   --  of time then reading the state of the RSTn line can be used to determine
-   --  when the DW1000 has finished the WAKEUP state and has entered the INIT
-   --  state.
-
-
-   procedure Deassert_WAKEUP
-     with Global => (In_Out => Device_State);
-   -- De-assert (set to low) the WAKEUP pin to the DW1000.
+   --  If Wait_For_INIT is True, then this function will then also wait for up
+   --  to an additional 4 milliseconds for the DW1000 to enter the INIT state.
+   --  This guarantees that the SPI interface is ready after the return of this
+   --  procedure.
+   --
+   --  This is a non-blocking function (the Ada 'delay' statement is not used).
+   --  Instead, a busy wait is be used for the delays.
 
 
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;

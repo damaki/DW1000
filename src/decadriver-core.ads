@@ -293,10 +293,6 @@ is
       --  the DW1000's ROM into the DW1000's RAM. This is necessary for the LDE
       --  algorithm to operate. If this is False then the LDE algorithm is
       --  disabled and is not run when packets are received.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Configure (Config : in Configuration_Type)
         with Global => (In_Out => DW1000.BSP.Device_State),
@@ -306,11 +302,6 @@ is
                     Driver             => + Config),
         Post => (PHR_Mode = Config.PHR_Mode);
       --  Configure the DW1000 for a specific channel, PRF, preamble, etc...
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
-
 
       procedure Configure_LEDs (Tx_LED_Enable    : in Boolean;
                                 Rx_LED_Enable    : in Boolean;
@@ -325,30 +316,18 @@ is
                                                 Rx_OK_LED_Enable,
                                                 SFD_LED_Enable,
                                                 Test_Flash));
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
-
 
       procedure Configure_Errors (Frame_Timeout : in Boolean;
                                   SFD_Timeout   : in Boolean;
                                   PHR_Error     : in Boolean;
                                   RS_Error      : in Boolean;
                                   FCS_Error     : in Boolean)
-        with Global => (In_Out => DW1000.BSP.Device_State),
-        Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
-                                                Frame_Timeout,
-                                                SFD_Timeout,
-                                                PHR_Error,
-                                                RS_Error,
-                                                FCS_Error),
-                    Driver             => (Driver,
-                                                Frame_Timeout,
-                                                SFD_Timeout,
-                                                PHR_Error,
-                                                RS_Error,
-                                                FCS_Error));
+        with Global => null,
+        Depends => (Driver =>+ (Frame_Timeout,
+                                SFD_Timeout,
+                                PHR_Error,
+                                RS_Error,
+                                FCS_Error));
       --  Configure which error notifications are enabled.
       --
       --  @param Frame_Timeout Set to True if error notifications should be
@@ -371,10 +350,6 @@ is
       --  @param FCS_Error Set to True if error notifications should be
       --     given for packets with an invalid FCS. When False, then FCS errors
       --     are ignored.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Force_Tx_Rx_Off
         with Global => (In_Out => (DW1000.BSP.Device_State, Tx.Transmitter)),
@@ -384,30 +359,18 @@ is
       --  Switch off the transmitter and receiver.
       --
       --  This will abort any reception or transmission currently in progress.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_PAN_ID (PAN_ID : in Bits_16)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 PAN_ID),
                     Driver             => Driver);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Short_Address (Short_Address : in Bits_16)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Short_Address),
                     Driver             => Driver);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       function Get_Part_ID return Bits_32;
       function Get_Lot_ID  return Bits_32;
@@ -432,10 +395,6 @@ is
                     Rx.Receiver             => (DW1000.BSP.Device_State,
                                                 Rx.Receiver,
                                                 Driver));
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
       --  DW1000 IRQ handler.
       --
       --  This performs functionality for packet reception and transmission.

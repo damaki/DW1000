@@ -29,7 +29,7 @@ with DW1000.BSP;
 with DW1000.Driver;      use DW1000.Driver;
 with DW1000.System_Time; use DW1000.System_Time;
 with DW1000.Types;
-with EVB1000_Tx_Power;
+with Tx_Power;
 
 --  This example continuously waits for a packet to be received, and then
 --  re-transmits the received packet after a 500 ms delay.
@@ -85,7 +85,7 @@ begin
    --  Configure the transmit power for the PRF and channel chosen.
    --  We use the reference values for the EVB1000 in this example.
    DecaDriver.Tx.Transmitter.Configure_Tx_Power
-     (EVB1000_Tx_Power.Manual_Tx_Power_Table (1, PRF_64MHz));
+     (Tx_Power.Manual_Tx_Power_Table (1, PRF_64MHz));
 
    --  Enable the LEDs controlled by the DW1000.
    DecaDriver.Core.Driver.Configure_LEDs
