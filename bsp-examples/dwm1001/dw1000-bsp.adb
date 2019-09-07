@@ -20,11 +20,13 @@
 -- IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with Ada.Real_Time; use Ada.Real_Time;
-with NRF52;         use NRF52;
-with NRF52.GPIO;    use NRF52.GPIO;
-with NRF52.SPI;     use NRF52.SPI;
-with NRF52.GPIOTE;  use NRF52.GPIOTE;
+with Ada.Real_Time;           use Ada.Real_Time;
+with NRF52;                   use NRF52;
+with NRF52.GPIO;              use NRF52.GPIO;
+with NRF52.SPI;               use NRF52.SPI;
+with NRF52.GPIOTE;            use NRF52.GPIOTE;
+
+with System.Storage_Elements; use System.Storage_Elements;
 
 --  BSP implementation for the DWM1001 module.
 --
@@ -39,6 +41,7 @@ with NRF52.GPIOTE;  use NRF52.GPIOTE;
 package body DW1000.BSP
 with SPARK_Mode => Off
 is
+
    --  PO pin assignments.
    Reset_Pin    : constant := 24;
    SPI_MOSI_Pin : constant := 20;
@@ -49,44 +52,53 @@ is
 
    IRQ_Event    : constant := 0;
 
-   Wakeup_Delay : constant Time_Span := Microseconds (500);
+   Wakeup_Delay : constant Time_Span := Microseconds (510);
 
    procedure Select_Device
    is
    begin
-      P0_Periph.OUT_k.Arr (SPI_CS_Pin) := Low;
+      P0_Periph.OUTCLR := (As_Array => True,
+                           Arr      => (SPI_CS_Pin => Clear,
+                                        others     => <>));
    end Select_Device;
 
    procedure Deselect_Device
    is
    begin
-      P0_Periph.OUT_k.Arr (SPI_CS_Pin) := High;
+      P0_Periph.OUTSET := (As_Array => True,
+                           Arr      => (SPI_CS_Pin => Set,
+                                        others     => <>));
    end Deselect_Device;
 
    procedure Reset_DW1000
    is
+      End_Time : Ada.Real_Time.Time;
    begin
 
       --  Configure RSTn as output low
-      P0_Periph.OUT_k.Arr (Reset_Pin) := Low;
-      P0_Periph.PIN_CNF (Reset_Pin) := (DIR            => Output,
-                                        INPUT          => Disconnect,
-                                        PULL           => Disabled,
-                                        Reserved_4_7   => <>,
-                                        DRIVE          => S0S1,
-                                        Reserved_11_15 => <>,
-                                        SENSE          => Disabled,
-                                        Reserved_18_31 => <>);
+      P0_Periph.PIN_CNF (Reset_Pin) := (DIR    => Output,
+                                        INPUT  => Disconnect,
+                                        PULL   => Disabled,
+                                        DRIVE  => S0S1,
+                                        SENSE  => Disabled,
+                                        others => <>);
+      P0_Periph.OUTCLR := (As_Array => True,
+                           Arr      => (Reset_Pin => Clear,
+                                        others    => <>));
+
+      --  Busy wait for 2 ms
+      End_Time := Ada.Real_Time.Clock + Milliseconds (2);
+      loop
+         exit when Ada.Real_Time.Clock >= End_Time;
+      end loop;
 
       --  Put the RSTn line back to hi-Z
-      P0_Periph.PIN_CNF (Reset_Pin) := (DIR            => Input,
-                                        INPUT          => Connect,
-                                        PULL           => Disabled,
-                                        Reserved_4_7   => <>,
-                                        DRIVE          => S0S1,
-                                        Reserved_11_15 => <>,
-                                        SENSE          => Disabled,
-                                        Reserved_18_31 => <>);
+      P0_Periph.PIN_CNF (Reset_Pin) := (DIR    => Input,
+                                        INPUT  => Connect,
+                                        PULL   => Disabled,
+                                        DRIVE  => S0S1,
+                                        SENSE  => Disabled,
+                                        others => <>);
    end Reset_DW1000;
 
    procedure Get_Reset_State (State : out DW1000.Types.Bits_1)
@@ -102,14 +114,12 @@ is
    procedure Acknowledge_DW1000_IRQ
    is
    begin
-      GPIOTE_Periph.EVENTS_IN (IRQ_Event) := (EVENTS_IN     => 0,
-                                              Reserved_1_31 => <>);
+      GPIOTE_Periph.EVENTS_IN (IRQ_Event) := (EVENTS_IN => 0, others => <>);
    end Acknowledge_DW1000_IRQ;
 
    procedure Disable_DW1000_IRQ
    is
    begin
-      --  Disable IRQ #25 (EXTI9_5_Interrupt)
       GPIOTE_Periph.INTENCLR.IN_k.Arr (IRQ_Event) := Clear;
    end Disable_DW1000_IRQ;
 
@@ -117,7 +127,6 @@ is
    procedure Enable_DW1000_IRQ
    is
    begin
-      --  Enable IRQ #25 (EXTI9_5_Interrupt)
       GPIOTE_Periph.INTENSET.IN_k.Arr (IRQ_Event) := Set;
    end Enable_DW1000_IRQ;
 
@@ -125,14 +134,14 @@ is
    procedure Use_Slow_SPI_Clock
    is
    begin
-      SPI0_Periph.FREQUENCY := 16#2000_0000#; --  2 Mbps
+      SPI1_Periph.FREQUENCY := 16#2000_0000#; --  2 Mbps
    end Use_Slow_SPI_Clock;
 
 
    procedure Use_Fast_SPI_Clock
    is
    begin
-      SPI0_Periph.FREQUENCY := 16#8000_0000#; --  8 Mbps (max speed)
+      SPI1_Periph.FREQUENCY := 16#8000_0000#; --  8 Mbps (max speed)
    end Use_Fast_SPI_Clock;
 
 
@@ -155,54 +164,44 @@ is
    procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
                                Data   : in DW1000.Types.Byte_Array)
    is
+      Dummy : Byte;
+
    begin
       Disable_DW1000_IRQ;
 
       Select_Device;
 
-      --  Enable SPI
-      SPI0_Periph.ENABLE := (ENABLE        => Enabled,
-                             Reserved_4_31 => <>);
+      SPI1_Periph.EVENTS_READY := (EVENTS_READY => 0, others => <>);
 
-      --  Clear event
-      SPI0_Periph.EVENTS_READY := (EVENTS_READY  => 0,
-                                   Reserved_1_31 => <>);
+      --  Send the header
+      for B of Header loop
+         SPI1_Periph.TXD := (TXD => Byte (B), others => <>);
 
-      --  Send header
-      for I in Header'Range loop
-         SPI0_Periph.TXD := (TXD           => NRF52.Byte (Header (I)),
-                             Reserved_8_31 => <>);
-
-         --  Wait for byte to be sent
          loop
-            exit when SPI0_Periph.EVENTS_READY.EVENTS_READY = 1;
+            exit when SPI1_Periph.EVENTS_READY.EVENTS_READY = 1;
          end loop;
 
-         --  Clear event
-         SPI0_Periph.EVENTS_READY := (EVENTS_READY  => 0,
-                                      Reserved_1_31 => <>);
+         SPI1_Periph.EVENTS_READY := (EVENTS_READY => 0, others => <>);
+
+         --  Read of RXD is needed after every byte transmission
+         Dummy := SPI1_Periph.RXD.RXD;
       end loop;
 
-      --  Send data
-      for I in Data'Range loop
-         SPI0_Periph.TXD := (TXD           => NRF52.Byte (Data (I)),
-                             Reserved_8_31 => <>);
+      --  Send the data
+      for B of Data loop
+         SPI1_Periph.TXD := (TXD => Byte (B), others => <>);
 
-         --  Wait for byte to be sent
          loop
-            exit when SPI0_Periph.EVENTS_READY.EVENTS_READY = 1;
+            exit when SPI1_Periph.EVENTS_READY.EVENTS_READY = 1;
          end loop;
 
-         --  Clear event
-         SPI0_Periph.EVENTS_READY := (EVENTS_READY  => 0,
-                                      Reserved_1_31 => <>);
+         SPI1_Periph.EVENTS_READY := (EVENTS_READY => 0, others => <>);
+
+         --  Read of RXD is needed after every byte transmission
+         Dummy := SPI1_Periph.RXD.RXD;
       end loop;
 
       Deselect_Device;
-
-      --  Disable SPI
-      SPI0_Periph.ENABLE := (ENABLE        => Enabled,
-                             Reserved_4_31 => <>);
 
       Enable_DW1000_IRQ;
 
@@ -211,58 +210,43 @@ is
    procedure Read_Transaction(Header : in     DW1000.Types.Byte_Array;
                               Data   :    out DW1000.Types.Byte_Array)
    is
+      Dummy : Byte;
+
    begin
       Disable_DW1000_IRQ;
 
       Select_Device;
 
-      --  Enable SPI
-      SPI0_Periph.ENABLE := (ENABLE        => Enabled,
-                             Reserved_4_31 => <>);
+      SPI1_Periph.EVENTS_READY := (EVENTS_READY => 0, others => <>);
 
-      --  Clear event
-      SPI0_Periph.EVENTS_READY := (EVENTS_READY  => 0,
-                                   Reserved_1_31 => <>);
+      --  Send the header
+      for B of Header loop
+         SPI1_Periph.TXD := (TXD => Byte (B), others => <>);
 
-      --  Send header
-      for I in Header'Range loop
-         SPI0_Periph.TXD := (TXD           => NRF52.Byte (Header (I)),
-                             Reserved_8_31 => <>);
-
-         --  Wait for byte to be sent
          loop
-            exit when SPI0_Periph.EVENTS_READY.EVENTS_READY = 1;
+            exit when SPI1_Periph.EVENTS_READY.EVENTS_READY = 1;
          end loop;
 
-         --  Clear event
-         SPI0_Periph.EVENTS_READY := (EVENTS_READY  => 0,
-                                      Reserved_1_31 => <>);
+         SPI1_Periph.EVENTS_READY := (EVENTS_READY => 0, others => <>);
+
+         --  Read of RXD is needed after every byte transmission
+         Dummy := SPI1_Periph.RXD.RXD;
       end loop;
 
-      --  Send data
-      for I in Data'Range loop
-         --  Send dummy byte
-         SPI0_Periph.TXD := (TXD           => 0,
-                             Reserved_8_31 => <>);
+      --  Receive the data
+      for B of Data loop
+         SPI1_Periph.TXD := (TXD => 16#FF#, others => <>);
 
-         --  Wait for byte to be sent
          loop
-            exit when SPI0_Periph.EVENTS_READY.EVENTS_READY = 1;
+            exit when SPI1_Periph.EVENTS_READY.EVENTS_READY = 1;
          end loop;
 
-         --  Read received byte
-         Data (I) := DW1000.Types.Bits_8 (SPI0_Periph.RXD.RXD);
+         SPI1_Periph.EVENTS_READY := (EVENTS_READY => 0, others => <>);
 
-         --  Clear event
-         SPI0_Periph.EVENTS_READY := (EVENTS_READY  => 0,
-                                      Reserved_1_31 => <>);
+         B := DW1000.Types.Bits_8 (SPI1_Periph.RXD.RXD);
       end loop;
 
       Deselect_Device;
-
-      --  Disable SPI
-      SPI0_Periph.ENABLE := (ENABLE        => Enabled,
-                             Reserved_4_31 => <>);
 
       Enable_DW1000_IRQ;
 
@@ -271,78 +255,63 @@ is
 begin
    --  Configure GPIOs
 
-   --  Set reset pin to hi-z by default. See DW1000 Datasheet clause 5.6.3.1
-   P0_Periph.PIN_CNF (Reset_Pin) := (DIR            => Input,
-                                     INPUT          => Connect,
-                                     PULL           => Disabled,
-                                     Reserved_4_7   => <>,
-                                     DRIVE          => S0S1,
-                                     Reserved_11_15 => <>,
-                                     SENSE          => Disabled,
-                                     Reserved_18_31 => <>);
-   P0_Periph.PIN_CNF (DW_IRQ_Pin) := (DIR            => Input,
-                                      INPUT          => Connect,
-                                      PULL           => Disabled,
-                                      Reserved_4_7   => <>,
-                                      DRIVE          => S0S1,
-                                      Reserved_11_15 => <>,
-                                      SENSE          => Disabled,
-                                      Reserved_18_31 => <>);
-   P0_Periph.PIN_CNF (SPI_MISO_Pin) := (DIR            => Input,
-                                        INPUT          => Connect,
-                                        PULL           => Disabled,
-                                        Reserved_4_7   => <>,
-                                        DRIVE          => S0S1,
-                                        Reserved_11_15 => <>,
-                                        SENSE          => Disabled,
-                                        Reserved_18_31 => <>);
-   P0_Periph.PIN_CNF (SPI_CS_Pin) := (DIR            => Output,
-                                      INPUT          => Disconnect,
-                                      PULL           => Disabled,
-                                      Reserved_4_7   => <>,
-                                      DRIVE          => S0S1,
-                                      Reserved_11_15 => <>,
-                                      SENSE          => Disabled,
-                                      Reserved_18_31 => <>);
-   P0_Periph.PIN_CNF (SPI_MOSI_Pin) := (DIR            => Output,
-                                        INPUT          => Disconnect,
-                                        PULL           => Disabled,
-                                        Reserved_4_7   => <>,
-                                        DRIVE          => S0S1,
-                                        Reserved_11_15 => <>,
-                                        SENSE          => Disabled,
-                                        Reserved_18_31 => <>);
-   P0_Periph.PIN_CNF (SPI_CLK_Pin) := (DIR            => Output,
-                                       INPUT          => Disconnect,
-                                       PULL           => Disabled,
-                                       Reserved_4_7   => <>,
-                                       DRIVE          => S0S1,
-                                       Reserved_11_15 => <>,
-                                       SENSE          => Disabled,
-                                       Reserved_18_31 => <>);
-
    Deselect_Device;
-   Deassert_WAKEUP;
+
+   --  Set reset pin to hi-z by default. See DW1000 Datasheet clause 5.6.3.1
+   P0_Periph.PIN_CNF (Reset_Pin) := (DIR    => Input,
+                                     INPUT  => Connect,
+                                     PULL   => Disabled,
+                                     DRIVE  => S0S1,
+                                     SENSE  => Disabled,
+                                     others => <>);
+   P0_Periph.PIN_CNF (DW_IRQ_Pin) := (DIR    => Input,
+                                      INPUT  => Connect,
+                                      PULL   => Disabled,
+                                      DRIVE  => S0S1,
+                                      SENSE  => Disabled,
+                                      others => <>);
+   P0_Periph.PIN_CNF (SPI_MISO_Pin) := (DIR    => Input,
+                                        INPUT  => Connect,
+                                        PULL   => Pullup,
+                                        DRIVE  => S0S1,
+                                        SENSE  => Disabled,
+                                        others => <>);
+   P0_Periph.PIN_CNF (SPI_MOSI_Pin) := (DIR    => Output,
+                                        INPUT  => Disconnect,
+                                        PULL   => Disabled,
+                                        DRIVE  => S0S1,
+                                        SENSE  => Disabled,
+                                        others => <>);
+   P0_Periph.PIN_CNF (SPI_CLK_Pin) := (DIR    => Output,
+                                       INPUT  => Connect,
+                                       PULL   => Disabled,
+                                       DRIVE  => S0S1,
+                                       SENSE  => Disabled,
+                                       others => <>);
+   P0_Periph.PIN_CNF (SPI_CS_Pin) := (DIR    => Output,
+                                      INPUT  => Disconnect,
+                                      PULL   => Disabled,
+                                      DRIVE  => S0S1,
+                                      SENSE  => Disabled,
+                                      others => <>);
 
    --  Configure SPI
-   SPI0_Periph.CONFIG := (ORDER         => LsbFirst,
-                          CPHA          => Leading,
-                          CPOL          => ActiveHigh,
-                          Reserved_3_31 => <>);
-   SPI0_Periph.PSEL := (SCK  => SPI_CLK_Pin,
+   SPI1_Periph.CONFIG := (ORDER  => MsbFirst,
+                          CPHA   => Leading,
+                          CPOL   => Activehigh,
+                          others => <>);
+   SPI1_Periph.PSEL := (SCK  => SPI_CLK_Pin,
                         MOSI => SPI_MOSI_Pin,
                         MISO => SPI_MISO_Pin);
-   SPI0_Periph.FREQUENCY := 16#2000_0000#; --  2 Mbps
+   SPI1_Periph.FREQUENCY := 16#2000_0000#; --  2 Mbps
+   SPI1_Periph.ENABLE := (ENABLE => Enabled, others => <>);
 
    --  Configure IRQ
-   GPIOTE_Periph.CONFIG (IRQ_Event) := (MODE           => Event,
-                                        Reserved_2_7   => <>,
-                                        PSEL           => DW_IRQ_Pin,
-                                        Reserved_13_15 => <>,
-                                        POLARITY       => Lotohi,
-                                        Reserved_18_19 => <>,
-                                        OUTINIT        => Low,
-                                        Reserved_21_31 => <>);
+   GPIOTE_Periph.CONFIG (IRQ_Event) := (MODE     => Event,
+                                        PSEL     => DW_IRQ_Pin,
+                                        POLARITY => Lotohi,
+                                        OUTINIT  => Low,
+                                        others   => <>);
    GPIOTE_Periph.INTENSET.IN_k.Arr (0) := Set; --  Enable interrupt
 
    --  Device might be sleeping, so assert the WAKEUP pin to wake it.
