@@ -26,7 +26,7 @@ with DecaDriver.Tx;
 with DW1000.BSP;
 with DW1000.Driver;   use DW1000.Driver;
 with DW1000.Types;
-with EVB1000_Tx_Power;
+with Tx_Power;
 
 --  This simple example demonstrates how to transmit packets.
 procedure Transmit_Example
@@ -68,7 +68,7 @@ begin
    --  Configure the transmit power for the PRF and channel chosen.
    --  We use the reference values for the EVB1000 in this example.
    DecaDriver.Tx.Transmitter.Configure_Tx_Power
-     (EVB1000_Tx_Power.Manual_Tx_Power_Table (1, PRF_64MHz));
+     (Tx_Power.Manual_Tx_Power_Table (1, PRF_64MHz));
 
    --  Enable the LEDs controlled by the DW1000.
    DecaDriver.Core.Driver.Configure_LEDs
@@ -95,7 +95,8 @@ begin
 
       --  Start transmitting the packet now.
       --  (don't turn on the receiver after transmitting).
-      DecaDriver.Tx.Transmitter.Start_Tx_Immediate (Rx_After_Tx => False);
+      DecaDriver.Tx.Transmitter.Start_Tx_Immediate (Rx_After_Tx     => False,
+                                                    Auto_Append_FCS => False);
 
       --  Wait for the packet to finish sending.
       DecaDriver.Tx.Transmitter.Wait_For_Tx_Complete;
