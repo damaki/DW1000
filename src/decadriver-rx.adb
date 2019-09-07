@@ -375,4 +375,9 @@ is
 
    end Receiver;
 
+   pragma Annotate
+     (GNATprove, False_Positive,
+      "call to potentially blocking subprogram ""dw1000.bsp.",
+      "Procedures in DW1000.BSP are not blocking");
+
 end DecaDriver.Rx;

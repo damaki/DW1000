@@ -206,10 +206,6 @@ is
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Enabled,
                     Receiver           => Receiver);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
       --  Enable or disable the automatic frame check sequence (FCS) on
       --  received frames.
       --
@@ -244,10 +240,6 @@ is
       --
       --  @param Enabled When set to True frame filtering is enabled.
       --     Otherwise, when False, it is disabled.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Configure_Frame_Filtering (Behave_As_Coordinator : in Boolean;
                                            Allow_Beacon_Frame    : in Boolean;
@@ -309,20 +301,12 @@ is
       --     frames whose frame type is set to the value 2#101#, i.e. 5.
       --     When set to False and when frame filtering is enabled the DW1000
       --     will reject these frames.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Rx_Double_Buffer (Enabled : in Boolean)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Enabled,
                     Receiver           => Receiver);
       --  Enable or disable the double-buffer mode of the receiver.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Rx_Auto_Reenable (Enabled : in Boolean)
         with Global => (In_Out => DW1000.BSP.Device_State),
@@ -345,10 +329,6 @@ is
       --    * In double-buffer mode the receiver is automatically re-enabled
       --      when a frame is received, or when an error occurs (e.g. physical
       --      header error), EXCEPT a frame wait timeout error.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
       procedure Set_Delayed_Rx_Time(Time : in Coarse_System_Time)
         with Global => (In_Out => DW1000.BSP.Device_State),
@@ -370,20 +350,12 @@ is
       --  WARNING: The receiver and transmitter both share the same tx time
       --  register. So calling this procedure will overwrite any delayed
       --  receive time.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
 
       procedure Set_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time)
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Timeout,
                     Receiver           => Receiver);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
 
       procedure Start_Rx_Immediate
@@ -391,10 +363,6 @@ is
         Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                     Receiver           => Receiver);
       --  Turn on the receiver immediately (without delay).
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
 
       procedure Start_Rx_Delayed (Result  : out Result_Type)
@@ -407,20 +375,12 @@ is
       --  The time at which the receiver should be enabled is programmed
       --  using the Set_Delayed_Rx_Time procedure, which must be called before
       --  calling this procedure.
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
 
       procedure Notify_Frame_Received
         with Global => (In_Out => DW1000.BSP.Device_State),
         Depends => (DW1000.BSP.Device_State => + Receiver,
                     Receiver           => + DW1000.BSP.Device_State);
-      pragma Annotate
-        (GNATprove, False_Positive,
-         "potentially blocking operation in protected operation",
-         "Procedures in DW1000.BSP are not blocking");
 
 
       --  Reads a received frame from the DW1000.

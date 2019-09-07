@@ -109,7 +109,6 @@ is
       end Initialize;
 
 
-
       procedure Configure (Config : in Configuration_Type)
       is
          SFD_Timeout : DW1000.Driver.SFD_Timeout_Number;
@@ -388,6 +387,11 @@ is
       end DW1000_IRQ;
 
    end Driver;
+
+   pragma Annotate
+     (GNATprove, False_Positive,
+      "call to potentially blocking subprogram ""dw1000.bsp.",
+      "Procedures in DW1000.BSP are not blocking");
 
 
 end DecaDriver.Core;

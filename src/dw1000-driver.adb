@@ -1519,8 +1519,6 @@ is
       AON_RDAT_Reg : AON_RDAT_Type;
 
    begin
-      Data := (others => 0); -- workaround for flow analysis.
-
       for I in Data'Range loop
          -- Load address
          AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Address));
