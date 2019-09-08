@@ -73,7 +73,7 @@ is
       Anchor_Tx_Resp_Timestamp : in Fine_System_Time;
       Tag_Rx_Resp_Timestamp    : in Fine_System_Time;
       Channel                  : in DW1000.Driver.Channel_Number;
-      PRF                      : in DW1000.Driver.PRF_Type) return Distance
+      PRF                      : in DW1000.Driver.PRF_Type) return Meters
    is
       Distance_With_Bias : Biased_Distance;
 

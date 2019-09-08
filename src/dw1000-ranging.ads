@@ -28,30 +28,42 @@ with SPARK_Mode => On
 is
    Air_Refractive_Index     : constant := 1.0003;
 
-   Speed_Of_Light_In_Vacuum : constant := 299_792_458.0;
+   Speed_Of_Light_In_Vacuum : constant := 299_792_458.0; --  meters per second
 
    Speed_Of_Light_In_Air    : constant
-     := Speed_Of_Light_In_Vacuum / Air_Refractive_Index;
+     := Speed_Of_Light_In_Vacuum / Air_Refractive_Index; --  meters per second
 
-   type Distance is
-   delta 0.01
-   range 0.0 .. System_Time_Span'Last * Speed_Of_Light_In_Air
-     with Small => 0.01;
-   --  Distance in meters, with precision to 1 cm.
+   type Meters is new Float
+     range 0.0 .. Float (Speed_Of_Light_In_Air * System_Time_Span'Last);
+   --  Distance in meters.
    --
-   --  The maximum possible distance represented by this type is a little
-   --  over 5 million kilometers. Although such a distance is not achievable
-   --  in practice since the range of the DW1000 is limited to about 300 m,
-   --  the range of the DW1000 timestamps (40-bit) do permit such a large value
-   --  to be calculated if extreme values are used.
+   --  The range of this type is constrained to the range of distance values
+   --  possible based on the maximum possible value for the time of flight.
+   --
+   --  This is a Float type (rather than a fixed-point type) to avoid some
+   --  difficulties when dealing with fixed-point types with fractional 'smalls,
+   --  for example that 1.0 can't be represented exactly. If a fixed-point type
+   --  without a fractional 'small is used then we would run into problems where
+   --  conversions from System_Time_Span to Meters would not be provable in SPARK
+   --  because the conversion would not be in the perfect result set as defined
+   --  in Annex G.2.3 of the Ada 2012 LRM. GNATprove currently limits conversions
+   --  between fixed-point types to always belong to the perfect result set.
 
-   type Biased_Distance is new Distance;
-   --  Type for distance measurements which include the ranging bias.
+   type Biased_Distance is new Meters;
+   --  Type for distance measurements (in meters) which includes a ranging bias.
+   --
+   --  The bias is influenced by the UWB channel and pulse repetition frequency
+   --  (PRF) that was used to perform the measurement. This bias must be removed
+   --  for a more accurate ranging measurement.
+
+   function To_Distance (Time_Of_Flight : in System_Time_Span) return Meters
+     with Global => null;
+   --  Calculate the distance based on the specified time of flight in seconds.
 
    function Remove_Ranging_Bias
      (Measured_Distance : in Biased_Distance;
       Channel           : in DW1000.Driver.Channel_Number;
-      PRF               : in DW1000.Driver.PRF_Type) return Distance
+      PRF               : in DW1000.Driver.PRF_Type) return Meters
      with Global => null;
    --  Remove the ranging bias from a distance measurement.
    --
