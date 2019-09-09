@@ -625,21 +625,6 @@ is
 
    end Lookup_Correction;
 
-   -------------------
-   --  To_Distance  --
-   -------------------
-
-   function To_Distance (Time_Of_Flight : in System_Time_Span) return Meters
-   is
-      Fine : constant Fine_System_Time := Fine_System_Time (Time_Of_Flight);
-      TOF  : Long_Float;
-
-   begin
-      TOF := Long_Float (To_Bits_40 (Fine)) * System_Time_Span'Delta;
-
-      return Meters (TOF * Speed_Of_Light_In_Air);
-   end To_Distance;
-
    ---------------------------
    --  Remove_Ranging_Bias  --
    ---------------------------

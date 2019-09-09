@@ -56,10 +56,6 @@ is
    --  (PRF) that was used to perform the measurement. This bias must be removed
    --  for a more accurate ranging measurement.
 
-   function To_Distance (Time_Of_Flight : in System_Time_Span) return Meters
-     with Global => null;
-   --  Calculate the distance based on the specified time of flight in seconds.
-
    function Remove_Ranging_Bias
      (Measured_Distance : in Biased_Distance;
       Channel           : in DW1000.Driver.Channel_Number;
