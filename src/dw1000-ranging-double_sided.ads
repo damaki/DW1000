@@ -69,7 +69,7 @@ is
       Tag_Tx_Final_Timestamp    : in Fine_System_Time;
       Anchor_Rx_Final_Timestamp : in Fine_System_Time;
       Channel                   : in DW1000.Driver.Channel_Number;
-      PRF                       : in DW1000.Driver.PRF_Type) return Distance
+      PRF                       : in DW1000.Driver.PRF_Type) return Meters
      with Global => null;
    --  Compute the distance based on a double-sided ranging exchange, and
    --  automatically remove ranging bias.

@@ -20,6 +20,8 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
+with DW1000.Types; use DW1000.Types;
+
 package body DW1000.Ranging.Double_Sided
 with SPARK_Mode => On
 is
@@ -31,56 +33,62 @@ is
       Tag_Tx_Final_Timestamp    : in Fine_System_Time;
       Anchor_Rx_Final_Timestamp : in Fine_System_Time) return Biased_Distance
    is
-      --  Subtypes to help GNATprove prove absence of runtime errors.
-      subtype System_Time_Span_Float is Long_Float
-      range 0.0 .. Long_Float (System_Time_Span'Last);
+      type System_Time_Span_Div2 is
+      delta System_Time_Span'Delta / 2.0
+      range 0.0 .. System_Time_Span'Last --  need the same range as System_Time_Span
+        with Small => System_Time_Span'Small / 2.0;
 
-      subtype Time_Of_Flight_Float is Long_Float
-      range 0.0 .. System_Time_Span_Float'Last / 2.0;
+      type System_Time_Span_Div4 is
+      delta System_Time_Span'Delta / 4.0
+      range 0.0 .. System_Time_Span'Last / 2.0
+        with Small => System_Time_Span'Small / 4.0;
 
-      subtype Distance_Float is Long_Float
-      range 0.0 .. Time_Of_Flight_Float'Last * Speed_Of_Light_In_Air;
+      T_Roundtrip1 : constant System_Time_Span := Calculate_Span
+        (Start_Time => Tag_Tx_Poll_Timestamp,
+         End_Time   => Tag_Rx_Resp_Timestamp);
 
-      T_Roundtrip1 : constant System_Time_Span_Float := System_Time_Span_Float
-        (Calculate_Span
-           (Start_Time => Tag_Tx_Poll_Timestamp,
-            End_Time   => Tag_Rx_Resp_Timestamp));
+      T_Reply1 : constant System_Time_Span := Calculate_Span
+        (Start_Time => Anchor_Rx_Poll_Timestamp,
+         End_Time   => Anchor_Tx_Resp_Timestamp);
 
-      T_Reply1 : constant System_Time_Span_Float := System_Time_Span_Float
-        (Calculate_Span
-           (Start_Time => Anchor_Rx_Poll_Timestamp,
-            End_Time   => Anchor_Tx_Resp_Timestamp));
+      T_Roundtrip2 : constant System_Time_Span := Calculate_Span
+        (Start_Time => Anchor_Tx_Resp_Timestamp,
+         End_Time   => Anchor_Rx_Final_Timestamp);
 
-      T_Roundtrip2 : constant System_Time_Span_Float := System_Time_Span_Float
-        (Calculate_Span
-           (Start_Time => Anchor_Tx_Resp_Timestamp,
-            End_Time   => Anchor_Rx_Final_Timestamp));
+      T_Reply2 : constant System_Time_Span := Calculate_Span
+        (Start_Time => Tag_Rx_Resp_Timestamp,
+         End_Time   => Tag_Tx_Final_Timestamp);
 
-      T_Reply2 : constant System_Time_Span_Float := System_Time_Span_Float
-        (Calculate_Span
-           (Start_Time => Tag_Rx_Resp_Timestamp,
-            End_Time   => Tag_Tx_Final_Timestamp));
+      Time_Of_Flight_1 : System_Time_Span_Div2;
+      Time_Of_Flight_2 : System_Time_Span_Div2;
+      Time_Of_Flight   : System_Time_Span_Div4;
 
-      Time_Of_Flight_1 : Time_Of_Flight_Float;
-      Time_Of_Flight_2 : Time_Of_Flight_Float;
-      Time_Of_Flight   : Time_Of_Flight_Float;
+      Diff : System_Time_Span;
+      Sum  : System_Time_Span_Div2;
 
-      Result : Distance_Float;
+      TOF_I41   : Bits_41;
+      TOF_Float : Long_Float;
 
    begin
       if (T_Reply1 > T_Roundtrip1) or (T_Reply2 > T_Roundtrip2) then
          Time_Of_Flight := 0.0;
 
       else
-         Time_Of_Flight_1 := (T_Roundtrip1 - T_Reply1) / 2.0;
-         Time_Of_Flight_2 := (T_Roundtrip2 - T_Reply2) / 2.0;
+         Diff := T_Roundtrip1 - T_Reply1;
+         Time_Of_Flight_1 := System_Time_Span_Div2 (Diff / System_Time_Span (2.0));
 
-         Time_Of_Flight := (Time_Of_Flight_1 + Time_Of_Flight_2) / 2.0;
+         Diff := T_Roundtrip2 - T_Reply2;
+         Time_Of_Flight_2 := System_Time_Span_Div2 (Diff / System_Time_Span (2.0));
+
+         Sum := Time_Of_Flight_1 + Time_Of_Flight_2;
+         Time_Of_Flight := System_Time_Span_Div4 (Sum / System_Time_Span_Div4 (2.0));
       end if;
 
-      Result := Distance_Float (Time_Of_Flight * Speed_Of_Light_In_Air);
+      --  Convert to floating point
+      TOF_I41   := Bits_41 (Time_Of_Flight / System_Time_Span_Div4 (System_Time_Span_Div4'Delta));
+      TOF_Float := Long_Float (TOF_I41) * System_Time_Span_Div4'Delta;
 
-      return Biased_Distance (Result);
+      return Biased_Distance (TOF_Float * Speed_Of_Light_In_Air);
    end Compute_Distance;
 
 
@@ -92,7 +100,7 @@ is
       Tag_Tx_Final_Timestamp    : in Fine_System_Time;
       Anchor_Rx_Final_Timestamp : in Fine_System_Time;
       Channel                   : in DW1000.Driver.Channel_Number;
-      PRF                       : in DW1000.Driver.PRF_Type) return Distance
+      PRF                       : in DW1000.Driver.PRF_Type) return Meters
    is
       Distance_With_Bias : Biased_Distance;
 

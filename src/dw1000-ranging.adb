@@ -26,39 +26,33 @@ package body DW1000.Ranging
 with SPARK_Mode => On
 is
 
-   Nb_16MHz_Corrections_Narrowband : constant := 37;
-   Nb_16MHz_Corrections_Wideband   : constant := 68;
-   Nb_64MHz_Corrections_Narrowband : constant := 26;
-   Nb_64MHz_Corrections_Wideband   : constant := 59;
-
    type Short_Distance is
    delta 0.25
    range 0.0 .. 63.75
-     with Small => 0.25,
-     Size => 8;
+     with Size => 8;
 
    type Correction_Table is array (Natural range <>) of Short_Distance;
 
-   subtype Correction_Distance is Distance range 0.0 .. 0.68;
-
-   subtype Correction_Table_16MHz_Narrowband is
-     Correction_Table (Natural range 0 .. Nb_16MHz_Corrections_Narrowband - 1);
-
-   subtype Correction_Table_16MHz_Wideband is
-     Correction_Table (Natural range 0 .. Nb_16MHz_Corrections_Wideband - 1);
-
-   subtype Correction_Table_64MHz_Narrowband is
-     Correction_Table (Natural range 0 .. Nb_64MHz_Corrections_Narrowband - 1);
-
-   subtype Correction_Table_64MHz_Wideband is
-     Correction_Table (Natural range 0 .. Nb_64MHz_Corrections_Wideband - 1);
+   subtype Correction_Distance is Meters range 0.0 .. 0.68;
+   --  Subtype to constrain the maximum amount of correction that is applied.
 
    Offset_16MHz_Narrowband : constant Correction_Distance := 0.23;
    Offset_16MHz_Wideband   : constant Correction_Distance := 0.28;
    Offset_64MHz_Narrowband : constant Correction_Distance := 0.17;
    Offset_64MHz_Wideband   : constant Correction_Distance := 0.30;
 
-   Correction_Table_Ch1_16MHz : constant Correction_Table_16MHz_Narrowband
+   -------------------------
+   --  Correction Tables  --
+   -------------------------
+
+   --  These lookup tables are used to determine the correction value needed
+   --  to remove the ranging bias from the raw distance measurements.
+   --
+   --  Each entry in the table is a threshold value, in meters. The index of
+   --  the array element is the correction value needed in centimeters for that
+   --  threshold value.
+
+   Correction_Table_Ch1_16MHz : constant Correction_Table
      := (0  =>  0.25,
          1  =>  0.75,
          2  =>  1.00,
@@ -98,7 +92,7 @@ is
          36 => 63.75);
 
 
-   Correction_Table_Ch2_16MHz : constant Correction_Table_16MHz_Narrowband
+   Correction_Table_Ch2_16MHz : constant Correction_Table
      := (0 => 0.25,
          1 => 0.50,
          2 => 1.00,
@@ -137,7 +131,7 @@ is
          35 => 60.00,
          36 => 63.75);
 
-   Correction_Table_Ch3_16MHz : constant Correction_Table_16MHz_Narrowband
+   Correction_Table_Ch3_16MHz : constant Correction_Table
      := (0 => 0.25,
          1 => 0.50,
          2 => 0.75,
@@ -176,7 +170,7 @@ is
          35 => 53.25,
          36 => 63.75);
 
-   Correction_Table_Ch4_16MHz : constant Correction_Table_16MHz_Wideband
+   Correction_Table_Ch4_16MHz : constant Correction_Table
      := (0 => 1.75,
          1 => 1.75,
          2 => 2.00,
@@ -246,7 +240,7 @@ is
          66 => 63.75,
          67 => 63.75);
 
-   Correction_Table_Ch5_16MHz : constant Correction_Table_16MHz_Narrowband
+   Correction_Table_Ch5_16MHz : constant Correction_Table
      := (0 => 0.25,
          1 => 0.25,
          2 => 0.50,
@@ -285,7 +279,7 @@ is
          35 => 37.00,
          36 => 63.75);
 
-   Correction_Table_Ch7_16MHz : constant Correction_Table_16MHz_Wideband
+   Correction_Table_Ch7_16MHz : constant Correction_Table
      := (0 => 1.00,
          1 => 1.25,
          2 => 1.25,
@@ -355,7 +349,7 @@ is
          66 => 51.25,
          67 => 63.75);
 
-   Correction_Table_Ch1_64MHz : constant Correction_Table_64MHz_Narrowband
+   Correction_Table_Ch1_64MHz : constant Correction_Table
      := (0 => 0.25,
          1 => 0.50,
          2 => 0.50,
@@ -383,7 +377,7 @@ is
          24 => 39.25,
          25 => 63.75);
 
-   Correction_Table_Ch2_64MHz : constant Correction_Table_64MHz_Narrowband
+   Correction_Table_Ch2_64MHz : constant Correction_Table
      := (0 => 0.25,
          1 => 0.50,
          2 => 0.50,
@@ -411,7 +405,7 @@ is
          24 => 34.50,
          25 => 63.75);
 
-   Correction_Table_Ch3_64MHz : constant Correction_Table_64MHz_Narrowband
+   Correction_Table_Ch3_64MHz : constant Correction_Table
      := (0 => 0.25,
          1 => 0.25,
          2 => 0.50,
@@ -439,7 +433,7 @@ is
          24 => 30.50,
          25 => 63.75);
 
-   Correction_Table_Ch4_64MHz : constant Correction_Table_64MHz_Wideband
+   Correction_Table_Ch4_64MHz : constant Correction_Table
      := (0 => 1.75,
          1 => 2.00,
          2 => 2.00,
@@ -500,7 +494,7 @@ is
          57 => 63.75,
          58 => 63.75);
 
-   Correction_Table_Ch5_64MHz : constant Correction_Table_64MHz_Narrowband
+   Correction_Table_Ch5_64MHz : constant Correction_Table
      := (0 => 0.25,
          1 => 0.25,
          2 => 0.25,
@@ -528,7 +522,7 @@ is
          24 => 21.25,
          25 => 63.75);
 
-   Correction_Table_Ch7_64MHz : constant Correction_Table_64MHz_Wideband
+   Correction_Table_Ch7_64MHz : constant Correction_Table
      := (0 => 1.00,
          1 => 1.25,
          2 => 1.25,
@@ -589,8 +583,11 @@ is
          57 => 48.00,
          58 => 63.75);
 
+   -------------------------
+   --  Lookup_Correction  --
+   -------------------------
 
-   function Lookup_Correction (Measured_Distance : in Distance;
+   function Lookup_Correction (Measured_Distance : in Meters;
                                Table           : in Correction_Table)
                                return Correction_Distance
      with Global => null,
@@ -601,21 +598,20 @@ is
       I : Natural;
 
    begin
-      if Measured_Distance > Distance (Short_Distance'Last) then
+      if Measured_Distance > Meters (Short_Distance'Last) then
          Distance_25cm := Short_Distance'Last;
 
       else
          --  Workaround since GNATprove does not yet support conversions
-         --  between different fixed-point types.
+         --  between different fixed-point and floating-point types.
          --
          --  This is equivalent to:
-         --     Distance_25cm := Bias (Measured_Distance);
+         --     Distance_25cm := Short_Distance (Measured_Distance);
          Distance_25cm :=
-           Short_Distance'Delta * Integer (Measured_Distance / Distance (Short_Distance'Delta));
+           Short_Distance'Delta * Integer (Measured_Distance / Short_Distance'Delta);
       end if;
 
-      --  Find the index of the table entry which matches
-      --  the estimated distance.
+      --  Find the index of the table entry which matches the estimated distance.
       I := 0;
       while I < Table'Length loop
          pragma Loop_Variant (Increases => I);
@@ -624,23 +620,26 @@ is
          I := I + 1;
       end loop;
 
-      --  The index is the correction needed in increments of 25 cm.
-      return Correction_Distance (0.01) * Distance (I);
+      --  The index is the correction needed in centimeters.
+      return Correction_Distance (0.01) * Meters (I);
 
    end Lookup_Correction;
 
+   ---------------------------
+   --  Remove_Ranging_Bias  --
+   ---------------------------
 
    function Remove_Ranging_Bias
      (Measured_Distance : in Biased_Distance;
       Channel           : in DW1000.Driver.Channel_Number;
-      PRF               : in DW1000.Driver.PRF_Type) return Distance
+      PRF               : in DW1000.Driver.PRF_Type) return Meters
    is
-      Initial_Distance : constant Distance := Distance (Measured_Distance);
+      Initial_Distance : constant Meters := Meters (Measured_Distance);
 
       Correction : Correction_Distance;
       PRF_Offset : Correction_Distance;
 
-      Result     : Distance;
+      Result     : Meters;
 
    begin
 
@@ -727,11 +726,7 @@ is
          --  Positive correction
          Correction := PRF_Offset - Correction;
 
-         if Initial_Distance <= Distance'Last - Correction then
-            Result := Initial_Distance + Correction;
-         else
-            Result := Distance'Last;
-         end if;
+         Result := Initial_Distance + Correction;
       end if;
 
       return Result;

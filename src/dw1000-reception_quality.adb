@@ -187,7 +187,6 @@ is
 
       N   : Numerator_Range;
       D   : Denominator_Range;
-      Div : Division_Result_Range;
       R   : Long_Float;
       A   : Long_Float;
    begin
@@ -221,8 +220,7 @@ is
          D := 1.0;
       end if;
 
-      Div := N / D;
-      R := Log10 (Div);
+      R := Log10 (N / D);
 
       --  The values in this assumption were generated using Wolfram|Alpha
       --  based on the range of the Division_Result_Range subtype.
