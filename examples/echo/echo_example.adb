@@ -21,10 +21,7 @@
 -------------------------------------------------------------------------------
 
 with Ada.Real_Time;      use Ada.Real_Time;
-with DecaDriver;
-with DecaDriver.Core;
-with DecaDriver.Rx;      use DecaDriver.Rx;
-with DecaDriver.Tx;
+with DecaDriver;         use DecaDriver;
 with DW1000.BSP;
 with DW1000.Driver;      use DW1000.Driver;
 with DW1000.System_Time; use DW1000.System_Time;
@@ -37,23 +34,19 @@ procedure Echo_Example
   with SPARK_Mode,
   Global => (Input  => Ada.Real_Time.Clock_Time,
              In_Out => (DW1000.BSP.Device_State,
-                        DecaDriver.Core.Driver,
-                        DecaDriver.Rx.Receiver,
-                        DecaDriver.Tx.Transmitter)),
-  Depends => (DecaDriver.Core.Driver    => + DW1000.BSP.Device_State,
-              DecaDriver.Rx.Receiver    => + (DW1000.BSP.Device_State,
-                                              DecaDriver.Core.Driver),
-              DecaDriver.Tx.Transmitter => + (DW1000.BSP.Device_State,
-                                              DecaDriver.Core.Driver,
-                                              DecaDriver.Rx.Receiver),
-              DW1000.BSP.Device_State   => + (DecaDriver.Core.Driver,
-                                              DecaDriver.Rx.Receiver),
-              null                      => Ada.Real_Time.Clock_Time)
+                        DecaDriver.Driver,
+                        DecaDriver.Tx_Complete_Flag)),
+  Depends => (DecaDriver.Driver           => + (DW1000.BSP.Device_State,
+                                                DecaDriver.Driver),
+              DW1000.BSP.Device_State     => + (DecaDriver.Driver),
+              DecaDriver.Tx_Complete_Flag => + (DecaDriver.Driver,
+                                                DW1000.BSP.Device_State),
+              null                        => Ada.Real_Time.Clock_Time)
 is
    Rx_Packet        : DW1000.Types.Byte_Array (1 .. 127) := (others => 0);
    Rx_Packet_Length : DecaDriver.Frame_Length_Number;
-   Rx_Frame_Info    : DecaDriver.Rx.Frame_Info_Type;
-   Rx_Status        : DecaDriver.Rx.Rx_Status_Type;
+   Rx_Frame_Info    : DecaDriver.Frame_Info_Type;
+   Rx_Status        : DecaDriver.Rx_Status_Type;
    Rx_Overrun       : Boolean;
 
    Rx_Timestamp     : DW1000.System_Time.Fine_System_Time;
@@ -63,14 +56,14 @@ is
 
 begin
    --  Driver must be initialized once before it is used.
-   DecaDriver.Core.Driver.Initialize
+   DecaDriver.Driver.Initialize
      (Load_Antenna_Delay  => True,
       Load_XTAL_Trim      => True,
       Load_UCode_From_ROM => True);
 
    --  Configure the DW1000
-   DecaDriver.Core.Driver.Configure
-     (DecaDriver.Core.Configuration_Type'
+   DecaDriver.Driver.Configure
+     (DecaDriver.Configuration_Type'
         (Channel             => 1,
          PRF                 => PRF_64MHz,
          Tx_Preamble_Length  => PLEN_1024,
@@ -84,11 +77,11 @@ begin
 
    --  Configure the transmit power for the PRF and channel chosen.
    --  We use the reference values for the EVB1000 in this example.
-   DecaDriver.Tx.Transmitter.Configure_Tx_Power
+   DW1000.Driver.Configure_Tx_Power
      (Tx_Power.Manual_Tx_Power_Table (1, PRF_64MHz));
 
    --  Enable the LEDs controlled by the DW1000.
-   DecaDriver.Core.Driver.Configure_LEDs
+   DW1000.Driver.Configure_LEDs
      (Tx_LED_Enable    => True,  --  Enable transmit LED
       Rx_LED_Enable    => True,  --  Enable receive LED
       Rx_OK_LED_Enable => False,
@@ -99,13 +92,13 @@ begin
    --  so configure the DW1000 to automatically re-enable the receiver when
    --  errors occur. The driver will not be notified of receiver errors whilst
    --  this is enabled.
-   DecaDriver.Rx.Receiver.Set_Rx_Auto_Reenable (Enabled => True);
+   DW1000.Driver.Set_Auto_Rx_Reenable (Enabled => True);
 
-   DecaDriver.Rx.Receiver.Start_Rx_Immediate;
+   DecaDriver.Driver.Start_Rx_Immediate;
 
    --  Continuously receive packets, and echo them back after a 500 ms delay.
    loop
-      DecaDriver.Rx.Receiver.Wait
+      DecaDriver.Driver.Rx_Wait
         (Frame      => Rx_Packet,
          Length     => Rx_Packet_Length,
          Frame_Info => Rx_Frame_Info,
@@ -113,31 +106,33 @@ begin
          Overrun    => Rx_Overrun);
 
       if Rx_Status = No_Error then
+         --  Limit frame length
+         Rx_Packet_Length := Frame_Length_Number'Min (Rx_Packet_Length, Rx_Packet'Length);
+
          --  Get the timestamp at which the packet was received.
-         Rx_Timestamp := DecaDriver.Rx.Receive_Timestamp (Rx_Frame_Info);
+         Rx_Timestamp := DecaDriver.Receive_Timestamp (Rx_Frame_Info);
 
          --  We want to send the packet 0.5 seconds after it was received.
          Tx_Timestamp := System_Time_Offset (Rx_Timestamp, 0.5);
 
          --  Configure the transmitter to transmit the packet
          --  at the delayed time.
-         DecaDriver.Tx.Transmitter.Set_Delayed_Tx_Time
-           (Time => To_Coarse_System_Time (Tx_Timestamp));
+         DW1000.Driver.Set_Delayed_Tx_Rx_Time (Coarse_System_Time (Tx_Timestamp));
 
          --  Load the packet into the transmitter
-         DecaDriver.Tx.Transmitter.Set_Tx_Data
+         DW1000.Driver.Set_Tx_Data
            (Data   => Rx_Packet (1 .. Rx_Packet_Length),
             Offset => 0);
 
          --  Tell the driver the length of the packet and its position in the
          --  transmit buffer.
-         DecaDriver.Tx.Transmitter.Set_Tx_Frame_Length
+         DW1000.Driver.Set_Tx_Frame_Length
            (Length => Rx_Packet_Length,
             Offset => 0);
 
          --  Transmit the delayed packet, and enable the receiver after the
          --  packet is sent.
-         DecaDriver.Tx.Transmitter.Start_Tx_Delayed
+         DecaDriver.Driver.Start_Tx_Delayed
            (Rx_After_Tx => True,
             Result      => Tx_Result);
 
@@ -145,7 +140,7 @@ begin
          --  took too long to configure the transmitter, etc...) then don't
          --  transmit and just wait for another packet
          if Tx_Result /= Success then
-            DecaDriver.Rx.Receiver.Start_Rx_Immediate;
+            DecaDriver.Driver.Start_Rx_Immediate;
          end if;
       end if;
    end loop;
