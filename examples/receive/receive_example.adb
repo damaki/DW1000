@@ -22,8 +22,6 @@
 
 with Ada.Real_Time;   use Ada.Real_Time;
 with DecaDriver;
-with DecaDriver.Core;
-with DecaDriver.Rx;
 with DW1000.BSP;
 with DW1000.Driver;   use DW1000.Driver;
 with DW1000.Types;
@@ -33,29 +31,27 @@ procedure Receive_Example
   with SPARK_Mode,
   Global => (Input  => Ada.Real_Time.Clock_Time,
              In_Out => (DW1000.BSP.Device_State,
-                        DecaDriver.Core.Driver,
-                        DecaDriver.Rx.Receiver)),
-  Depends => (DecaDriver.Core.Driver    => + DW1000.BSP.Device_State,
-              DecaDriver.Rx.Receiver    => + null,
-              DW1000.BSP.Device_State   => + DecaDriver.Core.Driver,
+                        DecaDriver.Driver)),
+  Depends => (DecaDriver.Driver         => + DW1000.BSP.Device_State,
+              DW1000.BSP.Device_State   => + DecaDriver.Driver,
               null                      => Ada.Real_Time.Clock_Time)
 is
    Rx_Packet        : DW1000.Types.Byte_Array (1 .. 127) := (others => 0);
    Rx_Packet_Length : DecaDriver.Frame_Length_Number;
-   Rx_Frame_Info    : DecaDriver.Rx.Frame_Info_Type;
-   Rx_Status        : DecaDriver.Rx.Rx_Status_Type;
+   Rx_Frame_Info    : DecaDriver.Frame_Info_Type;
+   Rx_Status        : DecaDriver.Rx_Status_Type;
    Rx_Overrun       : Boolean;
 
 begin
    --  Driver must be initialized once before it is used.
-   DecaDriver.Core.Driver.Initialize
+   DecaDriver.Driver.Initialize
      (Load_Antenna_Delay  => True,
       Load_XTAL_Trim      => True,
       Load_UCode_From_ROM => True);
 
    --  Configure the DW1000
-   DecaDriver.Core.Driver.Configure
-     (DecaDriver.Core.Configuration_Type'
+   DecaDriver.Driver.Configure
+     (DecaDriver.Configuration_Type'
         (Channel             => 1,
          PRF                 => PRF_64MHz,
          Tx_Preamble_Length  => PLEN_1024,
@@ -71,7 +67,7 @@ begin
    --  we don't transmit any frames!
 
    --  Enable the LEDs controlled by the DW1000.
-   DecaDriver.Core.Driver.Configure_LEDs
+   DW1000.Driver.Configure_LEDs
      (Tx_LED_Enable    => True,  --  Enable transmit LED
       Rx_LED_Enable    => True,  --  Enable receive LED
       Rx_OK_LED_Enable => False,
@@ -82,15 +78,15 @@ begin
    --  so configure the DW1000 to automatically re-enable the receiver when
    --  errors occur. The driver will not be notified of receiver errors whilst
    --  this is enabled.
-   DecaDriver.Rx.Receiver.Set_Rx_Auto_Reenable (Enabled => True);
+   DW1000.Driver.Set_Auto_Rx_Reenable (Enabled => True);
 
    --  Continuously receive packets
    loop
       --  Enable the receiver to listen for a packet
-      DecaDriver.Rx.Receiver.Start_Rx_Immediate;
+      DecaDriver.Driver.Start_Rx_Immediate;
 
       --  Wait for a packet
-      DecaDriver.Rx.Receiver.Wait
+      DecaDriver.Driver.Rx_Wait
         (Frame      => Rx_Packet,
          Length     => Rx_Packet_Length,
          Frame_Info => Rx_Frame_Info,
