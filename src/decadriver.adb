@@ -188,15 +188,12 @@ is
             DW1000.Driver.Read_OTP (OTP_ADDR_ANTENNA_DELAY,
                                     Word);
 
-            -- High 16 bits are the antenna delay with a 64 MHz PRF.
-            -- Low 16 bits are the antenna delay with a 16 MHz PRF.
-            Antenna_Delay_PRF_16 :=
-              To_Fine_System_Time (Bits_40 (Word and 16#FFFF#));
+            --  High 16 bits are the antenna delay with a 64 MHz PRF.
+            --  Low 16 bits are the antenna delay with a 16 MHz PRF.
+            Antenna_Delay_PRF_16 := To_Antenna_Delay_Time (Bits_16 (Word and 16#FFFF#));
 
             Word := Shift_Right (Word, 16);
-
-            Antenna_Delay_PRF_64 :=
-              To_Fine_System_Time (Bits_40 (Word and 16#FFFF#));
+            Antenna_Delay_PRF_64 := To_Antenna_Delay_Time (Bits_16 (Word and 16#FFFF#));
          else
             Antenna_Delay_PRF_16 := 0.0;
             Antenna_Delay_PRF_64 := 0.0;

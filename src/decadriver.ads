@@ -418,8 +418,7 @@ is
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Config,
                                                 Driver),
-                    Driver             => + Config),
-        Post => (PHR_Mode = Config.PHR_Mode);
+                    Driver             => + Config);
       --  Configure the DW1000 for a specific channel, PRF, preamble, etc...
 
 
@@ -645,8 +644,8 @@ is
       Part_ID : Bits_32 := 0;
       Lot_ID  : Bits_32 := 0;
 
-      Antenna_Delay_PRF_64 : Fine_System_Time := 0.0;
-      Antenna_Delay_PRF_16 : Fine_System_Time := 0.0;
+      Antenna_Delay_PRF_64 : Antenna_Delay_Time := 0.0;
+      Antenna_Delay_PRF_16 : Antenna_Delay_Time := 0.0;
       XTAL_Trim            : Bits_5  := 2#1_0000#;
 
       Long_Frames : Boolean := False;
