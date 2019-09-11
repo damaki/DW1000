@@ -35,10 +35,10 @@ is
    -- DEV_ID register file
 
    type DEV_ID_Type is record
-      REV    : Types.Bits_4;
-      VER    : Types.Bits_4;
-      MODEL  : Types.Bits_8;
-      RIDTAG : Types.Bits_16;
+      REV    : Types.Bits_4  := 2#0000#;
+      VER    : Types.Bits_4  := 2#0011#;
+      MODEL  : Types.Bits_8  := 16#01#;
+      RIDTAG : Types.Bits_16 := 16#DECA#;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -69,8 +69,8 @@ is
    -- PANDADR register file
 
    type PANADR_Type is record
-      SHORT_ADDR : Types.Bits_16;
-      PAN_ID     : Types.Bits_16;
+      SHORT_ADDR : Types.Bits_16 := 16#FFFF#;
+      PAN_ID     : Types.Bits_16 := 16#FFFF#;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -85,32 +85,32 @@ is
    -- SYS_CFG register file
 
    type SYS_CFG_Type is record
-      FFEN       : Types.Bits_1;
-      FFBC       : Types.Bits_1;
-      FFAB       : Types.Bits_1;
-      FFAD       : Types.Bits_1;
-      FFAA       : Types.Bits_1;
-      FFAM       : Types.Bits_1;
-      FFAR       : Types.Bits_1;
-      FFA4       : Types.Bits_1;
-      FFA5       : Types.Bits_1;
-      HIRQ_POL   : Types.Bits_1;
-      SPI_EDGE   : Types.Bits_1;
-      DIS_FCE    : Types.Bits_1;
-      DIS_DRXB   : Types.Bits_1;
-      DIS_PHE    : Types.Bits_1;
-      DIS_RSDE   : Types.Bits_1;
-      FCS_INT2F  : Types.Bits_1;
-      PHR_MODE   : Types.Bits_2;
-      DIS_STXP   : Types.Bits_1;
-      RXM110K    : Types.Bits_1;
-      RXWTOE     : Types.Bits_1;
-      RXAUTR     : Types.Bits_1;
-      AUTOACK    : Types.Bits_1;
-      AACKPEND   : Types.Bits_1;
+      FFEN       : Types.Bits_1 := 0;
+      FFBC       : Types.Bits_1 := 0;
+      FFAB       : Types.Bits_1 := 0;
+      FFAD       : Types.Bits_1 := 0;
+      FFAA       : Types.Bits_1 := 0;
+      FFAM       : Types.Bits_1 := 0;
+      FFAR       : Types.Bits_1 := 0;
+      FFA4       : Types.Bits_1 := 0;
+      FFA5       : Types.Bits_1 := 0;
+      HIRQ_POL   : Types.Bits_1 := 1;
+      SPI_EDGE   : Types.Bits_1 := 0;
+      DIS_FCE    : Types.Bits_1 := 0;
+      DIS_DRXB   : Types.Bits_1 := 1;
+      DIS_PHE    : Types.Bits_1 := 0;
+      DIS_RSDE   : Types.Bits_1 := 0;
+      FCS_INT2F  : Types.Bits_1 := 0;
+      PHR_MODE   : Types.Bits_2 := 0;
+      DIS_STXP   : Types.Bits_1 := 0;
+      RXM110K    : Types.Bits_1 := 0;
+      RXWTOE     : Types.Bits_1 := 0;
+      RXAUTR     : Types.Bits_1 := 0;
+      AUTOACK    : Types.Bits_1 := 0;
+      AACKPEND   : Types.Bits_1 := 0;
 
-      Reserved_1 : Types.Bits_3;
-      Reserved_2 : Types.Bits_5;
+      Reserved_1 : Types.Bits_3 := 0;
+      Reserved_2 : Types.Bits_5 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -162,16 +162,16 @@ is
    -- TX_FCTRL register file
 
    type TX_FCTRL_Type is record
-      TFLEN    : Types.Bits_7;
-      TFLE     : Types.Bits_3;
-      R        : Types.Bits_3;
-      TXBR     : Types.Bits_2;
-      TR       : Types.Bits_1;
-      TXPRF    : Types.Bits_2;
-      TXPSR    : Types.Bits_2;
-      PE       : Types.Bits_2;
-      TXBOFFS  : Types.Bits_10;
-      IFSDELAY : Types.Bits_8;
+      TFLEN    : Types.Bits_7  := 12;
+      TFLE     : Types.Bits_3  := 0;
+      R        : Types.Bits_3  := 0;
+      TXBR     : Types.Bits_2  := 0;
+      TR       : Types.Bits_1  := 0;
+      TXPRF    : Types.Bits_2  := 0;
+      TXPSR    : Types.Bits_2  := 0;
+      PE       : Types.Bits_2  := 0;
+      TXBOFFS  : Types.Bits_10 := 0;
+      IFSDELAY : Types.Bits_8  := 0;
    end record
      with Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -194,7 +194,7 @@ is
    -- TX_BUFFER register file
 
    type TX_BUFFER_Type is record
-      TX_BUFFER : Types.Byte_Array(1 .. 1024);
+      TX_BUFFER : Types.Byte_Array(1 .. 1024) := (others => 0);
    end record
      with Size => 8192,
      Bit_Order => System.Low_Order_First,
@@ -218,7 +218,7 @@ is
    -- RX_FWTO register file
 
    type RX_FWTO_Type is record
-      RXFWTO : Types.Bits_16;
+      RXFWTO : Types.Bits_16 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -232,19 +232,19 @@ is
    -- SYS_CTRL register file
 
    type SYS_CTRL_Type is record
-      SFCST     : Types.Bits_1;
-      TXSTRT    : Types.Bits_1;
-      TXDLYS    : Types.Bits_1;
-      CANSFCS   : Types.Bits_1;
-      TRXOFF    : Types.Bits_1;
-      WAIT4RESP : Types.Bits_1;
-      RXENAB    : Types.Bits_1;
-      RXDLYE    : Types.Bits_1;
-      HRBPT     : Types.Bits_1;
+      SFCST     : Types.Bits_1   := 0;
+      TXSTRT    : Types.Bits_1   := 0;
+      TXDLYS    : Types.Bits_1   := 0;
+      CANSFCS   : Types.Bits_1   := 0;
+      TRXOFF    : Types.Bits_1   := 0;
+      WAIT4RESP : Types.Bits_1   := 0;
+      RXENAB    : Types.Bits_1   := 0;
+      RXDLYE    : Types.Bits_1   := 0;
+      HRBPT     : Types.Bits_1   := 0;
 
-      Reserved_1 : Types.Bits_2;
-      Reserved_2 : Types.Bits_14;
-      Reserved_3 : Types.Bits_7;
+      Reserved_1 : Types.Bits_2  := 0;
+      Reserved_2 : Types.Bits_14 := 0;
+      Reserved_3 : Types.Bits_7  := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -274,38 +274,38 @@ is
    -- SYS_MASK register file
 
    type SYS_MASK_Type is record
-      MCPLOCK   : Types.Bits_1;
-      MESYNCR   : Types.Bits_1;
-      MAAT      : Types.Bits_1;
-      MTXFRB    : Types.Bits_1;
-      MTXPRS    : Types.Bits_1;
-      MTXPHS    : Types.Bits_1;
-      MTXFRS    : Types.Bits_1;
-      MRXPRD    : Types.Bits_1;
-      MRXSFDD   : Types.Bits_1;
-      MLDEDONE  : Types.Bits_1;
-      MRXPHD    : Types.Bits_1;
-      MRXPHE    : Types.Bits_1;
-      MRXDFR    : Types.Bits_1;
-      MRXFCG    : Types.Bits_1;
-      MRXFCE    : Types.Bits_1;
-      MRXRFSL   : Types.Bits_1;
-      MRXRFTO   : Types.Bits_1;
-      MLDEERR   : Types.Bits_1;
-      MRXOVRR   : Types.Bits_1;
-      MRXPTO    : Types.Bits_1;
-      MGPIOIRQ  : Types.Bits_1;
-      MSLP2INIT : Types.Bits_1;
-      MRFPLLLL  : Types.Bits_1;
-      MCPLLLL   : Types.Bits_1;
-      MRXSFDTO  : Types.Bits_1;
-      MHPDWARN  : Types.Bits_1;
-      MTXBERR   : Types.Bits_1;
-      MAFFREJ   : Types.Bits_1;
+      MCPLOCK   : Types.Bits_1  := 0;
+      MESYNCR   : Types.Bits_1  := 0;
+      MAAT      : Types.Bits_1  := 0;
+      MTXFRB    : Types.Bits_1  := 0;
+      MTXPRS    : Types.Bits_1  := 0;
+      MTXPHS    : Types.Bits_1  := 0;
+      MTXFRS    : Types.Bits_1  := 0;
+      MRXPRD    : Types.Bits_1  := 0;
+      MRXSFDD   : Types.Bits_1  := 0;
+      MLDEDONE  : Types.Bits_1  := 0;
+      MRXPHD    : Types.Bits_1  := 0;
+      MRXPHE    : Types.Bits_1  := 0;
+      MRXDFR    : Types.Bits_1  := 0;
+      MRXFCG    : Types.Bits_1  := 0;
+      MRXFCE    : Types.Bits_1  := 0;
+      MRXRFSL   : Types.Bits_1  := 0;
+      MRXRFTO   : Types.Bits_1  := 0;
+      MLDEERR   : Types.Bits_1  := 0;
+      MRXOVRR   : Types.Bits_1  := 0;
+      MRXPTO    : Types.Bits_1  := 0;
+      MGPIOIRQ  : Types.Bits_1  := 0;
+      MSLP2INIT : Types.Bits_1  := 0;
+      MRFPLLLL  : Types.Bits_1  := 0;
+      MCPLLLL   : Types.Bits_1  := 0;
+      MRXSFDTO  : Types.Bits_1  := 0;
+      MHPDWARN  : Types.Bits_1  := 0;
+      MTXBERR   : Types.Bits_1  := 0;
+      MAFFREJ   : Types.Bits_1  := 0;
 
-      Reserved_1 : Types.Bits_1;
-      Reserved_2 : Types.Bits_1;
-      Reserved_3 : Types.Bits_2;
+      Reserved_1 : Types.Bits_1 := 0;
+      Reserved_2 : Types.Bits_1 := 0;
+      Reserved_3 : Types.Bits_2 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -353,43 +353,43 @@ is
    -- SYS_STATUS register file
 
    type SYS_STATUS_Type is record
-      IRQS      : Types.Bits_1;
-      CPLOCK    : Types.Bits_1;
-      ESYNCR    : Types.Bits_1;
-      AAT       : Types.Bits_1;
-      TXFRB     : Types.Bits_1;
-      TXPRS     : Types.Bits_1;
-      TXPHS     : Types.Bits_1;
-      TXFRS     : Types.Bits_1;
-      RXPRD     : Types.Bits_1;
-      RXSFDD    : Types.Bits_1;
-      LDEDONE   : Types.Bits_1;
-      RXPHD     : Types.Bits_1;
-      RXPHE     : Types.Bits_1;
-      RXDFR     : Types.Bits_1;
-      RXFCG     : Types.Bits_1;
-      RXFCE     : Types.Bits_1;
-      RXRFSL    : Types.Bits_1;
-      RXRFTO    : Types.Bits_1;
-      LDEERR    : Types.Bits_1;
-      RXOVRR    : Types.Bits_1;
-      RXPTO     : Types.Bits_1;
-      GPIOIRQ   : Types.Bits_1;
-      SLP2INIT  : Types.Bits_1;
-      RFPLL_LL  : Types.Bits_1;
-      CLKPLL_LL : Types.Bits_1;
-      RXSFDTO   : Types.Bits_1;
-      HPDWARN   : Types.Bits_1;
-      TXBERR    : Types.Bits_1;
-      AFFREJ    : Types.Bits_1;
-      HSRBP     : Types.Bits_1;
-      ICRBP     : Types.Bits_1;
-      RXRSCS    : Types.Bits_1;
-      RXPREJ    : Types.Bits_1;
-      TXPUTE    : Types.Bits_1;
+      IRQS      : Types.Bits_1  := 0;
+      CPLOCK    : Types.Bits_1  := 0;
+      ESYNCR    : Types.Bits_1  := 0;
+      AAT       : Types.Bits_1  := 0;
+      TXFRB     : Types.Bits_1  := 0;
+      TXPRS     : Types.Bits_1  := 0;
+      TXPHS     : Types.Bits_1  := 0;
+      TXFRS     : Types.Bits_1  := 0;
+      RXPRD     : Types.Bits_1  := 0;
+      RXSFDD    : Types.Bits_1  := 0;
+      LDEDONE   : Types.Bits_1  := 0;
+      RXPHD     : Types.Bits_1  := 0;
+      RXPHE     : Types.Bits_1  := 0;
+      RXDFR     : Types.Bits_1  := 0;
+      RXFCG     : Types.Bits_1  := 0;
+      RXFCE     : Types.Bits_1  := 0;
+      RXRFSL    : Types.Bits_1  := 0;
+      RXRFTO    : Types.Bits_1  := 0;
+      LDEERR    : Types.Bits_1  := 0;
+      RXOVRR    : Types.Bits_1  := 0;
+      RXPTO     : Types.Bits_1  := 0;
+      GPIOIRQ   : Types.Bits_1  := 0;
+      SLP2INIT  : Types.Bits_1  := 0;
+      RFPLL_LL  : Types.Bits_1  := 0;
+      CLKPLL_LL : Types.Bits_1  := 0;
+      RXSFDTO   : Types.Bits_1  := 0;
+      HPDWARN   : Types.Bits_1  := 0;
+      TXBERR    : Types.Bits_1  := 0;
+      AFFREJ    : Types.Bits_1  := 0;
+      HSRBP     : Types.Bits_1  := 0;
+      ICRBP     : Types.Bits_1  := 0;
+      RXRSCS    : Types.Bits_1  := 0;
+      RXPREJ    : Types.Bits_1  := 0;
+      TXPUTE    : Types.Bits_1  := 0;
 
-      Reserved_1 : Types.Bits_1;
-      Reserved_2 : Types.Bits_5;
+      Reserved_1 : Types.Bits_1 := 0;
+      Reserved_2 : Types.Bits_5 := 0;
    end record
      with Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -441,16 +441,16 @@ is
    -- RX_FINFO register file
 
    type RX_FINFO_Type is record
-      RXFLEN : Types.Bits_7;
-      RXFLE  : Types.Bits_3;
-      RXNSPL : Types.Bits_2;
-      RXBR   : Types.Bits_2;
-      RNG    : Types.Bits_1;
-      RXPRF  : Types.Bits_2;
-      RXPSR  : Types.Bits_2;
-      RXPACC : Types.Bits_12;
+      RXFLEN : Types.Bits_7   := 0;
+      RXFLE  : Types.Bits_3   := 0;
+      RXNSPL : Types.Bits_2   := 0;
+      RXBR   : Types.Bits_2   := 0;
+      RNG    : Types.Bits_1   := 0;
+      RXPRF  : Types.Bits_2   := 0;
+      RXPSR  : Types.Bits_2   := 0;
+      RXPACC : Types.Bits_12  := 0;
 
-      Reserved : Types.Bits_1;
+      Reserved : Types.Bits_1 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -474,7 +474,7 @@ is
    -- RX_BUFFER register file
 
    type RX_BUFFER_Type is record
-      RX_BUFFER : Types.Byte_Array(1 .. 1024);
+      RX_BUFFER : Types.Byte_Array(1 .. 1024) := (others => 0);
    end record
      with Size => 8192,
      Bit_Order => System.Low_Order_First,
@@ -488,10 +488,10 @@ is
    -- RX_FQUAL register file
 
    type RX_FQUAL_Type is record
-      STD_NOISE : Types.Bits_16;
-      FP_AMPL2  : Types.Bits_16;
-      FP_AMPL3  : Types.Bits_16;
-      CIR_PWR   : Types.Bits_16;
+      STD_NOISE : Types.Bits_16 := 0;
+      FP_AMPL2  : Types.Bits_16 := 0;
+      FP_AMPL3  : Types.Bits_16 := 0;
+      CIR_PWR   : Types.Bits_16 := 0;
    end record
      with Size => 64,
      Bit_Order => System.Low_Order_First,
@@ -508,7 +508,7 @@ is
    -- RX_TTCKI register file
 
    type RX_TTCKI_Type is record
-      RXTTCKI : Types.Bits_32;
+      RXTTCKI : Types.Bits_32 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -522,12 +522,12 @@ is
    -- RX_TTCKO register file
 
    type RX_TTCKO_Type is record
-      RXTOFS  : Types.Bits_19;
-      RSMPDEL : Types.Bits_8;
-      RCPHASE : Types.Bits_7;
+      RXTOFS  : Types.Bits_19   := 0;
+      RSMPDEL : Types.Bits_8    := 0;
+      RCPHASE : Types.Bits_7    := 0;
 
-      Reserved_1 : Types.Bits_5;
-      Reserved_2 : Types.Bits_1;
+      Reserved_1 : Types.Bits_5 := 0;
+      Reserved_2 : Types.Bits_1 := 0;
    end record
      with Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -548,10 +548,10 @@ is
    -- RX_TIME register file
 
    type RX_TIME_Type is record
-      RX_STAMP : Types.Bits_40;
-      FP_INDEX : Types.Bits_16;
-      FP_AMPL1 : Types.Bits_16;
-      RX_RAWST : Types.Bits_40;
+      RX_STAMP : Types.Bits_40 := 0;
+      FP_INDEX : Types.Bits_16 := 0;
+      FP_AMPL1 : Types.Bits_16 := 0;
+      RX_RAWST : Types.Bits_40 := 0;
    end record
      with Size => 8*14,
      Bit_Order => System.Low_Order_First,
@@ -568,8 +568,8 @@ is
    -- TX_TIME register file
 
    type TX_TIME_Type is record
-      TX_STAMP : Types.Bits_40;
-      TX_RAWST : Types.Bits_40;
+      TX_STAMP : Types.Bits_40 := 0;
+      TX_RAWST : Types.Bits_40 := 0;
    end record
      with Size => 80,
      Bit_Order => System.Low_Order_First,
@@ -598,10 +598,10 @@ is
    -- ACK_RESP_T register file
 
    type ACK_RESP_T_Type is record
-      W4D_TIM : Types.Bits_20;
-      ACK_TIM : Types.Bits_8;
+      W4D_TIM : Types.Bits_20 := 0;
+      ACK_TIM : Types.Bits_8  := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -619,11 +619,11 @@ is
    -- RX_SNIFF register file
 
    type RX_SNIFF_Type is record
-      SNIFF_ONT  : Types.Bits_4;
-      SNIFF_OFFT : Types.Bits_8;
+      SNIFF_ONT  : Types.Bits_4  := 0;
+      SNIFF_OFFT : Types.Bits_8  := 0;
 
-      Reserved_1 : Types.Bits_4;
-      Reserved_2 : Types.Bits_16;
+      Reserved_1 : Types.Bits_4  := 0;
+      Reserved_2 : Types.Bits_16 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -643,10 +643,10 @@ is
    -- TX_POWER register file
 
    type TX_POWER_Type is record
-      BOOSTNORM : Types.Bits_8;
-      BOOSTP500 : Types.Bits_8;
-      BOOSTP250 : Types.Bits_8;
-      BOOSTP125 : Types.Bits_8;
+      BOOSTNORM : Types.Bits_8 := 16#22#;
+      BOOSTP500 : Types.Bits_8 := 16#02#;
+      BOOSTP250 : Types.Bits_8 := 16#08#;
+      BOOSTP125 : Types.Bits_8 := 16#0E#;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -663,16 +663,16 @@ is
    -- CHAN_CTRL register file
 
    type CHAN_CTRL_Type is record
-      TX_CHAN  : Types.Bits_4;
-      RX_CHAN  : Types.Bits_4;
-      DWSFD    : Types.Bits_1;
-      RXPRF    : Types.Bits_2;
-      TNSSFD   : Types.Bits_1;
-      RNSSFD   : Types.Bits_1;
-      TX_PCODE : Types.Bits_5;
-      RX_PCODE : Types.Bits_5;
+      TX_CHAN  : Types.Bits_4 := 5;
+      RX_CHAN  : Types.Bits_4 := 5;
+      DWSFD    : Types.Bits_1 := 0;
+      RXPRF    : Types.Bits_2 := 0;
+      TNSSFD   : Types.Bits_1 := 0;
+      RNSSFD   : Types.Bits_1 := 0;
+      TX_PCODE : Types.Bits_5 := 0;
+      RX_PCODE : Types.Bits_5 := 0;
 
-      Reserved : Types.Bits_9;
+      Reserved : Types.Bits_9 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -711,9 +711,9 @@ is
 
    -- AGC_CTRL1 sub-register
    type AGC_CTRL1_Type is record
-      DIS_AM : Types.Bits_1;
+      DIS_AM : Types.Bits_1    := 1;
 
-      Reserved : Types.Bits_15;
+      Reserved : Types.Bits_15 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -787,13 +787,13 @@ is
 
    -- EC_CTRL sub-register
    type EC_CTRL_Type is record
-      OSTSM  : Types.Bits_1;
-      OSRSM  : Types.Bits_1;
-      PLLLDT : Types.Bits_1;
-      WAIT   : Types.Bits_8;
-      OSTRM  : Types.Bits_1;
+      OSTSM  : Types.Bits_1    := 0;
+      OSRSM  : Types.Bits_1    := 0;
+      PLLLDT : Types.Bits_1    := 0;
+      WAIT   : Types.Bits_8    := 0;
+      OSTRM  : Types.Bits_1    := 0;
 
-      Reserved : Types.Bits_20;
+      Reserved : Types.Bits_20 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -823,9 +823,9 @@ is
 
    -- EC_GOLP sub-register
    type EC_GOLP_Type is record
-      OFFSET_EXT : Types.Bits_6;
+      OFFSET_EXT : Types.Bits_6  := 0;
 
-      Reserved   : Types.Bits_26;
+      Reserved   : Types.Bits_26 := 0;
    end record
    with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -874,18 +874,18 @@ is
 
    -- GPIO_MODE sub-register
    type GPIO_MODE_Type is record
-      MSGP0 : Types.Bits_2;
-      MSGP1 : Types.Bits_2;
-      MSGP2 : Types.Bits_2;
-      MSGP3 : Types.Bits_2;
-      MSGP4 : Types.Bits_2;
-      MSGP5 : Types.Bits_2;
-      MSGP6 : Types.Bits_2;
-      MSGP7 : Types.Bits_2;
-      MSGP8 : Types.Bits_2;
+      MSGP0 : Types.Bits_2      := 0;
+      MSGP1 : Types.Bits_2      := 0;
+      MSGP2 : Types.Bits_2      := 0;
+      MSGP3 : Types.Bits_2      := 0;
+      MSGP4 : Types.Bits_2      := 0;
+      MSGP5 : Types.Bits_2      := 0;
+      MSGP6 : Types.Bits_2      := 0;
+      MSGP7 : Types.Bits_2      := 0;
+      MSGP8 : Types.Bits_2      := 0;
 
-      Reserved_1 : Types.Bits_6;
-      Reserved_2 : Types.Bits_8;
+      Reserved_1 : Types.Bits_6 := 0;
+      Reserved_2 : Types.Bits_8 := 0;
    end record
    with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -909,27 +909,27 @@ is
 
    -- GPIO_DIR sub-register
    type GPIO_DIR_Type is record
-      GDP0 : Types.Bits_1;
-      GDP1 : Types.Bits_1;
-      GDP2 : Types.Bits_1;
-      GDP3 : Types.Bits_1;
-      GDM0 : Types.Bits_1;
-      GDM1 : Types.Bits_1;
-      GDM2 : Types.Bits_1;
-      GDM3 : Types.Bits_1;
-      GDP4 : Types.Bits_1;
-      GDP5 : Types.Bits_1;
-      GDP6 : Types.Bits_1;
-      GDP7 : Types.Bits_1;
-      GDM4 : Types.Bits_1;
-      GDM5 : Types.Bits_1;
-      GDM6 : Types.Bits_1;
-      GDM7 : Types.Bits_1;
-      GDP8 : Types.Bits_1;
-      GDM8 : Types.Bits_1;
+      GDP0 : Types.Bits_1 := 1;
+      GDP1 : Types.Bits_1 := 1;
+      GDP2 : Types.Bits_1 := 1;
+      GDP3 : Types.Bits_1 := 1;
+      GDM0 : Types.Bits_1 := 0;
+      GDM1 : Types.Bits_1 := 0;
+      GDM2 : Types.Bits_1 := 0;
+      GDM3 : Types.Bits_1 := 0;
+      GDP4 : Types.Bits_1 := 1;
+      GDP5 : Types.Bits_1 := 1;
+      GDP6 : Types.Bits_1 := 1;
+      GDP7 : Types.Bits_1 := 1;
+      GDM4 : Types.Bits_1 := 0;
+      GDM5 : Types.Bits_1 := 0;
+      GDM6 : Types.Bits_1 := 0;
+      GDM7 : Types.Bits_1 := 0;
+      GDP8 : Types.Bits_1 := 1;
+      GDM8 : Types.Bits_1 := 0;
 
-      Reserved_1 : Types.Bits_3;
-      Reserved_2 : Types.Bits_11;
+      Reserved_1 : Types.Bits_3  := 0;
+      Reserved_2 : Types.Bits_11 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -963,27 +963,27 @@ is
 
    -- GPIO_DOUT sub-register
    type GPIO_DOUT_Type is record
-      GOP0 : Types.Bits_1;
-      GOP1 : Types.Bits_1;
-      GOP2 : Types.Bits_1;
-      GOP3 : Types.Bits_1;
-      GOM0 : Types.Bits_1;
-      GOM1 : Types.Bits_1;
-      GOM2 : Types.Bits_1;
-      GOM3 : Types.Bits_1;
-      GOP4 : Types.Bits_1;
-      GOP5 : Types.Bits_1;
-      GOP6 : Types.Bits_1;
-      GOP7 : Types.Bits_1;
-      GOM4 : Types.Bits_1;
-      GOM5 : Types.Bits_1;
-      GOM6 : Types.Bits_1;
-      GOM7 : Types.Bits_1;
-      GOP8 : Types.Bits_1;
-      GOM8 : Types.Bits_1;
+      GOP0 : Types.Bits_1 := 0;
+      GOP1 : Types.Bits_1 := 0;
+      GOP2 : Types.Bits_1 := 0;
+      GOP3 : Types.Bits_1 := 0;
+      GOM0 : Types.Bits_1 := 0;
+      GOM1 : Types.Bits_1 := 0;
+      GOM2 : Types.Bits_1 := 0;
+      GOM3 : Types.Bits_1 := 0;
+      GOP4 : Types.Bits_1 := 0;
+      GOP5 : Types.Bits_1 := 0;
+      GOP6 : Types.Bits_1 := 0;
+      GOP7 : Types.Bits_1 := 0;
+      GOM4 : Types.Bits_1 := 0;
+      GOM5 : Types.Bits_1 := 0;
+      GOM6 : Types.Bits_1 := 0;
+      GOM7 : Types.Bits_1 := 0;
+      GOP8 : Types.Bits_1 := 0;
+      GOM8 : Types.Bits_1 := 0;
 
-      Reserved_1 : Types.Bits_3;
-      Reserved_2 : Types.Bits_11;
+      Reserved_1 : Types.Bits_3  := 0;
+      Reserved_2 : Types.Bits_11 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1017,17 +1017,17 @@ is
 
    -- GPIO_IRQE sub-register
    type GPIO_IRQE_Type is record
-      GIRQE0 : Types.Bits_1;
-      GIRQE1 : Types.Bits_1;
-      GIRQE2 : Types.Bits_1;
-      GIRQE3 : Types.Bits_1;
-      GIRQE4 : Types.Bits_1;
-      GIRQE5 : Types.Bits_1;
-      GIRQE6 : Types.Bits_1;
-      GIRQE7 : Types.Bits_1;
-      GIRQE8 : Types.Bits_1;
+      GIRQE0 : Types.Bits_1 := 0;
+      GIRQE1 : Types.Bits_1 := 0;
+      GIRQE2 : Types.Bits_1 := 0;
+      GIRQE3 : Types.Bits_1 := 0;
+      GIRQE4 : Types.Bits_1 := 0;
+      GIRQE5 : Types.Bits_1 := 0;
+      GIRQE6 : Types.Bits_1 := 0;
+      GIRQE7 : Types.Bits_1 := 0;
+      GIRQE8 : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_23;
+      Reserved : Types.Bits_23 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1049,17 +1049,17 @@ is
 
    -- GPIO_ISEN sub-register
    type GPIO_ISEN_Type is record
-      GISEN0 : Types.Bits_1;
-      GISEN1 : Types.Bits_1;
-      GISEN2 : Types.Bits_1;
-      GISEN3 : Types.Bits_1;
-      GISEN4 : Types.Bits_1;
-      GISEN5 : Types.Bits_1;
-      GISEN6 : Types.Bits_1;
-      GISEN7 : Types.Bits_1;
-      GISEN8 : Types.Bits_1;
+      GISEN0 : Types.Bits_1 := 0;
+      GISEN1 : Types.Bits_1 := 0;
+      GISEN2 : Types.Bits_1 := 0;
+      GISEN3 : Types.Bits_1 := 0;
+      GISEN4 : Types.Bits_1 := 0;
+      GISEN5 : Types.Bits_1 := 0;
+      GISEN6 : Types.Bits_1 := 0;
+      GISEN7 : Types.Bits_1 := 0;
+      GISEN8 : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_23;
+      Reserved : Types.Bits_23 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1081,17 +1081,17 @@ is
 
    -- GPIO_IMODE sub-register
    type GPIO_IMODE_Type is record
-      GIMOD0 : Types.Bits_1;
-      GIMOD1 : Types.Bits_1;
-      GIMOD2 : Types.Bits_1;
-      GIMOD3 : Types.Bits_1;
-      GIMOD4 : Types.Bits_1;
-      GIMOD5 : Types.Bits_1;
-      GIMOD6 : Types.Bits_1;
-      GIMOD7 : Types.Bits_1;
-      GIMOD8 : Types.Bits_1;
+      GIMOD0 : Types.Bits_1 := 0;
+      GIMOD1 : Types.Bits_1 := 0;
+      GIMOD2 : Types.Bits_1 := 0;
+      GIMOD3 : Types.Bits_1 := 0;
+      GIMOD4 : Types.Bits_1 := 0;
+      GIMOD5 : Types.Bits_1 := 0;
+      GIMOD6 : Types.Bits_1 := 0;
+      GIMOD7 : Types.Bits_1 := 0;
+      GIMOD8 : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_23;
+      Reserved : Types.Bits_23 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1113,17 +1113,17 @@ is
 
    -- GPIO_IBES sub-register
    type GPIO_IBES_Type is record
-      GIBES0 : Types.Bits_1;
-      GIBES1 : Types.Bits_1;
-      GIBES2 : Types.Bits_1;
-      GIBES3 : Types.Bits_1;
-      GIBES4 : Types.Bits_1;
-      GIBES5 : Types.Bits_1;
-      GIBES6 : Types.Bits_1;
-      GIBES7 : Types.Bits_1;
-      GIBES8 : Types.Bits_1;
+      GIBES0 : Types.Bits_1 := 0;
+      GIBES1 : Types.Bits_1 := 0;
+      GIBES2 : Types.Bits_1 := 0;
+      GIBES3 : Types.Bits_1 := 0;
+      GIBES4 : Types.Bits_1 := 0;
+      GIBES5 : Types.Bits_1 := 0;
+      GIBES6 : Types.Bits_1 := 0;
+      GIBES7 : Types.Bits_1 := 0;
+      GIBES8 : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_23;
+      Reserved : Types.Bits_23 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1145,17 +1145,17 @@ is
 
    -- GPIO_ICLR sub-register
    type GPIO_ICLR_Type is record
-      GICLR0 : Types.Bits_1;
-      GICLR1 : Types.Bits_1;
-      GICLR2 : Types.Bits_1;
-      GICLR3 : Types.Bits_1;
-      GICLR4 : Types.Bits_1;
-      GICLR5 : Types.Bits_1;
-      GICLR6 : Types.Bits_1;
-      GICLR7 : Types.Bits_1;
-      GICLR8 : Types.Bits_1;
+      GICLR0 : Types.Bits_1 := 0;
+      GICLR1 : Types.Bits_1 := 0;
+      GICLR2 : Types.Bits_1 := 0;
+      GICLR3 : Types.Bits_1 := 0;
+      GICLR4 : Types.Bits_1 := 0;
+      GICLR5 : Types.Bits_1 := 0;
+      GICLR6 : Types.Bits_1 := 0;
+      GICLR7 : Types.Bits_1 := 0;
+      GICLR8 : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_23;
+      Reserved : Types.Bits_23 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1177,17 +1177,17 @@ is
 
    -- GPIO_IDBE sub-register
    type GPIO_IDBE_Type is record
-      GIDBE0 : Types.Bits_1;
-      GIDBE1 : Types.Bits_1;
-      GIDBE2 : Types.Bits_1;
-      GIDBE3 : Types.Bits_1;
-      GIDBE4 : Types.Bits_1;
-      GIDBE5 : Types.Bits_1;
-      GIDBE6 : Types.Bits_1;
-      GIDBE7 : Types.Bits_1;
-      GIDBE8 : Types.Bits_1;
+      GIDBE0 : Types.Bits_1 := 0;
+      GIDBE1 : Types.Bits_1 := 0;
+      GIDBE2 : Types.Bits_1 := 0;
+      GIDBE3 : Types.Bits_1 := 0;
+      GIDBE4 : Types.Bits_1 := 0;
+      GIDBE5 : Types.Bits_1 := 0;
+      GIDBE6 : Types.Bits_1 := 0;
+      GIDBE7 : Types.Bits_1 := 0;
+      GIDBE8 : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_23;
+      Reserved : Types.Bits_23 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1209,17 +1209,17 @@ is
 
    -- GPIO_RAW sub-register
    type GPIO_RAW_Type is record
-      GRAWP0 : Types.Bits_1;
-      GRAWP1 : Types.Bits_1;
-      GRAWP2 : Types.Bits_1;
-      GRAWP3 : Types.Bits_1;
-      GRAWP4 : Types.Bits_1;
-      GRAWP5 : Types.Bits_1;
-      GRAWP6 : Types.Bits_1;
-      GRAWP7 : Types.Bits_1;
-      GRAWP8 : Types.Bits_1;
+      GRAWP0 : Types.Bits_1 := 0;
+      GRAWP1 : Types.Bits_1 := 0;
+      GRAWP2 : Types.Bits_1 := 0;
+      GRAWP3 : Types.Bits_1 := 0;
+      GRAWP4 : Types.Bits_1 := 0;
+      GRAWP5 : Types.Bits_1 := 0;
+      GRAWP6 : Types.Bits_1 := 0;
+      GRAWP7 : Types.Bits_1 := 0;
+      GRAWP8 : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_23;
+      Reserved : Types.Bits_23 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1343,13 +1343,13 @@ is
 
    -- RF_CONF sub-register
    type RF_CONF_Type is record
-      TXFEN  : Types.Bits_5;
-      PLLFEN : Types.Bits_3;
-      LDOFEN : Types.Bits_5;
-      TXRXSW : Types.Bits_2;
+      TXFEN  : Types.Bits_5 := 0;
+      PLLFEN : Types.Bits_3 := 0;
+      LDOFEN : Types.Bits_5 := 0;
+      TXRXSW : Types.Bits_2 := 0;
 
-      Reserved_1 : Types.Bits_8;
-      Reserved_2 : Types.Bits_9;
+      Reserved_1 : Types.Bits_8 := 0;
+      Reserved_2 : Types.Bits_9 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1380,7 +1380,7 @@ is
 
    -- RF_TXCTRL sub-register
    type RF_TXCTRL_Type is record
-      RF_TXCTRL : Types.Bits_32;
+      RF_TXCTRL : Types.Bits_32 := 16#001E_3DE0#;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1392,14 +1392,14 @@ is
 
    -- RF_STATUS sub-register
    type RF_STATUS_Type is record
-      CPLLLOCK  : Types.Bits_1;
-      CPLLLOW   : Types.Bits_1;
-      CPLLHIGH  : Types.Bits_1;
-      RFPLLLOCK : Types.Bits_1;
+      CPLLLOCK  : Types.Bits_1 := 0;
+      CPLLLOW   : Types.Bits_1 := 0;
+      CPLLHIGH  : Types.Bits_1 := 0;
+      RFPLLLOCK : Types.Bits_1 := 0;
 
-      Reserved  : Types.Bits_28;
+      Reserved  : Types.Bits_4 := 0;
    end record
-     with Size => 32,
+     with Size => 8,
      Bit_Order => System.Low_Order_First,
      Scalar_Storage_Order => System.Low_Order_First;
 
@@ -1409,12 +1409,12 @@ is
       CPLLHIGH  at 0 range 2 .. 2;
       RFPLLLOCK at 0 range 3 .. 3;
 
-      Reserved  at 0 range 4 .. 31;
+      Reserved  at 0 range 4 .. 7;
    end record;
 
    -- LDOTUNE sub-register
    type LDOTUNE_Type is Record
-      LDOTUNE : Types.Bits_40;
+      LDOTUNE : Types.Bits_40 := 16#88_8888_8888#;
    end record
      with Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -1429,9 +1429,9 @@ is
 
    -- TC_SARC sub-register
    type TC_SARC_Type is record
-      SAR_CTRL : Types.Bits_1;
+      SAR_CTRL : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_15;
+      Reserved : Types.Bits_15 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1445,10 +1445,10 @@ is
 
    -- TC_SARL sub-register
    type TC_SARL_Type is record
-      SAR_LVBAT : Types.Bits_8;
-      SAR_LTEMP : Types.Bits_8;
+      SAR_LVBAT : Types.Bits_8 := 0;
+      SAR_LTEMP : Types.Bits_8 := 0;
 
-      Reserved  : Types.Bits_8;
+      Reserved  : Types.Bits_8 := 0;
    end record
      with Size => 24,
      Bit_Order => System.Low_Order_First,
@@ -1463,8 +1463,8 @@ is
 
    -- TC_SARW sub-register
    type TC_SARW_Type is record
-      SAR_WVBAT : Types.Bits_8;
-      SAR_WTEMP : Types.Bits_8;
+      SAR_WVBAT : Types.Bits_8 := 0;
+      SAR_WTEMP : Types.Bits_8 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1528,9 +1528,9 @@ is
 
    -- FS_XTALT sub-register
    type FS_XTALT_Type is record
-      XTALT    : Types.Bits_5;
+      XTALT    : Types.Bits_5 := 0;
 
-      Reserved : Types.Bits_3;
+      Reserved : Types.Bits_3 := 2#011#;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1547,19 +1547,19 @@ is
 
    -- AON_WCFG sub-register
    type AON_WCFG_Type is record
-      ONW_RAD    : Types.Bits_1;
-      ONW_RX     : Types.Bits_1;
-      ONW_LEUI   : Types.Bits_1;
-      ONW_LDC    : Types.Bits_1;
-      ONW_L64    : Types.Bits_1;
-      PRES_SLEE  : Types.Bits_1;
-      ONW_LLDE   : Types.Bits_1;
-      ONW_LLD    : Types.Bits_1;
+      ONW_RAD    : Types.Bits_1 := 0;
+      ONW_RX     : Types.Bits_1 := 0;
+      ONW_LEUI   : Types.Bits_1 := 0;
+      ONW_LDC    : Types.Bits_1 := 0;
+      ONW_L64    : Types.Bits_1 := 0;
+      PRES_SLEE  : Types.Bits_1 := 0;
+      ONW_LLDE   : Types.Bits_1 := 0;
+      ONW_LLD    : Types.Bits_1 := 0;
 
-      Reserved_1 : Types.Bits_1;
-      Reserved_2 : Types.Bits_2;
-      Reserved_3 : Types.Bits_2;
-      Reserved_4 : Types.Bits_3;
+      Reserved_1 : Types.Bits_1 := 0;
+      Reserved_2 : Types.Bits_2 := 0;
+      Reserved_3 : Types.Bits_2 := 0;
+      Reserved_4 : Types.Bits_3 := 0;
    end Record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1589,13 +1589,13 @@ is
 
    -- AON_CTRL sub-register
    type AON_CTRL_Type is record
-      RESTORE  : Types.Bits_1;
-      SAVE     : Types.Bits_1;
-      UPL_CFG  : Types.Bits_1;
-      DCA_READ : Types.Bits_1;
-      DCA_ENAB : Types.Bits_1;
+      RESTORE  : Types.Bits_1 := 0;
+      SAVE     : Types.Bits_1 := 0;
+      UPL_CFG  : Types.Bits_1 := 0;
+      DCA_READ : Types.Bits_1 := 0;
+      DCA_ENAB : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_3;
+      Reserved : Types.Bits_3 := 0;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1638,13 +1638,13 @@ is
 
    -- AON_CFG0 sub-register
    type AON_CFG0_Type is record
-      SLEEP_EN  : Types.Bits_1;
-      WAKE_PIN  : Types.Bits_1;
-      WAKE_SPI  : Types.Bits_1;
-      WAKE_CNT  : Types.Bits_1;
-      LPDIV_EN  : Types.Bits_1;
-      LPCLKDIVA : Types.Bits_11;
-      SLEEP_TIM : Types.Bits_16;
+      SLEEP_EN  : Types.Bits_1  := 0;
+      WAKE_PIN  : Types.Bits_1  := 1;
+      WAKE_SPI  : Types.Bits_1  := 1;
+      WAKE_CNT  : Types.Bits_1  := 1;
+      LPDIV_EN  : Types.Bits_1  := 0;
+      LPCLKDIVA : Types.Bits_11 := 2#000_1111_1111#;
+      SLEEP_TIM : Types.Bits_16 := 2#0101_0000_1111_1111#;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1662,11 +1662,11 @@ is
 
    -- AON_CFG1 sub-register
    type AON_CFG1_Type is record
-      SLEEP_CE : Types.Bits_1;
-      SMXX     : Types.Bits_1;
-      LPOSC_C  : Types.Bits_1;
+      SLEEP_CE : Types.Bits_1 := 1;
+      SMXX     : Types.Bits_1 := 1;
+      LPOSC_C  : Types.Bits_1 := 1;
 
-      Reserved : Types.Bits_13;
+      Reserved : Types.Bits_13 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1697,9 +1697,9 @@ is
 
    -- OTP_ADDR sub-register
    type OTP_ADDR_Type is record
-      OTP_ADDR : Types.Bits_11;
+      OTP_ADDR : Types.Bits_11 := 0;
 
-      Reserved : Types.Bits_5;
+      Reserved : Types.Bits_5  := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1713,16 +1713,16 @@ is
 
    -- OTP_CTRL sub-register
    type OTP_CTRL_Type is record
-      OTPRDEN : Types.Bits_1;
-      OTPREAD : Types.Bits_1;
-      OTPMRWR : Types.Bits_1;
-      OTPPROG : Types.Bits_1;
-      OTPMR   : Types.Bits_4;
-      LDELOAD : Types.Bits_1;
+      OTPRDEN : Types.Bits_1 := 0;
+      OTPREAD : Types.Bits_1 := 0;
+      OTPMRWR : Types.Bits_1 := 0;
+      OTPPROG : Types.Bits_1 := 0;
+      OTPMR   : Types.Bits_4 := 0;
+      LDELOAD : Types.Bits_1 := 0;
 
-      Reserved_1 : Types.Bits_1;
-      Reserved_2 : Types.Bits_2;
-      Reserved_3 : Types.Bits_4;
+      Reserved_1 : Types.Bits_1 := 0;
+      Reserved_2 : Types.Bits_2 := 0;
+      Reserved_3 : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1748,10 +1748,10 @@ is
 
    -- OTP_STAT sub-register
    type OTP_STAT_Type is record
-      OTPPRGD  : Types.Bits_1;
-      OTPVPOK  : Types.Bits_1;
+      OTPPRGD  : Types.Bits_1 := 0;
+      OTPVPOK  : Types.Bits_1 := 0;
 
-      Reserved : Types.Bits_14;
+      Reserved : Types.Bits_14 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1790,12 +1790,12 @@ is
 
    -- OTP_SF sub-register
    type OTP_SF_Type is record
-      OPS_KICK : Types.Bits_1;
-      LDO_KICK : Types.Bits_1;
-      OPS_SEL  : Types.Bits_1;
+      OPS_KICK : Types.Bits_1 := 0;
+      LDO_KICK : Types.Bits_1 := 0;
+      OPS_SEL  : Types.Bits_1 := 0;
 
-      Reserved_1 : Types.Bits_3;
-      Reserved_2 : Types.Bits_2;
+      Reserved_1 : Types.Bits_3 := 0;
+      Reserved_2 : Types.Bits_2 := 0;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1829,8 +1829,8 @@ is
 
    -- LDE_CFG1 sub-register
    type LDE_CFG1_Type is record
-      NTM   : Types.Bits_5;
-      PMULT : Types.Bits_3;
+      NTM   : Types.Bits_5 := 2#0_1100#;
+      PMULT : Types.Bits_3 := 2#011#;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1906,10 +1906,10 @@ is
 
    -- EVC_CTRL sub-register
    type EVC_CTRL_Type is record
-      EVC_EN  : Types.Bits_1;
-      EVC_CLR : Types.Bits_1;
+      EVC_EN  : Types.Bits_1   := 0;
+      EVC_CLR : Types.Bits_1   := 0;
 
-      Reserved : Types.Bits_30;
+      Reserved : Types.Bits_30 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1924,9 +1924,9 @@ is
 
    -- EVC_PHE sub-register
    type EVC_PHE_Type is record
-      EVC_PHE : Types.Bits_12;
+      EVC_PHE : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1940,9 +1940,9 @@ is
 
    -- EVC_RSE sub-register
    type EVC_RSE_Type is record
-      EVC_RSE : Types.Bits_12;
+      EVC_RSE : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1956,9 +1956,9 @@ is
 
    -- EVC_FCG sub-register
    type EVC_FCG_Type is record
-      EVC_FCG : Types.Bits_12;
+      EVC_FCG : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1972,9 +1972,9 @@ is
 
    -- EVC_FCE sub-register
    type EVC_FCE_Type is record
-      EVC_FCE : Types.Bits_12;
+      EVC_FCE : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1988,9 +1988,9 @@ is
 
    -- EVC_FFR sub-register
    type EVC_FFR_Type is record
-      EVC_FFR : Types.Bits_12;
+      EVC_FFR : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2004,9 +2004,9 @@ is
 
    -- EVC_OVR sub-register
    type EVC_OVR_Type is record
-      EVC_OVR : Types.Bits_12;
+      EVC_OVR : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2020,9 +2020,9 @@ is
 
    -- EVC_STO sub-register
    type EVC_STO_Type is record
-      EVC_STO : Types.Bits_12;
+      EVC_STO : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2036,9 +2036,9 @@ is
 
    -- EVC_PTO sub-register
    type EVC_PTO_Type is record
-      EVC_PTO : Types.Bits_12;
+      EVC_PTO : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2052,9 +2052,9 @@ is
 
    -- EVC_FWTO sub-register
    type EVC_FWTO_Type is record
-      EVC_FWTO : Types.Bits_12;
+      EVC_FWTO : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2068,9 +2068,9 @@ is
 
    -- EVC_TXFS sub-register
    type EVC_TXFS_Type is record
-      EVC_TXFS : Types.Bits_12;
+      EVC_TXFS : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2084,9 +2084,9 @@ is
 
    -- EVC_HPW sub-register
    type EVC_HPW_Type is record
-      EVC_HPW : Types.Bits_12;
+      EVC_HPW : Types.Bits_12 := 0;
 
-      Reserved : Types.Bits_4;
+      Reserved : Types.Bits_4 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2116,10 +2116,10 @@ is
 
    -- DIAG_TMC sub-register
    type DIAG_TMC_Type is record
-      TX_PSTM : Types.Bits_1;
+      TX_PSTM : Types.Bits_1 := 0;
 
-      Reserved_1 : Types.Bits_4;
-      Reserved_2 : Types.Bits_11;
+      Reserved_1 : Types.Bits_4  := 0;
+      Reserved_2 : Types.Bits_11 := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2137,23 +2137,23 @@ is
    -- PMSC register file
 
    type PMSC_CTRL0_Type is record
-      SYSCLKS   : Types.Bits_2;
-      RXCLKS    : Types.Bits_2;
-      TXCLKS    : Types.Bits_2;
-      FACE      : Types.Bits_1;
-      ADCCE     : Types.Bits_1;
-      AMCE      : Types.Bits_1;
-      GPCE      : Types.Bits_1;
-      GPRN      : Types.Bits_1;
-      GPDCE     : Types.Bits_1;
-      GPDRN     : Types.Bits_1;
-      KHZCLKEN  : Types.Bits_1;
-      SOFTRESET : Types.Bits_4;
+      SYSCLKS   : Types.Bits_2 := 0;
+      RXCLKS    : Types.Bits_2 := 0;
+      TXCLKS    : Types.Bits_2 := 0;
+      FACE      : Types.Bits_1 := 0;
+      ADCCE     : Types.Bits_1 := 0;
+      AMCE      : Types.Bits_1 := 0;
+      GPCE      : Types.Bits_1 := 0;
+      GPRN      : Types.Bits_1 := 0;
+      GPDCE     : Types.Bits_1 := 0;
+      GPDRN     : Types.Bits_1 := 0;
+      KHZCLKEN  : Types.Bits_1 := 0;
+      SOFTRESET : Types.Bits_4 := 2#1111#;
 
-      Reserved_1 : Types.Bits_3;
-      Reserved_2 : Types.Bits_4;
-      Reserved_3 : Types.Bits_3;
-      Reserved_4 : Types.Bits_4;
+      Reserved_1 : Types.Bits_3 := 2#100#;
+      Reserved_2 : Types.Bits_4 := 0;
+      Reserved_3 : Types.Bits_3 := 2#011#;
+      Reserved_4 : Types.Bits_4 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -2188,20 +2188,20 @@ is
 
    -- PMSC_CTRL1 sub-register
    type PMSC_CTRL1_Type is record
-      ARX2INIT  : Types.Bits_1;
-      PKTSEQ    : Types.Bits_8;
-      ATXSLP    : Types.Bits_1;
-      ARXSLP    : Types.Bits_1;
-      SNOZE     : Types.Bits_1;
-      SNOZR     : Types.Bits_1;
-      PLLSYN    : Types.Bits_1;
-      LDERUNE   : Types.Bits_1;
-      KHZCLKDIV : Types.Bits_6;
+      ARX2INIT  : Types.Bits_1 := 0;
+      PKTSEQ    : Types.Bits_8 := 2#1110_0111#;
+      ATXSLP    : Types.Bits_1 := 0;
+      ARXSLP    : Types.Bits_1 := 0;
+      SNOZE     : Types.Bits_1 := 0;
+      SNOZR     : Types.Bits_1 := 0;
+      PLLSYN    : Types.Bits_1 := 0;
+      LDERUNE   : Types.Bits_1 := 1;
+      KHZCLKDIV : Types.Bits_6 := 2#10_0000#;
 
-      Reserved_1 : Types.Bits_1;
-      Reserved_2 : Types.Bits_1;
-      Reserved_3 : Types.Bits_1;
-      Reserved_4 : Types.Bits_8;
+      Reserved_1 : Types.Bits_1 := 0;
+      Reserved_2 : Types.Bits_1 := 0;
+      Reserved_3 : Types.Bits_1 := 0;
+      Reserved_4 : Types.Bits_8 := 2#0100_0000#;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -2232,7 +2232,7 @@ is
 
    -- PMSC_SNOZT sub-register
    type PMSC_SNOZT_Type is record
-      SNOZ_TIM : Types.Bits_8;
+      SNOZ_TIM : Types.Bits_8 := 2#0100_0000#;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -2244,7 +2244,7 @@ is
 
    -- PMSC_TXFSEQ sub-register
    type PMSC_TXFSEQ_Type is record
-      TXFINESEQ : Types.Bits_16;
+      TXFINESEQ : Types.Bits_16 := 2#0000_1011_0011_1100#;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2256,12 +2256,12 @@ is
 
    -- PMSC_LEDC sub-register
    type PMSC_LEDC_Type is record
-      BLINK_TIM : Types.Bits_8;
-      BLNKEN    : Types.Bits_1;
-      BLNKNOW   : Types.Bits_4;
+      BLINK_TIM : Types.Bits_8 := 2#0010_0000#;
+      BLNKEN    : Types.Bits_1 := 0;
+      BLNKNOW   : Types.Bits_4 := 0;
 
-      Reserved_1 : Types.Bits_7;
-      Reserved_2 : Types.Bits_12;
+      Reserved_1 : Types.Bits_7  := 0;
+      Reserved_2 : Types.Bits_12 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
