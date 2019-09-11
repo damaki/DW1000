@@ -20,11 +20,11 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with Ada.Real_Time;   use Ada.Real_Time;
-with DecaDriver.Core;
-with DecaDriver.Tx;
+with Ada.Real_Time;                use Ada.Real_Time;
+with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
+with DecaDriver;
 with DW1000.BSP;
-with DW1000.Driver;   use DW1000.Driver;
+with DW1000.Driver;                use DW1000.Driver;
 with DW1000.Types;
 with Tx_Power;
 
@@ -33,12 +33,12 @@ procedure Transmit_Example
   with SPARK_Mode,
   Global => (Input  => Ada.Real_Time.Clock_Time,
              In_Out => (DW1000.BSP.Device_State,
-                        DecaDriver.Core.Driver,
-                        DecaDriver.Tx.Transmitter)),
-  Depends => (DecaDriver.Core.Driver    => + DW1000.BSP.Device_State,
-              DecaDriver.Tx.Transmitter => + null,
-              DW1000.BSP.Device_State   => + DecaDriver.Core.Driver,
-              null                      => Ada.Real_Time.Clock_Time)
+                        DecaDriver.Driver,
+                        DecaDriver.Tx_Complete_Flag)),
+  Depends => (DecaDriver.Driver           => + DW1000.BSP.Device_State,
+              DW1000.BSP.Device_State     => + DecaDriver.Driver,
+              DecaDriver.Tx_Complete_Flag => + null,
+              null                        => Ada.Real_Time.Clock_Time)
 is
    Packet : constant DW1000.Types.Byte_Array (1 .. 10) := (others => 16#AA#);
 
@@ -46,14 +46,14 @@ is
 
 begin
    --  Driver must be initialized once before it is used.
-   DecaDriver.Core.Driver.Initialize
+   DecaDriver.Driver.Initialize
      (Load_Antenna_Delay  => True,
       Load_XTAL_Trim      => True,
       Load_UCode_From_ROM => True);
 
    --  Configure the DW1000
-   DecaDriver.Core.Driver.Configure
-     (DecaDriver.Core.Configuration_Type'
+   DecaDriver.Driver.Configure
+     (DecaDriver.Configuration_Type'
         (Channel             => 1,
          PRF                 => PRF_64MHz,
          Tx_Preamble_Length  => PLEN_1024,
@@ -67,11 +67,11 @@ begin
 
    --  Configure the transmit power for the PRF and channel chosen.
    --  We use the reference values for the EVB1000 in this example.
-   DecaDriver.Tx.Transmitter.Configure_Tx_Power
+   DW1000.Driver.Configure_Tx_Power
      (Tx_Power.Manual_Tx_Power_Table (1, PRF_64MHz));
 
    --  Enable the LEDs controlled by the DW1000.
-   DecaDriver.Core.Driver.Configure_LEDs
+   DW1000.Driver.Configure_LEDs
      (Tx_LED_Enable    => True,  --  Enable transmit LED
       Rx_LED_Enable    => True,  --  Enable receive LED
       Rx_OK_LED_Enable => False,
@@ -83,23 +83,23 @@ begin
    --  Send packets at a rate of 1 packet per second
    loop
       --  Load the packet into the transmitter's buffer.
-      DecaDriver.Tx.Transmitter.Set_Tx_Data
+      DW1000.Driver.Set_Tx_Data
         (Data   => Packet,
          Offset => 0);
 
       --  Tell the driver the length of the packet and its position in the
       --  transmit buffer.
-      DecaDriver.Tx.Transmitter.Set_Tx_Frame_Length
+      DW1000.Driver.Set_Tx_Frame_Length
         (Length => Packet'Length,
          Offset => 0);
 
       --  Start transmitting the packet now.
       --  (don't turn on the receiver after transmitting).
-      DecaDriver.Tx.Transmitter.Start_Tx_Immediate (Rx_After_Tx     => False,
-                                                    Auto_Append_FCS => False);
+      DecaDriver.Driver.Start_Tx_Immediate (Rx_After_Tx     => False,
+                                            Auto_Append_FCS => False);
 
       --  Wait for the packet to finish sending.
-      DecaDriver.Tx.Transmitter.Wait_For_Tx_Complete;
+      Suspend_Until_True (DecaDriver.Tx_Complete_Flag);
 
       --  Wait for the time to send the next packet (1 second delay)
       Now := Now + Seconds (1);
