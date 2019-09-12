@@ -718,8 +718,7 @@ is
                      Data,
                      Offset)),
      Pre =>
-       (Data'Length > 0
-        and then Data'Length <= DW1000.Constants.TX_BUFFER_Length
+       (Data'Length <= DW1000.Constants.TX_BUFFER_Length
         and then Offset < DW1000.Constants.TX_BUFFER_Length
         and then Data'Length + Offset <= DW1000.Constants.TX_BUFFER_Length);
    --  Write data to the DW1000 TX buffer.

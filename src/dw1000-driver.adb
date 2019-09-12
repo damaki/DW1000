@@ -965,10 +965,12 @@ is
                           Offset : in Natural)
    is
    begin
-      DW1000.Register_Driver.Write_Register
-        (Register_ID => Registers.TX_BUFFER_Reg_ID,
-         Sub_Address => Types.Bits_15 (Offset),
-         Data        => Data);
+      if Data'Length > 0 then
+         DW1000.Register_Driver.Write_Register
+           (Register_ID => Registers.TX_BUFFER_Reg_ID,
+            Sub_Address => Types.Bits_15 (Offset),
+            Data        => Data);
+      end if;
    end Set_Tx_Data;
 
    procedure Set_Tx_Frame_Length (Length : in Natural;
