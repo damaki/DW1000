@@ -1,0 +1,14 @@
+language: c
+
+services:
+  - docker
+
+branches:
+  only:
+    master
+
+git:
+  submodules: false
+
+script:
+  - docker run -v $PWD:/app -w /app damaki/gnat-arm-elf:gpl.2019 /bin/sh -c "ci/build.sh"
