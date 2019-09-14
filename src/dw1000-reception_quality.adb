@@ -107,14 +107,8 @@ is
       subtype Denominator_Range is Long_Float
       range 1.0 .. (2.0**16 - 1.0)**2;
 
-      subtype Division_Result_Range is Long_Float
-      range Numerator_Range'First / Denominator_Range'Last ..
-            Numerator_Range'Last  / Denominator_Range'First;
-
-
       N   : Numerator_Range;
       D   : Denominator_Range;
-      Div : Division_Result_Range;
       A   : Long_Float;
       R   : Long_Float;
    begin
@@ -146,8 +140,7 @@ is
          D := 1.0;
       end if;
 
-      Div := N / D;
-      R := Log10 (Div);
+      R := Log10 (N / D);
 
       --  The values in this assumption were generated using Wolfram|Alpha
       --  based on the range of the Division_Result_Range subtype.
