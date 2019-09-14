@@ -637,6 +637,10 @@ is
       --
       --  This performs functionality for packet reception and transmission.
 
+      pragma Annotate (GNATprove, False_Positive,
+                       "this interrupt might be reserved",
+                       "The interrupt is assumed to not be reserved");
+
       ---------------------------
       --  Configuration Items  --
       ---------------------------

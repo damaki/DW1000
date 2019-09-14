@@ -31,6 +31,10 @@ is
    DW1000_IRQ_Id : constant Ada.Interrupts.Interrupt_ID
      := Ada.Interrupts.Names.GPIOTE_Interrupt;
    --  The interrupt ID for the DW1000 IRQ line.
+   --
+   --  This must not be a reserved interrupt. Note that GNAT Ravenscar runtimes
+   --  from bb-runtimes never have reserved interrupts, so any Interrupt_ID
+   --  is valid.
 
    Driver_Priority : constant System.Interrupt_Priority
      := System.Interrupt_Priority'Last;
