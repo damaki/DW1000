@@ -1,0 +1,18 @@
+language: c
+
+services:
+  - docker
+
+branches:
+  only:
+    master
+
+env:
+  - SCRIPT=ci/build.sh CONTAINER=damaki/gnat-arm-elf:gpl.2019
+  - SCRIPT=ci/proof.sh CONTAINER=damaki/gnat-arm-elf:gpl.2019.spark
+
+git:
+  submodules: false
+
+script:
+  - docker run -v $PWD:/app -w /app $CONTAINER /bin/sh -c "$SCRIPT"
