@@ -1,6 +1,8 @@
+[![Build Status](https://travis-ci.com/damaki/DW1000.svg?branch=master)](https://travis-ci.com/damaki/DW1000)
+
 # 1. DW1000
 
-This repository contains an Ada/SPARK driver for the 
+This repository contains an Ada/SPARK driver for the
 [DecaWave DW1000](http://www.decawave.com/products/dw1000)
 ultra-wideband (UWB) radio chip.
 
@@ -8,7 +10,7 @@ The driver is based on the C code provided by DecaWave, but most parts are
 quite different in order to take advantage of Ada's stronger type safety, and
 to provide an easier-to-use API.
 
-This DW1000 driver written and verified using the SPARK language. GNATprove is 
+This DW1000 driver written and verified using the SPARK language. GNATprove is
 used to prove the absence of runtime errors such as: numerical overflow,
 infinite loops, division by zero, and out-of-bounds array accesses.
 
@@ -36,7 +38,7 @@ bare-board Ada runtimes. In particular, the following features are used:
   * The ``Ada.Real_Time.Clock`` function is used by the ``DW1000.Driver``
     package. This feature is also supported in Ravenscar runtimes.
   * The package ``Ada.Numerics.Generic_Elementary_Functions`` is used by the
-    package ``DW1000.Reception_Quality``. Small footprint (SFP) Ravenscar 
+    package ``DW1000.Reception_Quality``. Small footprint (SFP) Ravenscar
     runtimes don't support these math functions, but they are implemented in
     the full Ravenscar runtimes.
 
@@ -52,8 +54,8 @@ interface to the DW1000. The package spec is already defined in the file
 be found in ``bsp-examples/evb1000/dw1000-bsp.adb``.
 
 During elaboration, the package body should initialize the peripherals used
-to communicate with the DW1000, i.e. the SPI and external interrupt (EXTI) 
-peripherals. 
+to communicate with the DW1000, i.e. the SPI and external interrupt (EXTI)
+peripherals.
 
 The package body must implement the following procedures:
   * The procedure ``Reset_DW1000`` resets the DW1000 by asserting low the nRST
@@ -78,11 +80,11 @@ The package body must implement the following procedures:
 
 ## 3.3 See Also
 
-If you are using the [DecaWave EVB1000](http://www.decawave.com/products/evk1000-evaluation-kit) 
-evaluation board then there are the following two SPARK and Ada projects on 
+If you are using the [DecaWave EVB1000](http://www.decawave.com/products/evk1000-evaluation-kit)
+evaluation board then there are the following two SPARK and Ada projects on
 GitHub which are useful:
   * [EVB1000](https://github.com/damaki/EVB1000): SPARK drivers for the LCD, LED,
-    and switch peripherals on the EVB1000. 
+    and switch peripherals on the EVB1000.
   * [Ravenscar-full-evb1000](https://github.com/damaki/ravenscar-full-evb1000):
     a full Ravenscar runtime for the STM32F105 ARM Cortex-M3 microcontroller,
     configured for the EVB1000.
@@ -159,7 +161,7 @@ begin
          Offset => 0);
 
       DecaDriver.Tx.Transmitter.Start_Tx_Immediate (Rx_After_Tx => False);
-      
+
       DecaDriver.Tx.Transmitter.Wait_For_Tx_Complete;
    end loop;
 end Example;
@@ -220,7 +222,7 @@ begin
    --  Continuously receive packets
    loop
       DecaDriver.Rx.Receiver.Start_Rx_Immediate;
-      
+
       DecaDriver.Rx.Receiver.Wait
         (Frame      => Frame_Data,
          Length     => Frame_Length,
