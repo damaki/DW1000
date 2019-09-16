@@ -9,7 +9,7 @@ branches:
 
 env:
   - SCRIPT=ci/build.sh CONTAINER=damaki/gnat-arm-elf:gpl.2019
-  - SCRIPT=ci/proof.sh CONTAINER=jklmnn/gnat:gpl.2019.spark
+  - SCRIPT=ci/proof.sh CONTAINER=damaki/gnat-arm-elf:gpl.2019.spark
 
 git:
   submodules: false
