@@ -13,7 +13,5 @@ gprbuild -P temp/BSPs/ravenscar_full_nrf52832.gpr -j0 -f
 gprinstall -P temp/BSPs/ravenscar_full_nrf52832.gpr -p -f
 cd ..
 
-# Prove all examples
-gnatprove -P examples/transmit/transmit_example.gpr --mode=all --level=3 -j0 --checks-as-errors -XBSP=DWM1001
-gnatprove -P examples/receive/receive_example.gpr --mode=all --level=3 -j0 --checks-as-errors -XBSP=DWM1001
-gnatprove -P examples/echo/echo_example.gpr --mode=all --level=3 -j0 --checks-as-errors -XBSP=DWM1001
+# Prove all .gpr files in the examples directory
+find examples -regex ".*\.gpr$" -exec gnatprove -P {} --mode=all --level=3 -j0 --checks-as-errors -XBSP=DWM1001 \;

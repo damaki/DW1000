@@ -13,7 +13,5 @@ gprbuild -P temp/BSPs/ravenscar_full_nrf52832.gpr -j0 -f
 gprinstall -P temp/BSPs/ravenscar_full_nrf52832.gpr -p -f
 cd ..
 
-# Build all examples
-gprbuild -p -P examples/transmit/transmit_example.gpr -j0 -f -XBSP=DWM1001
-gprbuild -p -P examples/receive/receive_example.gpr -j0 -f -XBSP=DWM1001
-gprbuild -p -P examples/echo/echo_example.gpr -j0 -f -XBSP=DWM1001
+# Build all .gpr files in the examples directory
+find examples -regex ".*\.gpr$" -exec gprbuild -p -P {} -j0 -f -XBSP=DWM1001 \;
