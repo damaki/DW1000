@@ -1000,15 +1000,15 @@ is
 
    begin
       SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => (if Auto_Append_FCS then 0 else 1),
-         TXSTRT     => 1,
-         TXDLYS     => 0, --  No delay
-         CANSFCS    => 0,
-         TRXOFF     => 0,
-         WAIT4RESP  => (if Rx_After_Tx then 1 else 0),
-         RXENAB     => 0,
-         RXDLYE     => 0,
-         HRBPT      => 0,
+        (SFCST      => (if Auto_Append_FCS then Not_Suppressed else Suppressed),
+         TXSTRT     => Start_Tx,
+         TXDLYS     => Not_Delayed,
+         CANSFCS    => Not_Cancelled,
+         TRXOFF     => No_Action,
+         WAIT4RESP  => (if Rx_After_Tx then Wait else No_Wait),
+         RXENAB     => No_Action,
+         RXDLYE     => Not_Delayed,
+         HRBPT      => No_Action,
          Reserved_1 => 0,
          Reserved_2 => 0,
          Reserved_3 => 0);
@@ -1024,15 +1024,15 @@ is
 
    begin
       SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => 0,
-         TXSTRT     => 1,
-         TXDLYS     => 1, --  Delayed transmit
-         CANSFCS    => 0,
-         TRXOFF     => 0,
-         WAIT4RESP  => (if Rx_After_Tx then 1 else 0),
-         RXENAB     => 0,
-         RXDLYE     => 0,
-         HRBPT      => 0,
+        (SFCST      => Not_Suppressed,
+         TXSTRT     => Start_Tx,
+         TXDLYS     => Delayed,
+         CANSFCS    => Not_Cancelled,
+         TRXOFF     => No_Action,
+         WAIT4RESP  => (if Rx_After_Tx then Wait else No_Wait),
+         RXENAB     => No_Action,
+         RXDLYE     => Not_Delayed,
+         HRBPT      => No_Action,
          Reserved_1 => 0,
          Reserved_2 => 0,
          Reserved_3 => 0);
@@ -1046,15 +1046,15 @@ is
 
       else
          -- Cancel the transmit
-         SYS_CTRL_Reg := SYS_CTRL_Type'(SFCST      => 0,
-                                        TXSTRT     => 0,
-                                        TXDLYS     => 0,
-                                        CANSFCS    => 0,
-                                        TRXOFF     => 1,
-                                        WAIT4RESP  => 0,
-                                        RXENAB     => 0,
-                                        RXDLYE     => 0,
-                                        HRBPT      => 0,
+         SYS_CTRL_Reg := SYS_CTRL_Type'(SFCST      => Not_Suppressed,
+                                        TXSTRT     => No_Action,
+                                        TXDLYS     => Not_Delayed,
+                                        CANSFCS    => Not_Cancelled,
+                                        TRXOFF     => Transceiver_Off,
+                                        WAIT4RESP  => No_Wait,
+                                        RXENAB     => No_Action,
+                                        RXDLYE     => Not_Delayed,
+                                        HRBPT      => No_Action,
                                         Reserved_1 => 0,
                                         Reserved_2 => 0,
                                         Reserved_3 => 0);
@@ -1080,7 +1080,7 @@ is
    procedure Set_Delayed_Tx_Rx_Time (Delay_Time : in Coarse_System_Time)
    is
    begin
-      DX_TIME.Write (DX_TIME_Type'(DX_TIME => To_Bits_40 (Delay_Time)));
+      DX_TIME.Write (DX_TIME_Type'(DX_TIME => Delay_Time));
    end Set_Delayed_Tx_Rx_Time;
 
    procedure Set_Sleep_After_Tx (Enabled : in Boolean)
@@ -1186,11 +1186,8 @@ is
                                      others     => 0));
 
       -- Disable Tx/Rx
-      SYS_CTRL.Write (SYS_CTRL_Type'(TRXOFF     => 1,
-                                     Reserved_1 => 0,
-                                     Reserved_2 => 0,
-                                     Reserved_3 => 0,
-                                     others     => 0));
+      SYS_CTRL.Write (SYS_CTRL_Type'(TRXOFF     => Transceiver_Off,
+                                     others     => <>));
 
       -- Force transceiver off; don't want to see any new events.
       SYS_STATUS.Write (SYS_STATUS_Type'(AAT        => 1,
@@ -1246,7 +1243,7 @@ is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
    begin
       SYS_CTRL.Read (SYS_CTRL_Reg);
-      SYS_CTRL_Reg.HRBPT := 1;
+      SYS_CTRL_Reg.HRBPT := Toggle;
       SYS_CTRL.Write (SYS_CTRL_Reg);
    end Toggle_Host_Side_Rx_Buffer_Pointer;
 
@@ -1274,15 +1271,15 @@ is
       Sync_Rx_Buffer_Pointers;
 
       SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => 0,
-         TXSTRT     => 0,
-         TXDLYS     => 0,
-         CANSFCS    => 0,
-         TRXOFF     => 0,
-         WAIT4RESP  => 0,
-         RXENAB     => 1,
-         RXDLYE     => 0,
-         HRBPT      => 0,
+        (SFCST      => Not_Suppressed,
+         TXSTRT     => No_Action,
+         TXDLYS     => Not_Delayed,
+         CANSFCS    => Not_Cancelled,
+         TRXOFF     => No_Action,
+         WAIT4RESP  => No_Wait,
+         RXENAB     => Start_Rx,
+         RXDLYE     => Not_Delayed,
+         HRBPT      => No_Action,
          Reserved_1 => 0,
          Reserved_2 => 0,
          Reserved_3 => 0);
@@ -1301,15 +1298,15 @@ is
       Sync_Rx_Buffer_Pointers;
 
       SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => 0,
-         TXSTRT     => 0,
-         TXDLYS     => 0,
-         CANSFCS    => 0,
-         TRXOFF     => 0,
-         WAIT4RESP  => 0,
-         RXENAB     => 1,
-         RXDLYE     => 1, --  Delayed RX
-         HRBPT      => 0,
+        (SFCST      => Not_Suppressed,
+         TXSTRT     => No_Action,
+         TXDLYS     => Not_Delayed,
+         CANSFCS    => Not_Cancelled,
+         TRXOFF     => No_Action,
+         WAIT4RESP  => No_Wait,
+         RXENAB     => Start_Rx,
+         RXDLYE     => Delayed,
+         HRBPT      => No_Action,
          Reserved_1 => 0,
          Reserved_2 => 0,
          Reserved_3 => 0);
@@ -1323,7 +1320,7 @@ is
          Force_Tx_Rx_Off;
 
          -- Clear the delay bit
-         SYS_CTRL_Reg.RXDLYE := 0;
+         SYS_CTRL_Reg.RXDLYE := Not_Delayed;
          SYS_CTRL.Write (SYS_CTRL_Reg);
 
          Result := Error;
@@ -1388,7 +1385,7 @@ is
       if Timeout > 0.0 then
          SYS_CFG_Reg.RXWTOE := Enabled;
 
-         RX_FWTO.Write ( (RXFWTO => To_Bits_16 (Timeout)) );
+         RX_FWTO.Write ( (RXFWTO => Timeout) );
 
       else
          SYS_CFG_Reg.RXWTOE := Disabled;

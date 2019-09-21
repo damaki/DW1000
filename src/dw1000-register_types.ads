@@ -401,7 +401,7 @@ is
    -- DX_TIME register file
 
    type DX_TIME_Type is record
-      DX_TIME : Types.Bits_40;
+      DX_TIME : System_Time.Coarse_System_Time := 0.0;
    end record
      with Pack, Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -411,7 +411,7 @@ is
    -- RX_FWTO register file
 
    type RX_FWTO_Type is record
-      RXFWTO : Types.Bits_16 := 0;
+      RXFWTO : System_Time.Frame_Wait_Timeout_Time := 0.0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -424,16 +424,70 @@ is
    ----------------------------------------------------------------------------
    -- SYS_CTRL register file
 
+   type SYS_CTRL_SFCST_Field is
+     (Not_Suppressed,
+      Suppressed)
+     with Size => 1;
+   --  Suppress auto-FCS Transmission (on this next frame).
+
+   type SYS_CTRL_TXSTRT_Field is
+     (No_Action,
+      Start_Tx)
+     with Size => 1;
+   --  Transmit Start.
+
+   type SYS_CTRL_TXDLYS_Field is
+     (Not_Delayed,
+      Delayed)
+     with Size => 1;
+   --  Transmitter Delayed Sending.
+
+   type SYS_CTRL_CANSFCS_Field is
+     (Not_Cancelled,
+      Cancelled)
+     with Size => 1;
+   --  Cancel Suppression of auto-FCS transmission (on the current frame).
+
+   type SYS_CTRL_TRXOFF_Field is
+     (No_Action,
+      Transceiver_Off)
+     with Size => 1;
+   --  Transceiver Off.
+
+   type SYS_CTRL_WAIT4RESP_Field is
+     (No_Wait,
+      Wait)
+     with Size => 1;
+   --  Wait for Response.
+
+   type SYS_CTRL_RXENAB_Field is
+     (No_Action,
+      Start_Rx)
+     with Size => 1;
+   --  Enable Receiver.
+
+   type SYS_CTRL_RXDLYE_Field is
+     (Not_Delayed,
+      Delayed)
+     with Size => 1;
+   --  Receiver Delayed Enable.
+
+   type SYS_CTRL_HRBPT_Field is
+     (No_Action,
+      Toggle)
+     with Size => 1;
+   --  Host Side Receive Buffer Pointer Toggle.
+
    type SYS_CTRL_Type is record
-      SFCST     : Types.Bits_1   := 0;
-      TXSTRT    : Types.Bits_1   := 0;
-      TXDLYS    : Types.Bits_1   := 0;
-      CANSFCS   : Types.Bits_1   := 0;
-      TRXOFF    : Types.Bits_1   := 0;
-      WAIT4RESP : Types.Bits_1   := 0;
-      RXENAB    : Types.Bits_1   := 0;
-      RXDLYE    : Types.Bits_1   := 0;
-      HRBPT     : Types.Bits_1   := 0;
+      SFCST     : SYS_CTRL_SFCST_Field     := Not_Suppressed;
+      TXSTRT    : SYS_CTRL_TXSTRT_Field    := No_Action;
+      TXDLYS    : SYS_CTRL_TXDLYS_Field    := Not_Delayed;
+      CANSFCS   : SYS_CTRL_CANSFCS_Field   := Not_Cancelled;
+      TRXOFF    : SYS_CTRL_TRXOFF_Field    := No_Action;
+      WAIT4RESP : SYS_CTRL_WAIT4RESP_Field := No_Wait;
+      RXENAB    : SYS_CTRL_RXENAB_Field    := No_Action;
+      RXDLYE    : SYS_CTRL_RXDLYE_Field    := Not_Delayed;
+      HRBPT     : SYS_CTRL_HRBPT_Field     := No_Action;
 
       Reserved_1 : Types.Bits_2  := 0;
       Reserved_2 : Types.Bits_14 := 0;
