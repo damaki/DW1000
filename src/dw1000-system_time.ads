@@ -92,7 +92,8 @@ is
    type Fine_System_Time is
    delta 1.0 / System_Time_Clock_Hz
    range 0.0 .. (2.0**40 - 1.0) / System_Time_Clock_Hz
-     with Small => 1.0 / System_Time_Clock_Hz;
+     with Small => 1.0 / System_Time_Clock_Hz,
+     Size => 40;
    --  Type for representing the DW1000 fine-grained system time in seconds,
    --  with a precision of at least 15.65 picoseconds.
    --
@@ -112,7 +113,8 @@ is
    type Coarse_System_Time is
    delta 512.0 / System_Time_Clock_Hz
    range 0.0 .. (2.0**40 - 1.0) / System_Time_Clock_Hz
-     with Small => 512.0 / System_Time_Clock_Hz;
+     with Small => 1.0 / System_Time_Clock_Hz,
+     Size => 40;
    --  Type for representing the DW1000 coarsely-grained system time in seconds,
    --  with a precision of at least 8.013 nanoseconds.
    --
@@ -132,14 +134,18 @@ is
 
    type System_Time_Span is new Fine_System_Time;
 
-   subtype Antenna_Delay_Time is Fine_System_Time
-   range 0.0 .. Fine_System_Time'Delta * (2**16 - 1);
+   type Antenna_Delay_Time is
+   delta Fine_System_Time'Delta
+   range 0.0 .. Fine_System_Time'Delta * (2**16 - 1)
+     with Small => Fine_System_Time'Small,
+     Size => 16;
    --  Type to represent an antenna delay time.
 
    type Frame_Wait_Timeout_Time is
    delta 512.0 / Chipping_Rate_Hz
    range 0.0 .. ((2.0**16 - 1.0) * 512.0) / Chipping_Rate_Hz
-     with Small => 512.0 / 499_200_000.0;
+     with Small => 512.0 / 499_200_000.0,
+     Size => 16;
    --  Type to represent the frame wait timeout.
    --
    --  The range of this type is 0.0 .. 0.067215385, i.e. the maximum value
