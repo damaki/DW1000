@@ -595,26 +595,29 @@ is
    is
    begin
       TX_FCTRL.Write
-        ((TFLEN    => Bits_7 (Frame_Length mod 128),
-          TFLE     => Bits_3 (Frame_Length / 128),
+        ((TFLEN    => TX_FCTRL_TFLEN_Field (Frame_Length mod 128),
+          TFLE     => TX_FCTRL_TFLE_Field (Frame_Length / 128),
           R        => 0,
-          TXBR     => Bits_2 (Data_Rates'Pos (Tx_Data_Rate)),
-          TR       => (if Ranging then 1 else 0),
+          TXBR     => (case Tx_Data_Rate is
+                          when Data_Rate_110k => Data_Rate_110K,
+                          when Data_Rate_850k => Data_Rate_850K,
+                          when Data_Rate_6M8  => Data_Rate_6M8),
+          TR       => (if Ranging then Enabled else Disabled),
           TXPRF    => (if Tx_PRF = PRF_16MHz
-                       then 2#01# else 2#10#),
+                       then PRF_16MHz else PRF_64MHz),
           TXPSR    =>
              (case Preamble_Length is
-                 when PLEN_64 | PLEN_128 | PLEN_256 | PLEN_512 => 2#01#,
-                 when PLEN_1024 | PLEN_1536 | PLEN_2048        => 2#10#,
-                 when others                                   => 2#11#),
+                 when PLEN_64 | PLEN_128 | PLEN_256 | PLEN_512 => PLEN_64,
+                 when PLEN_1024 | PLEN_1536 | PLEN_2048        => PLEN_1024,
+                 when others                                   => PLEN_4096),
           PE       =>
             (case Preamble_Length is
                 when PLEN_64 | PLEN_1024 | PLEN_4096 => 2#00#,
                 when PLEN_128 | PLEN_1536            => 2#01#,
                 when PLEN_256 | PLEN_2048            => 2#10#,
                 when others                          => 2#11#),
-          TXBOFFS  => Bits_10 (Tx_Buffer_Offset),
-          IFSDELAY => Bits_8 (Inter_Frame_Spacing)));
+          TXBOFFS  => TX_FCTRL_TXBOFFS_Field (Tx_Buffer_Offset),
+          IFSDELAY => TX_FCTRL_IFSDELAY_Field (Inter_Frame_Spacing)));
    end Configure_TX_FCTRL;
 
    procedure Configure_CHAN_CTRL
@@ -983,9 +986,9 @@ is
 
    begin
       TX_FCTRL.Read (TX_FCTRL_Reg);
-      TX_FCTRL_Reg.TFLEN   := Types.Bits_7 (Length mod 2**7);
-      TX_FCTRL_Reg.TFLE    := Types.Bits_3 (Length / 2**7);
-      TX_FCTRL_Reg.TXBOFFS := Types.Bits_10 (Offset);
+      TX_FCTRL_Reg.TFLEN   := TX_FCTRL_TFLEN_Field (Length mod 2**7);
+      TX_FCTRL_Reg.TFLE    := TX_FCTRL_TFLE_Field (Length / 2**7);
+      TX_FCTRL_Reg.TXBOFFS := TX_FCTRL_TXBOFFS_Field (Offset);
       TX_FCTRL.Write (TX_FCTRL_Reg);
 
    end Set_Tx_Frame_Length;

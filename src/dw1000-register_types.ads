@@ -304,17 +304,67 @@ is
    ----------------------------------------------------------------------------
    -- TX_FCTRL register file
 
+   type TX_FCTRL_TFLEN_Field is range 0 .. 127
+     with Size => 7;
+   --  Transmit Frame Length.
+
+   type TX_FCTRL_TFLE_Field is range 0 .. 7
+     with Size => 3;
+   --  Transmit Frame Length Extension.
+
+   type TX_FCTRL_TXBR_Field is
+     (Data_Rate_110K,
+      Data_Rate_850K,
+      Data_Rate_6M8,
+      Reserved)
+     with Size => 2;
+   --  Transmit Bit Rate.
+
+   type TX_FCTRL_TR_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Transmit Ranging enable.
+
+   type TX_FCTRL_TXPRF_Field is
+     (PRF_4MHz,
+      PRF_16MHz,
+      PRF_64MHz,
+      Reserved)
+     with Size => 2;
+   --  Transmit Pulse Repetition Frequency.
+
+   type TX_FCTRL_TXPSR_Field is
+     (PLEN_16,
+      PLEN_64,
+      PLEN_1024,
+      PLEN_4096)
+     with Size => 2;
+   --  Transmit Preamble Symbol Repetitions (PSR).
+
+   type TX_FCTRL_PE_Field is range 0 .. 3
+     with Size => 2;
+   --  Preamble Extension.
+
+   type TX_FCTRL_TXBOFFS_Field is range 0 .. 2**10 - 1
+     with Size => 10;
+   --  Transmit buffer index offset.
+
+   type TX_FCTRL_IFSDELAY_Field is range 0 .. 255
+     with Size => 8;
+   --  Inter-Frame Spacing.
+
    type TX_FCTRL_Type is record
-      TFLEN    : Types.Bits_7  := 12;
-      TFLE     : Types.Bits_3  := 0;
-      R        : Types.Bits_3  := 0;
-      TXBR     : Types.Bits_2  := 0;
-      TR       : Types.Bits_1  := 0;
-      TXPRF    : Types.Bits_2  := 0;
-      TXPSR    : Types.Bits_2  := 0;
-      PE       : Types.Bits_2  := 0;
-      TXBOFFS  : Types.Bits_10 := 0;
-      IFSDELAY : Types.Bits_8  := 0;
+      TFLEN    : TX_FCTRL_TFLEN_Field    := 12;
+      TFLE     : TX_FCTRL_TFLE_Field     := 0;
+      R        : Types.Bits_3            := 0;
+      TXBR     : TX_FCTRL_TXBR_Field     := Data_Rate_6M8;
+      TR       : TX_FCTRL_TR_Field       := Disabled;
+      TXPRF    : TX_FCTRL_TXPRF_Field    := PRF_16MHz;
+      TXPSR    : TX_FCTRL_TXPSR_Field    := PLEN_64;
+      PE       : TX_FCTRL_PE_Field       := 0;
+      TXBOFFS  : TX_FCTRL_TXBOFFS_Field  := 0;
+      IFSDELAY : TX_FCTRL_IFSDELAY_Field := 0;
    end record
      with Size => 40,
      Bit_Order => System.Low_Order_First,

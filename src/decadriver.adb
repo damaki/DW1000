@@ -312,14 +312,17 @@ is
               (TFLEN    => 0,
                TFLE     => 0,
                R        => 0,
-               TXBR     => Bits_2 (Data_Rates'Pos (Config.Data_Rate)),
-               TR       => 1,
-               TXPRF    => (if Config.PRF = PRF_16MHz then 2#01# else 2#10#),
+               TXBR     => (case Config.Data_Rate is
+                               when Data_Rate_110k => Data_Rate_110K,
+                               when Data_Rate_850k => Data_Rate_850K,
+                               when Data_Rate_6M8 => Data_Rate_6M8),
+               TR       => Enabled,
+               TXPRF    => (if Config.PRF = PRF_16MHz then PRF_16MHz else PRF_64MHz),
                TXPSR    =>
                  (case Config.Tx_Preamble_Length is
-                     when PLEN_64 | PLEN_128 | PLEN_256 | PLEN_512 => 2#01#,
-                     when PLEN_1024 | PLEN_1536 | PLEN_2048        => 2#10#,
-                     when others                                   => 2#11#),
+                     when PLEN_64 | PLEN_128 | PLEN_256 | PLEN_512 => PLEN_64,
+                     when PLEN_1024 | PLEN_1536 | PLEN_2048        => PLEN_1024,
+                     when others                                   => PLEN_4096),
                PE       =>
                  (case Config.Tx_Preamble_Length is
                      when PLEN_64 | PLEN_1024 | PLEN_4096 => 2#00#,
