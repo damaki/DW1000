@@ -520,35 +520,41 @@ is
    ----------------------------------------------------------------------------
    -- SYS_MASK register file
 
+   type SYS_MASK_Mask_Field is
+     (Masked,
+      Not_Masked)
+     with Size => 1;
+   --  Mask event.
+
    type SYS_MASK_Type is record
-      MCPLOCK   : Types.Bits_1  := 0;
-      MESYNCR   : Types.Bits_1  := 0;
-      MAAT      : Types.Bits_1  := 0;
-      MTXFRB    : Types.Bits_1  := 0;
-      MTXPRS    : Types.Bits_1  := 0;
-      MTXPHS    : Types.Bits_1  := 0;
-      MTXFRS    : Types.Bits_1  := 0;
-      MRXPRD    : Types.Bits_1  := 0;
-      MRXSFDD   : Types.Bits_1  := 0;
-      MLDEDONE  : Types.Bits_1  := 0;
-      MRXPHD    : Types.Bits_1  := 0;
-      MRXPHE    : Types.Bits_1  := 0;
-      MRXDFR    : Types.Bits_1  := 0;
-      MRXFCG    : Types.Bits_1  := 0;
-      MRXFCE    : Types.Bits_1  := 0;
-      MRXRFSL   : Types.Bits_1  := 0;
-      MRXRFTO   : Types.Bits_1  := 0;
-      MLDEERR   : Types.Bits_1  := 0;
-      MRXOVRR   : Types.Bits_1  := 0;
-      MRXPTO    : Types.Bits_1  := 0;
-      MGPIOIRQ  : Types.Bits_1  := 0;
-      MSLP2INIT : Types.Bits_1  := 0;
-      MRFPLLLL  : Types.Bits_1  := 0;
-      MCPLLLL   : Types.Bits_1  := 0;
-      MRXSFDTO  : Types.Bits_1  := 0;
-      MHPDWARN  : Types.Bits_1  := 0;
-      MTXBERR   : Types.Bits_1  := 0;
-      MAFFREJ   : Types.Bits_1  := 0;
+      MCPLOCK   : SYS_MASK_Mask_Field := Masked;
+      MESYNCR   : SYS_MASK_Mask_Field := Masked;
+      MAAT      : SYS_MASK_Mask_Field := Masked;
+      MTXFRB    : SYS_MASK_Mask_Field := Masked;
+      MTXPRS    : SYS_MASK_Mask_Field := Masked;
+      MTXPHS    : SYS_MASK_Mask_Field := Masked;
+      MTXFRS    : SYS_MASK_Mask_Field := Masked;
+      MRXPRD    : SYS_MASK_Mask_Field := Masked;
+      MRXSFDD   : SYS_MASK_Mask_Field := Masked;
+      MLDEDONE  : SYS_MASK_Mask_Field := Masked;
+      MRXPHD    : SYS_MASK_Mask_Field := Masked;
+      MRXPHE    : SYS_MASK_Mask_Field := Masked;
+      MRXDFR    : SYS_MASK_Mask_Field := Masked;
+      MRXFCG    : SYS_MASK_Mask_Field := Masked;
+      MRXFCE    : SYS_MASK_Mask_Field := Masked;
+      MRXRFSL   : SYS_MASK_Mask_Field := Masked;
+      MRXRFTO   : SYS_MASK_Mask_Field := Masked;
+      MLDEERR   : SYS_MASK_Mask_Field := Masked;
+      MRXOVRR   : SYS_MASK_Mask_Field := Masked;
+      MRXPTO    : SYS_MASK_Mask_Field := Masked;
+      MGPIOIRQ  : SYS_MASK_Mask_Field := Masked;
+      MSLP2INIT : SYS_MASK_Mask_Field := Masked;
+      MRFPLLLL  : SYS_MASK_Mask_Field := Masked;
+      MCPLLLL   : SYS_MASK_Mask_Field := Masked;
+      MRXSFDTO  : SYS_MASK_Mask_Field := Masked;
+      MHPDWARN  : SYS_MASK_Mask_Field := Masked;
+      MTXBERR   : SYS_MASK_Mask_Field := Masked;
+      MAFFREJ   : SYS_MASK_Mask_Field := Masked;
 
       Reserved_1 : Types.Bits_1 := 0;
       Reserved_2 : Types.Bits_1 := 0;

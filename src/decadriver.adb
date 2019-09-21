@@ -224,12 +224,12 @@ is
 
          --  Configure IRQs
          DW1000.Registers.SYS_MASK.Read (SYS_MASK_Reg);
-         SYS_MASK_Reg.MRXRFTO  := 1;
-         SYS_MASK_Reg.MRXSFDTO := 1;
-         SYS_MASK_Reg.MRXPHE   := 1;
-         SYS_MASK_Reg.MRXRFSL  := 1;
-         SYS_MASK_Reg.MRXDFR   := 1; --  Always detect frame received
-         SYS_MASK_Reg.MTXFRS   := 1; --  Always detect frame sent
+         SYS_MASK_Reg.MRXRFTO  := Not_Masked;
+         SYS_MASK_Reg.MRXSFDTO := Not_Masked;
+         SYS_MASK_Reg.MRXPHE   := Not_Masked;
+         SYS_MASK_Reg.MRXRFSL  := Not_Masked;
+         SYS_MASK_Reg.MRXDFR   := Not_Masked; --  Always detect frame received
+         SYS_MASK_Reg.MTXFRS   := Not_Masked; --  Always detect frame sent
          DW1000.Registers.SYS_MASK.Write (SYS_MASK_Reg);
 
          Detect_Frame_Timeout := True;

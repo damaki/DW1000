@@ -1182,12 +1182,11 @@ is
    begin
       -- Temporarily disable all interrupts
       SYS_MASK.Read (SYS_MASK_Reg);
-      SYS_MASK.Write (SYS_MASK_Type'(Reserved_3 => 0,
-                                     others     => 0));
+      SYS_MASK.Write (SYS_MASK_Type'(others => <>));
 
       -- Disable Tx/Rx
-      SYS_CTRL.Write (SYS_CTRL_Type'(TRXOFF     => Transceiver_Off,
-                                     others     => <>));
+      SYS_CTRL.Write (SYS_CTRL_Type'(TRXOFF => Transceiver_Off,
+                                     others => <>));
 
       -- Force transceiver off; don't want to see any new events.
       SYS_STATUS.Write (SYS_STATUS_Type'(AAT        => 1,
