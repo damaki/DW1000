@@ -39,15 +39,7 @@ is
                               FP_INDEX => 0,
                               FP_AMPL1 => 0,
                               RX_RAWST => 0),
-         RX_FINFO_Reg     => (RXFLEN   => 0,
-                              RXFLE    => 0,
-                              RXNSPL   => 0,
-                              RXBR     => 0,
-                              RNG      => 0,
-                              RXPRF    => 0,
-                              RXPSR    => 0,
-                              RXPACC   => 0,
-                              Reserved => 0),
+         RX_FINFO_Reg     => (others   => <>),
          RX_FQUAL_Reg     => (STD_NOISE => 0,
                               FP_AMPL2  => 0,
                               FP_AMPL3  => 0,
@@ -80,14 +72,14 @@ is
    function Receive_Signal_Power (Frame_Info : in Frame_Info_Type)
                                   return Float
    is
-      RXBR       : Bits_2;
+      RXBR       : RX_FINFO_RXBR_Field;
       SFD_LENGTH : Bits_8;
-      RXPACC     : Bits_12;
+      RXPACC     : RX_FINFO_RXPACC_Field;
 
    begin
       RXBR := Frame_Info.RX_FINFO_Reg.RXBR;
-      if RXBR = 2#11# then --  Detect reserved value
-         RXBR := 2#10#;    --  default to 6.8 Mbps
+      if RXBR = Reserved then --  Detect reserved value
+         RXBR := Data_Rate_6M8;    --  default to 6.8 Mbps
       end if;
 
       SFD_LENGTH := Frame_Info.SFD_LENGTH;
@@ -103,7 +95,7 @@ is
          Non_Standard_SFD => Frame_Info.Non_Standard_SFD);
 
       return Receive_Signal_Power
-        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = 2#10#,
+        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = PRF_16MHz,
          RXPACC        => RXPACC,
          CIR_PWR       => Frame_Info.RX_FQUAL_Reg.CIR_PWR);
    end Receive_Signal_Power;
@@ -115,13 +107,13 @@ is
    function First_Path_Signal_Power (Frame_Info : in Frame_Info_Type)
                                      return Float
    is
-      RXBR       : Bits_2;
+      RXBR       : RX_FINFO_RXBR_Field;
       SFD_LENGTH : Bits_8;
-      RXPACC     : Bits_12;
+      RXPACC     : RX_FINFO_RXPACC_Field;
    begin
       RXBR := Frame_Info.RX_FINFO_Reg.RXBR;
-      if RXBR = 2#11# then --  Detect reserved value
-         RXBR := 2#10#; --  default to 6.8 Mbps
+      if RXBR = Reserved then --  Detect reserved value
+         RXBR := Data_Rate_6M8; --  default to 6.8 Mbps
       end if;
 
       SFD_LENGTH := Frame_Info.SFD_LENGTH;
@@ -137,7 +129,7 @@ is
          Non_Standard_SFD => Frame_Info.Non_Standard_SFD);
 
       return First_Path_Signal_Power
-        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = 2#10#,
+        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = PRF_16MHz,
          F1            => Frame_Info.RX_TIME_Reg.FP_AMPL1,
          F2            => Frame_Info.RX_FQUAL_Reg.FP_AMPL2,
          F3            => Frame_Info.RX_FQUAL_Reg.FP_AMPL3,

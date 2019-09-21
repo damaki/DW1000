@@ -21,6 +21,7 @@
 -------------------------------------------------------------------------------
 
 with Ada.Numerics.Generic_Elementary_Functions;
+with DW1000.Register_Types;                     use DW1000.Register_Types;
 with Interfaces;                                use Interfaces;
 
 package body DW1000.Reception_Quality
@@ -28,19 +29,19 @@ with SPARK_Mode => On
 is
 
 
-   function Adjust_RXPACC (RXPACC              : in Bits_12;
+   function Adjust_RXPACC (RXPACC              : in RX_FINFO_RXPACC_Field;
                            RXPACC_NOSAT        : in Bits_16;
-                           RXBR                : in Bits_2;
+                           RXBR                : in RX_FINFO_RXBR_Field;
                            SFD_LENGTH          : in Bits_8;
-                           Non_Standard_SFD    : in Boolean) return Bits_12
+                           Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field
    is
-      RXPACC_Adjustment : Bits_12;
+      RXPACC_Adjustment : RX_FINFO_RXPACC_Field;
 
    begin
       if Bits_16 (RXPACC) = RXPACC_NOSAT then
          if Non_Standard_SFD then
             --  DecaWave-defined SFD sequence is used
-            if RXBR = 2#00# then
+            if RXBR = Data_Rate_110K then
                --  110 kbps data rate. SFD length is always 64 symbols
                RXPACC_Adjustment := 82;
             else
@@ -50,7 +51,7 @@ is
 
          else
             --  Standard-defined SFD sequence is used
-            if RXBR = 2#00# then
+            if RXBR = Data_Rate_110K then
                -- 110 kbps data rate. SFD length is always 64 symbols
                RXPACC_Adjustment := 64;
             else
@@ -97,7 +98,7 @@ is
 
 
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
-                                  RXPACC        : in Bits_12;
+                                  RXPACC        : in RX_FINFO_RXPACC_Field;
                                   CIR_PWR       : in Bits_16)
                                   return Float
    is
@@ -164,7 +165,8 @@ is
                                      F1            : in Bits_16;
                                      F2            : in Bits_16;
                                      F3            : in Bits_16;
-                                     RXPACC        : in Bits_12) return Float
+                                     RXPACC        : in RX_FINFO_RXPACC_Field)
+                                     return Float
    is
       subtype F_Range is Long_Float range 0.0 .. (2.0**16 - 1.0)**2;
 

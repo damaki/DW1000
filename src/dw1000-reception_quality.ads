@@ -20,7 +20,8 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with DW1000.Types; use DW1000.Types;
+with DW1000.Register_Types; use DW1000.Register_Types;
+with DW1000.Types;          use DW1000.Types;
 
 --  @summary
 --  Utility functions for measuring the quality of received frames.
@@ -28,12 +29,12 @@ package DW1000.Reception_Quality
 with SPARK_Mode => On
 is
 
-   function Adjust_RXPACC (RXPACC              : in Bits_12;
+   function Adjust_RXPACC (RXPACC              : in RX_FINFO_RXPACC_Field;
                            RXPACC_NOSAT        : in Bits_16;
-                           RXBR                : in Bits_2;
+                           RXBR                : in RX_FINFO_RXBR_Field;
                            SFD_LENGTH          : in Bits_8;
-                           Non_Standard_SFD    : in Boolean) return Bits_12
-     with Pre => (RXBR /= 2#11#
+                           Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field
+     with Pre => (RXBR /= Reserved
                   and (if Non_Standard_SFD then SFD_LENGTH in 8 | 16));
    --  Apply the correction to the RXPACC value.
    --
@@ -64,7 +65,7 @@ is
 
 
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
-                                  RXPACC        : in Bits_12;
+                                  RXPACC        : in RX_FINFO_RXPACC_Field;
                                   CIR_PWR       : in Bits_16) return Float
      with Post => Receive_Signal_Power'Result in -166.90 .. -14.43;
    --  Compute the estimated receive signal power in dBm.
@@ -88,7 +89,8 @@ is
                                      F1            : in Bits_16;
                                      F2            : in Bits_16;
                                      F3            : in Bits_16;
-                                     RXPACC        : in Bits_12) return Float
+                                     RXPACC        : in RX_FINFO_RXPACC_Field)
+                                     return Float
      with Post => First_Path_Signal_Power'Result in -218.07 .. -12.66;
    --  Compute the estimated first path power level in dBm.
    --

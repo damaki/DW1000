@@ -693,15 +693,60 @@ is
    ----------------------------------------------------------------------------
    -- RX_FINFO register file
 
+   type RX_FINFO_RXFLEN_Field is range 0 .. 127
+     with Size => 7;
+   --  Receive Frame Length.
+
+   type RX_FINFO_RXFLE_Field is range 0 .. 7
+     with Size => 3;
+   --  Receive Frame Length Extension.
+
+   type RX_FINFO_RXNSPL_Field is range 0 .. 3
+     with Size => 2;
+   --  Receive non-standard preamble length.
+
+   type RX_FINFO_RXBR_Field is
+     (Data_Rate_110K,
+      Data_Rate_850K,
+      Data_Rate_6M8,
+      Reserved)
+     with Size => 2;
+   --  Receive Bit Rate report.
+
+   type RX_FINFO_RNG_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Receiver Ranging.
+
+   type RX_FINFO_RXPRFR_Field is
+     (Reserved_00,
+      PRF_16MHz,
+      PRF_64MHz,
+      Reserved_11)
+     with Size => 2;
+   --  RX Pulse Repetition Rate report.
+
+   type RX_FINFO_RXPSR_Field is
+     (PLEN_16,
+      PLEN_64,
+      PLEN_1024,
+      PLEN_4096)
+     with Size => 2;
+   --  RX Preamble Repetition.
+
+   type RX_FINFO_RXPACC_Field is range 0 .. 2**12 - 1
+     with Size => 12;
+
    type RX_FINFO_Type is record
-      RXFLEN : Types.Bits_7   := 0;
-      RXFLE  : Types.Bits_3   := 0;
-      RXNSPL : Types.Bits_2   := 0;
-      RXBR   : Types.Bits_2   := 0;
-      RNG    : Types.Bits_1   := 0;
-      RXPRF  : Types.Bits_2   := 0;
-      RXPSR  : Types.Bits_2   := 0;
-      RXPACC : Types.Bits_12  := 0;
+      RXFLEN : RX_FINFO_RXFLEN_Field := 0;
+      RXFLE  : RX_FINFO_RXFLE_Field  := 0;
+      RXNSPL : RX_FINFO_RXNSPL_Field := 0;
+      RXBR   : RX_FINFO_RXBR_Field   := Data_Rate_110K;
+      RNG    : RX_FINFO_RNG_Field    := Disabled;
+      RXPRF  : RX_FINFO_RXPRFR_Field := Reserved_00;
+      RXPSR  : RX_FINFO_RXPSR_Field  := PLEN_16;
+      RXPACC : RX_FINFO_RXPACC_Field := 0;
 
       Reserved : Types.Bits_1 := 0;
    end record
