@@ -20,7 +20,8 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with DW1000.Types; use DW1000.Types;
+with DW1000.System_Time;
+with DW1000.Types;       use DW1000.Types;
 with System;
 
 --  This package defines types for each of the DW1000 registers.
@@ -294,7 +295,7 @@ is
    -- SYS_TIME register file
 
    type SYS_TIME_Type is record
-      SYS_TIME : Types.Bits_40;
+      SYS_TIME : System_Time.Coarse_System_Time;
    end record
      with Pack, Size => 40,
      Bit_Order => System.Low_Order_First,

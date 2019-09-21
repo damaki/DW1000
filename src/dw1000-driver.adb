@@ -1160,7 +1160,7 @@ is
 
    begin
       SYS_TIME.Read (SYS_TIME_Reg);
-      Timestamp := To_Coarse_System_Time (SYS_TIME_Reg.SYS_TIME);
+      Timestamp := SYS_TIME_Reg.SYS_TIME;
    end Read_System_Timestamp;
 
    procedure Check_Overrun (Overrun : out Boolean)
