@@ -24,6 +24,7 @@ with Ada.Unchecked_Conversion;
 with DW1000.Constants;       use DW1000.Constants;
 with DW1000.Registers;       use DW1000.Registers;
 with DW1000.Register_Driver;
+with DW1000.Register_Types;  use DW1000.Register_Types;
 
 
 package body DW1000.Driver
@@ -761,7 +762,9 @@ is
       SYS_CFG_Reg : SYS_CFG_Type;
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.FFEN := (if Enabled then 1 else 0);
+      SYS_CFG_Reg.FFEN := (if Enabled
+                           then Register_Types.Enabled
+                           else Register_Types.Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Frame_Filtering_Enabled;
 
@@ -770,7 +773,7 @@ is
       SYS_CFG_Reg : SYS_CFG_Type;
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.DIS_FCE := (if Enabled then 0 else 1);
+      SYS_CFG_Reg.DIS_FCE := (if Enabled then Not_Disabled else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_FCS_Check_Enabled;
 
@@ -786,14 +789,14 @@ is
       SYS_CFG_Reg : SYS_CFG_Type;
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.FFBC := (if Behave_As_Coordinator then 1 else 0);
-      SYS_CFG_Reg.FFAB := (if Allow_Beacon_Frame    then 1 else 0);
-      SYS_CFG_Reg.FFAD := (if Allow_Data_Frame      then 1 else 0);
-      SYS_CFG_Reg.FFAA := (if Allow_Ack_Frame       then 1 else 0);
-      SYS_CFG_Reg.FFAM := (if Allow_MAC_Cmd_Frame   then 1 else 0);
-      SYS_CFG_Reg.FFAR := (if Allow_Reserved_Frame  then 1 else 0);
-      SYS_CFG_Reg.FFA4 := (if Allow_Frame_Type_4    then 1 else 0);
-      SYS_CFG_Reg.FFA5 := (if Allow_Frame_Type_5    then 1 else 0);
+      SYS_CFG_Reg.FFBC := (if Behave_As_Coordinator then Enabled else Disabled);
+      SYS_CFG_Reg.FFAB := (if Allow_Beacon_Frame    then Allowed else Not_Allowed);
+      SYS_CFG_Reg.FFAD := (if Allow_Data_Frame      then Allowed else Not_Allowed);
+      SYS_CFG_Reg.FFAA := (if Allow_Ack_Frame       then Allowed else Not_Allowed);
+      SYS_CFG_Reg.FFAM := (if Allow_MAC_Cmd_Frame   then Allowed else Not_Allowed);
+      SYS_CFG_Reg.FFAR := (if Allow_Reserved_Frame  then Allowed else Not_Allowed);
+      SYS_CFG_Reg.FFA4 := (if Allow_Frame_Type_4    then Allowed else Not_Allowed);
+      SYS_CFG_Reg.FFA5 := (if Allow_Frame_Type_5    then Allowed else Not_Allowed);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Configure_Frame_Filtering;
 
@@ -803,7 +806,7 @@ is
 
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.DIS_STXP := (if Enabled then 0 else 1);
+      SYS_CFG_Reg.DIS_STXP := (if Enabled then Not_Disabled else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Smart_Tx_Power;
 
@@ -956,8 +959,8 @@ is
 
       SYS_CFG.Read (SYS_CFG_Reg);
       SYS_CFG_Reg.DIS_STXP := (if Config.Smart_Tx_Power_Enabled
-                               then 0   --  Don't disable smart tx power
-                               else 1); --  Disable smart tx power
+                               then Not_Disabled
+                               else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Configure_Tx_Power;
 
@@ -1356,7 +1359,9 @@ is
 
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.RXAUTR := (if Enabled then 1 else 0);
+      SYS_CFG_Reg.RXAUTR := (if Enabled
+                             then Register_Types.Enabled
+                             else Register_Types.Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Auto_Rx_Reenable;
 
@@ -1366,7 +1371,7 @@ is
 
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.DIS_DRXB := (if Enabled then 0 else 1);
+      SYS_CFG_Reg.DIS_DRXB := (if Enabled then Not_Disabled else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Rx_Double_Buffer;
 
@@ -1378,12 +1383,12 @@ is
       SYS_CFG.Read (SYS_CFG_Reg);
 
       if Timeout > 0.0 then
-         SYS_CFG_Reg.RXWTOE := 1;
+         SYS_CFG_Reg.RXWTOE := Enabled;
 
          RX_FWTO.Write ( (RXFWTO => To_Bits_16 (Timeout)) );
 
       else
-         SYS_CFG_Reg.RXWTOE := 0;
+         SYS_CFG_Reg.RXWTOE := Disabled;
 
       end if;
 

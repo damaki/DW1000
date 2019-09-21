@@ -84,30 +84,172 @@ is
    ----------------------------------------------------------------------------
    -- SYS_CFG register file
 
+   type SYS_CFG_FFEN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Frame Filtering Enable.
+
+   type SYS_CFG_FFBC_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Frame Filtering Behave as a Coordinator.
+
+   type SYS_CFG_FFAB_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow Beacon frame reception.
+
+   type SYS_CFG_FFAD_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow Data frame reception.
+
+   type SYS_CFG_FFAA_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow Acknowledgment frame reception.
+
+   type SYS_CFG_FFAM_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow MAC command frame reception.
+
+   type SYS_CFG_FFAR_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow Reserved frame types.
+
+   type SYS_CFG_FFA4_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow frames with frame type field of 4, (binary 100).
+
+   type SYS_CFG_FFA5_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow frames with frame type field of 5, (binary 101).
+
+   type SYS_CFG_HIRQ_Pol_Field is
+     (Active_Low,
+      Active_High)
+     with Size => 1;
+   --  Host interrupt polarity.
+
+   type SYS_CFG_SPI_EDGE_Field is
+     (Sampling_Edge,
+      Opposite_Edge)
+     with Size => 1;
+   --  SPI data launch edge.
+
+   type SYS_CFG_DIS_FCE_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable frame check error handling.
+
+   type SYS_CFG_DIS_DRXB_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable Double RX Buffer.
+
+   type SYS_CFG_DIS_PHE_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable receiver abort on PHR error.
+
+   type SYS_CFG_DIS_RSDE_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable Receiver Abort on RSD (Reed-Solomon Decoder) error.
+
+   type SYS_CFG_FCS_INIT2F_Field is
+     (All_Zeroes,
+      All_Ones)
+     with Size => 1;
+   --  This bit allows selection of the initial seed value for the FCS
+   --  generation and checking function that is set at the start of each frame
+   --  transmission and reception.
+
+   type SYS_CFG_PHR_MODE_Field is
+     (Standard_Frames_Mode,
+      Reserved_01,
+      Reserved_10,
+      Long_Frames_Mode)
+     with Size => 2;
+   --  Standard (max. 127 octets) or long (max. 1023 octets) frames.
+
+   type SYS_CFG_DIS_STXP_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable Smart TX Power control.
+
+   type SYS_CFG_RXM110K_Field is
+     (SFD_850K_6M8,
+      SFD_110K)
+     with Size => 1;
+   --  Receiver Mode 110 kbps data rate.
+
+   type SYS_CFG_RXWTOE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Receive Wait Timeout Enable.
+
+   type SYS_CFG_RXAUTR_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Receiver Auto-Re-enable.
+
+   type SYS_CFG_AUTOACK_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Automatic Acknowledgement Enable.
+
+   type SYS_CFG_AACKPEND_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Automatic Acknowledgement Pending bit control.
+
    type SYS_CFG_Type is record
-      FFEN       : Types.Bits_1 := 0;
-      FFBC       : Types.Bits_1 := 0;
-      FFAB       : Types.Bits_1 := 0;
-      FFAD       : Types.Bits_1 := 0;
-      FFAA       : Types.Bits_1 := 0;
-      FFAM       : Types.Bits_1 := 0;
-      FFAR       : Types.Bits_1 := 0;
-      FFA4       : Types.Bits_1 := 0;
-      FFA5       : Types.Bits_1 := 0;
-      HIRQ_POL   : Types.Bits_1 := 1;
-      SPI_EDGE   : Types.Bits_1 := 0;
-      DIS_FCE    : Types.Bits_1 := 0;
-      DIS_DRXB   : Types.Bits_1 := 1;
-      DIS_PHE    : Types.Bits_1 := 0;
-      DIS_RSDE   : Types.Bits_1 := 0;
-      FCS_INT2F  : Types.Bits_1 := 0;
-      PHR_MODE   : Types.Bits_2 := 0;
-      DIS_STXP   : Types.Bits_1 := 0;
-      RXM110K    : Types.Bits_1 := 0;
-      RXWTOE     : Types.Bits_1 := 0;
-      RXAUTR     : Types.Bits_1 := 0;
-      AUTOACK    : Types.Bits_1 := 0;
-      AACKPEND   : Types.Bits_1 := 0;
+      FFEN       : SYS_CFG_FFEN_Field       := Disabled;
+      FFBC       : SYS_CFG_FFBC_Field       := Disabled;
+      FFAB       : SYS_CFG_FFAB_Field       := Not_Allowed;
+      FFAD       : SYS_CFG_FFAD_Field       := Not_Allowed;
+      FFAA       : SYS_CFG_FFAA_Field       := Not_Allowed;
+      FFAM       : SYS_CFG_FFAM_Field       := Not_Allowed;
+      FFAR       : SYS_CFG_FFAR_Field       := Not_Allowed;
+      FFA4       : SYS_CFG_FFA4_Field       := Not_Allowed;
+      FFA5       : SYS_CFG_FFA5_Field       := Not_Allowed;
+      HIRQ_POL   : SYS_CFG_HIRQ_Pol_Field   := Active_High;
+      SPI_EDGE   : SYS_CFG_SPI_EDGE_Field   := Sampling_Edge;
+      DIS_FCE    : SYS_CFG_DIS_FCE_Field    := Not_Disabled;
+      DIS_DRXB   : SYS_CFG_DIS_DRXB_Field   := Disabled;
+      DIS_PHE    : SYS_CFG_DIS_PHE_Field    := Not_Disabled;
+      DIS_RSDE   : SYS_CFG_DIS_RSDE_Field   := Not_Disabled;
+      FCS_INT2F  : SYS_CFG_FCS_INIT2F_Field := All_Zeroes;
+      PHR_MODE   : SYS_CFG_PHR_MODE_Field   := Standard_Frames_Mode;
+      DIS_STXP   : SYS_CFG_DIS_STXP_Field   := Not_Disabled;
+      RXM110K    : SYS_CFG_RXM110K_Field    := SFD_850K_6M8;
+      RXWTOE     : SYS_CFG_RXWTOE_Field     := Disabled;
+      RXAUTR     : SYS_CFG_RXAUTR_Field     := Disabled;
+      AUTOACK    : SYS_CFG_AUTOACK_Field    := Disabled;
+      AACKPEND   : SYS_CFG_AACKPEND_Field   := Disabled;
 
       Reserved_1 : Types.Bits_3 := 0;
       Reserved_2 : Types.Bits_5 := 0;

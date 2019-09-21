@@ -655,10 +655,8 @@ is
       Long_Frames : Boolean := False;
 
       SYS_CFG_Reg : SYS_CFG_Type := SYS_CFG_Type'
-        (Reserved_1 => 0,
-         Reserved_2 => 0,
-         PHR_MODE   => 0,
-         others     => 0);
+        (PHR_MODE   => Standard_Frames_Mode,
+         others     => <>);
 
       Use_OTP_XTAL_Trim     : Boolean := False;
       Use_OTP_Antenna_Delay : Boolean := False;

@@ -252,14 +252,15 @@ is
 
          --  110 kbps data rate has special handling
          if Config.Data_Rate = DW1000.Driver.Data_Rate_110k then
-            SYS_CFG_Reg.RXM110K := 1;
+            SYS_CFG_Reg.RXM110K := SFD_110K;
          else
-            SYS_CFG_Reg.RXM110K := 0;
+            SYS_CFG_Reg.RXM110K := SFD_850K_6M8;
          end if;
 
          --  Set physical header mode (standard or extended frames)
          Long_Frames := Config.PHR_Mode = Extended_Frames;
-         SYS_CFG_Reg.PHR_MODE := Bits_2 (Physical_Header_Modes'Pos (Config.PHR_Mode));
+         SYS_CFG_Reg.PHR_MODE := SYS_CFG_PHR_MODE_Field'Val
+           (Physical_Header_Modes'Pos (Config.PHR_Mode));
 
          DW1000.Registers.SYS_CFG.Write (SYS_CFG_Reg);
 
