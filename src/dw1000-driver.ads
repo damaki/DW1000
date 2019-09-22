@@ -97,6 +97,9 @@ is
    type SFD_Length_Number is new Natural range 8 .. 64
      with Static_Predicate => SFD_Length_Number in 8 .. 16 | 64;
 
+   type AON_Address_Array is array (Index range <>) of AON_ADDR_Field;
+   --  Array of addresses within the AON address space.
+
    type Rx_Modes is (Normal, Sniff);
 
    type Tx_Power_Config_Type (Smart_Tx_Power_Enabled : Boolean := True) is
@@ -1026,7 +1029,7 @@ is
    --  Load the user configuration from the AON memory into the host interface
    --  register set.
 
-   procedure AON_Read_Byte (Address : in     Types.Bits_8;
+   procedure AON_Read_Byte (Address : in     AON_ADDR_Field;
                             Data    :    out Types.Bits_8)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends =>
@@ -1034,7 +1037,7 @@ is
         Data                    => (DW1000.BSP.Device_State, Address));
    -- Reads a single byte from the Always-On block.
 
-   procedure AON_Contiguous_Read (Start_Address : in     Types.Bits_8;
+   procedure AON_Contiguous_Read (Start_Address : in     AON_ADDR_Field;
                                   Data          :    out Types.Byte_Array)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
@@ -1046,7 +1049,7 @@ is
              and then Natural (Start_Address) + Data'Length <= 256);
    -- Reads a contiguous sequence of bytes from the Always-On block.
 
-   procedure AON_Scatter_Read (Addresses : in     Types.Byte_Array;
+   procedure AON_Scatter_Read (Addresses : in     AON_Address_Array;
                                Data      :    out Types.Byte_Array)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
@@ -1061,7 +1064,7 @@ is
    --  Addresses array, and stores the byte that was read in the corresponding
    --  position in the Data array.
 
-   procedure Configure_Sleep_Count (Sleep_Count : in Types.Bits_16)
+   procedure Configure_Sleep_Count (Sleep_Count : in AON_CFG0_SLEEP_TIM_Field)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Sleep_Count);
 

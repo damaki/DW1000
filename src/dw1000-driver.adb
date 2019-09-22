@@ -1271,16 +1271,16 @@ is
 
    begin
       -- Enable calibration
-      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => 0,
-                                     SMXX     => 0,
-                                     LPOSC_C  => 1,
+      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Disabled,
+                                     SMXX     => Clear,
+                                     LPOSC_C  => Enabled,
                                      Reserved => 0));
       Upload_AON_Config;
 
       -- Disable calibration
-      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => 0,
-                                     SMXX     => 0,
-                                     LPOSC_C  => 0,
+      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Disabled,
+                                     SMXX     => Clear,
+                                     LPOSC_C  => Disabled,
                                      Reserved => 0));
       Upload_AON_Config;
 
@@ -1306,43 +1306,43 @@ is
    procedure Upload_AON_Config
    is
    begin
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                     SAVE     => 0,
-                                     UPL_CFG  => 1,
-                                     DCA_READ => 0,
-                                     DCA_ENAB => 0,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                     SAVE     => No_Action,
+                                     UPL_CFG  => Upload,
+                                     DCA_READ => No_Action,
+                                     DCA_ENAB => Disabled,
                                      Reserved => 0));
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                     SAVE     => 0,
-                                     UPL_CFG  => 0,
-                                     DCA_READ => 0,
-                                     DCA_ENAB => 0,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                     SAVE     => No_Action,
+                                     UPL_CFG  => No_Action,
+                                     DCA_READ => No_Action,
+                                     DCA_ENAB => Disabled,
                                      Reserved => 0));
    end Upload_AON_Config;
 
    procedure Save_Registers_To_AON
    is
    begin
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                     SAVE     => 1, --  This bit auto-clears
-                                     UPL_CFG  => 0,
-                                     DCA_READ => 0,
-                                     DCA_ENAB => 0,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                     SAVE     => Save,      --  This bit auto-clears
+                                     UPL_CFG  => No_Action,
+                                     DCA_READ => No_Action,
+                                     DCA_ENAB => Disabled,
                                      Reserved => 0));
    end Save_Registers_To_AON;
 
    procedure Restore_Registers_From_AON
    is
    begin
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 1, --  This bit auto-clears
-                                     SAVE     => 0,
-                                     UPL_CFG  => 0,
-                                     DCA_READ => 0,
-                                     DCA_ENAB => 0,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => Restore,   --  This bit auto-clears
+                                     SAVE     => No_Action,
+                                     UPL_CFG  => No_Action,
+                                     DCA_READ => No_Action,
+                                     DCA_ENAB => Disabled,
                                      Reserved => 0));
    end Restore_Registers_From_AON;
 
-   procedure AON_Read_Byte (Address : in     Types.Bits_8;
+   procedure AON_Read_Byte (Address : in     AON_ADDR_Field;
                             Data    :    out Types.Bits_8)
    is
       AON_RDAT_Reg : AON_RDAT_Type;
@@ -1352,19 +1352,19 @@ is
       AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Address));
 
       -- Enable DCA_ENAB
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                     SAVE     => 0,
-                                     UPL_CFG  => 0,
-                                     DCA_READ => 0,
-                                     DCA_ENAB => 1,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                     SAVE     => No_Action,
+                                     UPL_CFG  => No_Action,
+                                     DCA_READ => No_Action,
+                                     DCA_ENAB => Enabled,
                                      Reserved => 0));
 
       -- Now also enable DCA_READ
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                     SAVE     => 0,
-                                     UPL_CFG  => 0,
-                                     DCA_READ => 1,
-                                     DCA_ENAB => 1,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                     SAVE     => No_Action,
+                                     UPL_CFG  => No_Action,
+                                     DCA_READ => Trigger_Read,
+                                     DCA_ENAB => Enabled,
                                      Reserved => 0));
 
       -- Read the result
@@ -1372,18 +1372,18 @@ is
       Data := AON_RDAT_Reg.AON_RDAT;
 
       -- Clear DCA_ENAB and DCA_READ
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                     SAVE     => 0,
-                                     UPL_CFG  => 0,
-                                     DCA_READ => 0,
-                                     DCA_ENAB => 0,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                     SAVE     => No_Action,
+                                     UPL_CFG  => No_Action,
+                                     DCA_READ => No_Action,
+                                     DCA_ENAB => Disabled,
                                      Reserved => 0));
    end AON_Read_Byte;
 
-   procedure AON_Contiguous_Read (Start_Address : in     Types.Bits_8;
+   procedure AON_Contiguous_Read (Start_Address : in     AON_ADDR_Field;
                                   Data          :    out Types.Byte_Array)
    is
-      Address      : Types.Bits_8 := Start_Address;
+      Address      : AON_ADDR_Field := Start_Address;
       AON_RDAT_Reg : AON_RDAT_Type;
 
    begin
@@ -1392,19 +1392,19 @@ is
          AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Address));
 
          -- Enable DCA_ENAB
-         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                        SAVE     => 0,
-                                        UPL_CFG  => 0,
-                                        DCA_READ => 0,
-                                        DCA_ENAB => 1,
+         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                        SAVE     => No_Action,
+                                        UPL_CFG  => No_Action,
+                                        DCA_READ => No_Action,
+                                        DCA_ENAB => Enabled,
                                         Reserved => 0));
 
          -- Now also enable DCA_READ
-         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                        SAVE     => 0,
-                                        UPL_CFG  => 0,
-                                        DCA_READ => 1,
-                                        DCA_ENAB => 1,
+         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                        SAVE     => No_Action,
+                                        UPL_CFG  => No_Action,
+                                        DCA_READ => Trigger_Read,
+                                        DCA_ENAB => Enabled,
                                         Reserved => 0));
 
          -- Read the result
@@ -1415,15 +1415,15 @@ is
       end loop;
 
       -- Clear DCA_ENAB and DCA_READ
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                     SAVE     => 0,
-                                     UPL_CFG  => 0,
-                                     DCA_READ => 0,
-                                     DCA_ENAB => 0,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                     SAVE     => No_Action,
+                                     UPL_CFG  => No_Action,
+                                     DCA_READ => No_Action,
+                                     DCA_ENAB => Disabled,
                                      Reserved => 0));
    end AON_Contiguous_Read;
 
-   procedure AON_Scatter_Read (Addresses : in     Types.Byte_Array;
+   procedure AON_Scatter_Read (Addresses : in     AON_Address_Array;
                                Data      :    out Types.Byte_Array)
    is
       AON_RDAT_Reg : AON_RDAT_Type;
@@ -1434,24 +1434,24 @@ is
    begin
       Data := (others => 0); -- workaround for flow analysis.
 
-      for I in Natural range 0 .. Data'Length - 1 loop
+      for I in 0 .. Data'Length - 1 loop
          -- Load address
          AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Addresses (A_First + I)));
 
          -- Enable DCA_ENAB
-         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                        SAVE     => 0,
-                                        UPL_CFG  => 0,
-                                        DCA_READ => 0,
-                                        DCA_ENAB => 1,
+         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                        SAVE     => No_Action,
+                                        UPL_CFG  => No_Action,
+                                        DCA_READ => No_Action,
+                                        DCA_ENAB => Enabled,
                                         Reserved => 0));
 
          -- Now also enable DCA_READ
-         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                        SAVE     => 0,
-                                        UPL_CFG  => 0,
-                                        DCA_READ => 1,
-                                        DCA_ENAB => 1,
+         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                        SAVE     => No_Action,
+                                        UPL_CFG  => No_Action,
+                                        DCA_READ => Trigger_Read,
+                                        DCA_ENAB => Enabled,
                                         Reserved => 0));
 
          -- Read the result
@@ -1460,15 +1460,15 @@ is
       end loop;
 
       -- Clear DCA_ENAB and DCA_READ
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => 0,
-                                     SAVE     => 0,
-                                     UPL_CFG  => 0,
-                                     DCA_READ => 0,
-                                     DCA_ENAB => 0,
+      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
+                                     SAVE     => No_Action,
+                                     UPL_CFG  => No_Action,
+                                     DCA_READ => No_Action,
+                                     DCA_ENAB => Disabled,
                                      Reserved => 0));
    end AON_Scatter_Read;
 
-   procedure Configure_Sleep_Count (Sleep_Count : in Types.Bits_16)
+   procedure Configure_Sleep_Count (Sleep_Count : in AON_CFG0_SLEEP_TIM_Field)
    is
       PMSC_CTRL0_Reg : PMSC_CTRL0_Type;
 
@@ -1479,36 +1479,36 @@ is
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
       -- Make sure we don't accidentally sleep
-      AON_CFG0.Write (AON_CFG0_Type'(SLEEP_EN  => 0,
-                                     WAKE_PIN  => 0,
-                                     WAKE_SPI  => 0,
-                                     WAKE_CNT  => 0,
-                                     LPDIV_EN  => 0,
-                                     LPCLKDIVA => 0,
-                                     SLEEP_TIM => 0));
+      AON_CFG0.Write (AON_CFG0_Type'(SLEEP_EN  => Disabled,
+                                     WAKE_PIN  => Disabled,
+                                     WAKE_SPI  => Disabled,
+                                     WAKE_CNT  => Disabled,
+                                     LPDIV_EN  => Disabled,
+                                     LPCLKDIVA => <>,
+                                     SLEEP_TIM => <>));
 
-      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => 0,
-                                     SMXX     => 0,
-                                     LPOSC_C  => 0,
+      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Disabled,
+                                     SMXX     => Clear,
+                                     LPOSC_C  => Disabled,
                                      Reserved => 0));
 
       -- Disable the sleep counter
       Upload_AON_Config;
 
       -- Set the new value
-      AON_CFG0.Write (AON_CFG0_Type'(SLEEP_EN  => 0,
-                                     WAKE_PIN  => 0,
-                                     WAKE_SPI  => 0,
-                                     WAKE_CNT  => 0,
-                                     LPDIV_EN  => 0,
-                                     LPCLKDIVA => 0,
+      AON_CFG0.Write (AON_CFG0_Type'(SLEEP_EN  => Disabled,
+                                     WAKE_PIN  => Disabled,
+                                     WAKE_SPI  => Disabled,
+                                     WAKE_CNT  => Disabled,
+                                     LPDIV_EN  => Disabled,
+                                     LPCLKDIVA => <>,
                                      SLEEP_TIM => Sleep_Count));
       Upload_AON_Config;
 
       -- Enable the new value
-      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => 1,
-                                     SMXX     => 0,
-                                     LPOSC_C  => 0,
+      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Enabled,
+                                     SMXX     => Clear,
+                                     LPOSC_C  => Disabled,
                                      Reserved => 0));
 
       PMSC_CTRL0_Reg.SYSCLKS := 2#00#;

@@ -2613,16 +2613,68 @@ is
    ----------------------------------------------------------------------------
    -- AON register file
 
-   -- AON_WCFG sub-register
+   ----------------------------
+   -- AON_WCFG sub-register  --
+   ----------------------------
+
+   type AON_WCFG_ONW_RADC_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up Run the (temperature and voltage) Analog-to-Digital Convertors.
+
+   type AON_WCFG_ONW_RX_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up turn on the Receiver.
+
+   type AON_WCFG_ONW_LEUI_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up load the EUI from OTP memory into the EUI register.
+
+   type AON_WCFG_ONW_LDC_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-upload configurations from the AON memory into the host
+   --  interface register set.
+
+   type AON_WCFG_ONW_L64_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up load the Length64 receiver operating parameter set.
+
+   type AON_WCFG_PRES_SLEEP_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Preserve Sleep.
+
+   type AON_WCFG_ONW_LLDE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up load the LDE microcode.
+
+   type AON_WCFG_ONW_LLD0_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up load the LDOTUNE value from OTP.
+
    type AON_WCFG_Type is record
-      ONW_RAD    : Types.Bits_1 := 0;
-      ONW_RX     : Types.Bits_1 := 0;
-      ONW_LEUI   : Types.Bits_1 := 0;
-      ONW_LDC    : Types.Bits_1 := 0;
-      ONW_L64    : Types.Bits_1 := 0;
-      PRES_SLEE  : Types.Bits_1 := 0;
-      ONW_LLDE   : Types.Bits_1 := 0;
-      ONW_LLD    : Types.Bits_1 := 0;
+      ONW_RADC   : AON_WCFG_ONW_RADC_Field   := Disabled;
+      ONW_RX     : AON_WCFG_ONW_RX_Field     := Disabled;
+      ONW_LEUI   : AON_WCFG_ONW_LEUI_Field   := Disabled;
+      ONW_LDC    : AON_WCFG_ONW_LDC_Field    := Disabled;
+      ONW_L64    : AON_WCFG_ONW_L64_Field    := Disabled;
+      PRES_SLEEP : AON_WCFG_PRES_SLEEP_Field := Disabled;
+      ONW_LLDE   : AON_WCFG_ONW_LLDE_Field   := Disabled;
+      ONW_LLD0   : AON_WCFG_ONW_LLD0_Field   := Disabled;
 
       Reserved_1 : Types.Bits_1 := 0;
       Reserved_2 : Types.Bits_2 := 0;
@@ -2634,7 +2686,7 @@ is
      Scalar_Storage_Order => System.Low_Order_First;
 
    for AON_WCFG_Type use record
-      ONW_RAD    at 0 range  0 ..  0;
+      ONW_RADC   at 0 range  0 ..  0;
       ONW_RX     at 0 range  1 ..  1;
 
       Reserved_1 at 0 range  2 .. 2;
@@ -2645,23 +2697,58 @@ is
 
       ONW_LDC    at 0 range  6 ..  6;
       ONW_L64    at 0 range  7 ..  7;
-      PRES_SLEE  at 0 range  8 ..  8;
+      PRES_SLEEP at 0 range  8 ..  8;
 
       Reserved_3 at 0 range  9 .. 10;
 
       ONW_LLDE   at 0 range 11 .. 11;
-      ONW_LLD    at 0 range 12 .. 12;
+      ONW_LLD0   at 0 range 12 .. 12;
 
       Reserved_4 at 0 range 13 .. 15;
    end record;
 
-   -- AON_CTRL sub-register
+   ----------------------------
+   -- AON_CTRL sub-register  --
+   ----------------------------
+
+   type AON_CTRL_RESTORE_Field is
+     (No_Action,
+      Restore)
+     with Size => 1;
+   --  When this bit is set the DW1000 will copy the user configurations from
+   --  the AON memory to the host interface register set.
+
+   type AON_CTRL_SAVE_Field is
+     (No_Action,
+      Save)
+     with Size => 1;
+   --  When this bit is set the DW1000 will copy the user configurations from
+   --  the host interface register set into the AON memory.
+
+   type AON_CTRL_UPL_CFG_Field is
+     (No_Action,
+      Upload)
+     with Size => 1;
+   --  Upload the AON block configurations to the AON.
+
+   type AON_CTRL_DCA_READ_Field is
+     (No_Action,
+      Trigger_Read)
+     with Size => 1;
+   --  Direct AON memory access read.
+
+   type AON_CTRL_DCA_ENAB_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Direct AON memory access enable bit.
+
    type AON_CTRL_Type is record
-      RESTORE  : Types.Bits_1 := 0;
-      SAVE     : Types.Bits_1 := 0;
-      UPL_CFG  : Types.Bits_1 := 0;
-      DCA_READ : Types.Bits_1 := 0;
-      DCA_ENAB : Types.Bits_1 := 0;
+      RESTORE  : AON_CTRL_RESTORE_Field  := No_Action;
+      SAVE     : AON_CTRL_SAVE_Field     := No_Action;
+      UPL_CFG  : AON_CTRL_UPL_CFG_Field  := No_Action;
+      DCA_READ : AON_CTRL_DCA_READ_Field := No_Action;
+      DCA_ENAB : AON_CTRL_DCA_ENAB_Field := Disabled;
 
       Reserved : Types.Bits_3 := 0;
    end record
@@ -2680,7 +2767,10 @@ is
       DCA_ENAB at 0 range 7 .. 7;
    end record;
 
-   -- AON_RDAT sub-register
+   ----------------------------
+   -- AON_RDAT sub-register  --
+   ----------------------------
+
    type AON_RDAT_Type is record
       AON_RDAT : Types.Bits_8;
    end record
@@ -2692,9 +2782,14 @@ is
       AON_RDAT at 0 range 0 .. 7;
    end record;
 
-   -- AON_ADDR sub-register
+   ----------------------------
+   -- AON_ADDR sub-register  --
+   ----------------------------
+
+   type AON_ADDR_Field is new Bits_8;
+
    type AON_ADDR_Type is record
-      AON_ADDR : Types.Bits_8;
+      AON_ADDR : AON_ADDR_Field;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -2704,15 +2799,57 @@ is
       AON_ADDR at 0 range 0 .. 7;
    end record;
 
-   -- AON_CFG0 sub-register
+   ----------------------------
+   -- AON_CFG0 sub-register  --
+   ----------------------------
+
+   type AON_CFG0_SLEEP_EN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This is the sleep enable configuration bit.
+
+   type AON_CFG0_WAKE_PIN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Wake using WAKEUP pin.
+
+   type AON_CFG0_WAKE_SPI_Pin_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Wake using SPI access.
+
+   type AON_CFG0_WAKE_CNT_Pin_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Wake when sleep counter elapses.
+
+   type AON_CFG0_LPDIV_EN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Low power divider enable configuration.
+
+   type AON_CFG0_LPCLKDIVA_Field is range 0 .. 2**11 - 1
+     with Size => 11;
+   --  This field specifies a divider count for dividing the raw DW1000 XTAL
+   --  oscillator frequency to set an LP clock frequency.
+
+   type AON_CFG0_SLEEP_TIM_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  Sleep time.
+
    type AON_CFG0_Type is record
-      SLEEP_EN  : Types.Bits_1  := 0;
-      WAKE_PIN  : Types.Bits_1  := 1;
-      WAKE_SPI  : Types.Bits_1  := 1;
-      WAKE_CNT  : Types.Bits_1  := 1;
-      LPDIV_EN  : Types.Bits_1  := 0;
-      LPCLKDIVA : Types.Bits_11 := 2#000_1111_1111#;
-      SLEEP_TIM : Types.Bits_16 := 2#0101_0000_1111_1111#;
+      SLEEP_EN  : AON_CFG0_SLEEP_EN_Field     := Disabled;
+      WAKE_PIN  : AON_CFG0_WAKE_PIN_Field     := Enabled;
+      WAKE_SPI  : AON_CFG0_WAKE_SPI_Pin_Field := Enabled;
+      WAKE_CNT  : AON_CFG0_WAKE_CNT_Pin_Field := Enabled;
+      LPDIV_EN  : AON_CFG0_LPDIV_EN_Field     := Disabled;
+      LPCLKDIVA : AON_CFG0_LPCLKDIVA_Field    := 255;
+      SLEEP_TIM : AON_CFG0_SLEEP_TIM_Field    := 20735;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -2728,11 +2865,34 @@ is
       SLEEP_TIM at 0 range 16 .. 31;
    end record;
 
-   -- AON_CFG1 sub-register
+   ----------------------------
+   -- AON_CFG1 sub-register  --
+   ----------------------------
+
+   type AON_CFG1_SLEEP_CE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables the sleep counter.
+
+   type AON_CFG1_SMXX_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  This bit needs to be Cleared for correct operation in the SLEEP state
+   --  within the DW1000. By default this bit is Set.
+
+   type AON_CFG1_LPOSC_C_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables the calibration function that measures the period of the
+   --  IC's internal low powered oscillator
+
    type AON_CFG1_Type is record
-      SLEEP_CE : Types.Bits_1 := 1;
-      SMXX     : Types.Bits_1 := 1;
-      LPOSC_C  : Types.Bits_1 := 1;
+      SLEEP_CE : AON_CFG1_SLEEP_CE_Field := Enabled;
+      SMXX     : AON_CFG1_SMXX_Field     := Set;
+      LPOSC_C  : AON_CFG1_LPOSC_C_Field  := Enabled;
 
       Reserved : Types.Bits_13 := 0;
    end record
