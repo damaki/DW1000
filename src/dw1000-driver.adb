@@ -94,21 +94,21 @@ is
          Reserved => 2#011#);
 
    -- These values for RF_TXCTRL are given by the user manual
-   RF_TXCTRL_Values : constant array (Positive range 1 .. 7) of Types.Bits_32
-     := (1 => 16#00006C50#,
-         2 => 16#00056CA0#,
-         3 => 16#00086CC0#,
-         4 => 16#00045C80#,
-         5 => 16#001E3FE0#,
-         7 => 16#001E7DE0#,
+   RF_TXCTRL_Values : constant array (Positive range 1 .. 7) of RF_TXCTRL_Field
+     := (1 => RF_TXCTRL_Channel_1,
+         2 => RF_TXCTRL_Channel_2,
+         3 => RF_TXCTRL_Channel_3,
+         4 => RF_TXCTRL_Channel_4,
+         5 => RF_TXCTRL_Channel_5,
+         7 => RF_TXCTRL_Channel_7,
          -- Note that channel 6 is not a valid channel. However, Channel_Number
          -- cannot be used as the array index type since it has a predicate.
          6 => 0);
 
    -- These values for RF_RXCTRLH are given by the user manual
-   RF_RXCTRLH_Values : constant array (Positive range 1 .. 7) of Types.Bits_8
-     := (1..3|5 => 16#D8#,
-         4|7    => 16#BC#,
+   RF_RXCTRLH_Values : constant array (Positive range 1 .. 7) of RF_RXCTRLH_Field
+     := (1..3|5 => RF_RXCTRLH_500MHz,
+         4|7    => RF_RXCTRLH_900MHz,
          -- Note that channel 6 is not a valid channel. However, Channel_Number
          -- cannot be used as the array index type since it has a predicate.
          6      => 0);

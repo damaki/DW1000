@@ -2191,12 +2191,35 @@ is
    ----------------------------------------------------------------------------
    -- RF_CONF register file
 
-   -- RF_CONF sub-register
+   ---------------------------
+   -- RF_CONF sub-register  --
+   ---------------------------
+
+   type RF_CONF_TXFEN_Field is new Bits_5;
+   --  Transmit block force enable.
+
+   RF_CONF_TXFEN_Force_Enable : constant RF_CONF_TXFEN_Field := 16#1F#;
+
+   type RF_CONF_PLLFEN_Field is new Bits_3;
+   --  PLL block force enables.
+
+   RF_CONF_PLLFEN_Force_Enable : constant RF_CONF_PLLFEN_Field := 16#5#;
+
+   type RF_CONF_LDOFEN_Field is new Bits_5;
+   --  Write 0x1F to force the enable to all LDOs.
+
+   RF_CONF_LDOFEN_Force_Enable : constant RF_CONF_LDOFEN_Field := 16#1F#;
+
+   type RF_CONF_TXRXSW_Field is new Bits_2;
+
+   RF_CONF_TXRXSW_Force_Tx : constant RF_CONF_TXRXSW_Field := 16#2#;
+   RF_CONF_TXRXSW_Force_Rx : constant RF_CONF_TXRXSW_Field := 16#1#;
+
    type RF_CONF_Type is record
-      TXFEN  : Types.Bits_5 := 0;
-      PLLFEN : Types.Bits_3 := 0;
-      LDOFEN : Types.Bits_5 := 0;
-      TXRXSW : Types.Bits_2 := 0;
+      TXFEN  : RF_CONF_TXFEN_Field  := 0;
+      PLLFEN : RF_CONF_PLLFEN_Field := 0;
+      LDOFEN : RF_CONF_LDOFEN_Field := 0;
+      TXRXSW : RF_CONF_TXRXSW_Field := 0;
 
       Reserved_1 : Types.Bits_8 := 0;
       Reserved_2 : Types.Bits_9 := 0;
@@ -2216,9 +2239,17 @@ is
       Reserved_2 at 0 range 23 .. 31;
    end record;
 
-   -- RF_RXCTRLH sub-register
+   ------------------------------
+   -- RF_RXCTRLH sub-register  --
+   ------------------------------
+
+   type RF_RXCTRLH_Field is new Bits_8;
+
+   RF_RXCTRLH_500MHz : constant RF_RXCTRLH_Field := 16#D8#; --  Channels 1,2,3,5
+   RF_RXCTRLH_900MHz : constant RF_RXCTRLH_Field := 16#BC#; --  Channels 4,7
+
    type RF_RXCTRLH_Type is record
-      RF_RXCTRLH : Types.Bits_8;
+      RF_RXCTRLH : RF_RXCTRLH_Field;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -2228,9 +2259,21 @@ is
       RF_RXCTRLH at 0 range 0 .. 7;
    end record;
 
-   -- RF_TXCTRL sub-register
+   -----------------------------
+   -- RF_TXCTRL sub-register  --
+   -----------------------------
+
+   type RF_TXCTRL_Field is new Bits_32;
+
+   RF_TXCTRL_Channel_1 : constant RF_TXCTRL_Field := 16#00005C40#;
+   RF_TXCTRL_Channel_2 : constant RF_TXCTRL_Field := 16#00045CA0#;
+   RF_TXCTRL_Channel_3 : constant RF_TXCTRL_Field := 16#00086CC0#;
+   RF_TXCTRL_Channel_4 : constant RF_TXCTRL_Field := 16#00045C80#;
+   RF_TXCTRL_Channel_5 : constant RF_TXCTRL_Field := 16#001E3FE3#;
+   RF_TXCTRL_Channel_7 : constant RF_TXCTRL_Field := 16#001E7DE0#;
+
    type RF_TXCTRL_Type is record
-      RF_TXCTRL : Types.Bits_32 := 16#001E_3DE0#;
+      RF_TXCTRL : RF_TXCTRL_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -2240,12 +2283,39 @@ is
       RF_TXCTRL at 0 range 0 .. 31;
    end record;
 
-   -- RF_STATUS sub-register
+   -----------------------------
+   -- RF_STATUS sub-register  --
+   -----------------------------
+
+   type RF_STATUS_CPLLLOCK_Field is
+     (Not_Locked,
+      Locked)
+     with Size => 1;
+   --  Clock PLL Lock status.
+
+   type RF_STATUS_CPLLLOW_Field is
+     (Not_Low,
+      Low)
+     with Size => 1;
+   --  Clock PLL Low flag status.
+
+   type RF_STATUS_CPLLHIGH_Field is
+     (Not_High,
+      High)
+     with Size => 1;
+   --  Clock PLL High flag status.
+
+   type RF_STATUS_RFPLLLOCK_Field is
+     (Not_Locked,
+      Locked)
+     with Size => 1;
+   --  RF PLL Lock status.
+
    type RF_STATUS_Type is record
-      CPLLLOCK  : Types.Bits_1 := 0;
-      CPLLLOW   : Types.Bits_1 := 0;
-      CPLLHIGH  : Types.Bits_1 := 0;
-      RFPLLLOCK : Types.Bits_1 := 0;
+      CPLLLOCK  : RF_STATUS_CPLLLOCK_Field  := Not_Locked;
+      CPLLLOW   : RF_STATUS_CPLLLOW_Field   := Not_Low;
+      CPLLHIGH  : RF_STATUS_CPLLHIGH_Field  := Not_High;
+      RFPLLLOCK : RF_STATUS_RFPLLLOCK_Field := Not_Locked;
 
       Reserved  : Types.Bits_4 := 0;
    end record
@@ -2262,9 +2332,14 @@ is
       Reserved  at 0 range 4 .. 7;
    end record;
 
-   -- LDOTUNE sub-register
+   ---------------------------
+   -- LDOTUNE sub-register  --
+   ---------------------------
+
+   type LDOTUNE_Field is new Bits_40;
+
    type LDOTUNE_Type is Record
-      LDOTUNE : Types.Bits_40 := 16#88_8888_8888#;
+      LDOTUNE : LDOTUNE_Field := 16#88_8888_8888#;
    end record
      with Size => 40,
      Bit_Order => System.Low_Order_First,
