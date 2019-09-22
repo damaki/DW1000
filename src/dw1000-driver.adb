@@ -413,7 +413,7 @@ is
    begin
       TX_ANTD.Read (TX_ANTD_Reg);
 
-      Antenna_Delay := To_Antenna_Delay_Time (TX_ANTD_Reg.TX_ANTD);
+      Antenna_Delay := TX_ANTD_Reg.TX_ANTD;
    end Read_Tx_Antenna_Delay;
 
 
@@ -421,8 +421,7 @@ is
    procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
    is
    begin
-      TX_ANTD.Write
-        ( (TX_ANTD => To_Bits_16 (Antenna_Delay)) );
+      TX_ANTD.Write ( (TX_ANTD => Antenna_Delay) );
    end Write_Tx_Antenna_Delay;
 
 

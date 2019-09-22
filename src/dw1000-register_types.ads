@@ -928,7 +928,7 @@ is
    -- TX_ANTD register file
 
    type TX_ANTD_Type is record
-      TX_ANTD : Types.Bits_16;
+      TX_ANTD : System_Time.Antenna_Delay_Time := 0.0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
