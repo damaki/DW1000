@@ -150,6 +150,9 @@ is
    --
    --  The range of this type is 0.0 .. 0.067215385, i.e. the maximum value
    --  is 67.215385 milliseconds.
+   --
+   --  The resolution of this type is 128 system block cycle
+   --  (about 1 microsecond).
 
    type Response_Wait_Timeout_Time is
    delta 512.0 / Chipping_Rate_Hz
@@ -161,7 +164,21 @@ is
    --  The range of this type is 0.0 .. 1.0754615 i.e. the maximum value is
    --  about 1.0754615 seconds.
    --
-   --  The resolution of this type is about 1 microsecond.
+   --  The resolution of this type is 128 system block cycle
+   --  (about 1 microsecond).
+
+   type Sniff_Off_Time is
+   delta 512.0 / Chipping_Rate_Hz
+   range 0.0 .. ((2.0**8 - 1.0) * 512.0) / Chipping_Rate_Hz
+     with Small => 512.0 / Chipping_Rate_Hz,
+     Size => 8;
+   --  Type to represent the SNIFF mode OFF time.
+   --
+   --  The range of this type is 0.0 .. 0.000_262_051 i.e. the maximum value is
+   --  about 0.000_262_051 seconds (about 262 microseconds).
+   --
+   --  The resolution of this type is 128 system block cycle
+   --  (about 1 microsecond).
 
    function To_Bits_40 (Time : in Fine_System_Time) return Bits_40 is
      (Bits_40 (Time / Fine_System_Time (Fine_System_Time'Delta)));

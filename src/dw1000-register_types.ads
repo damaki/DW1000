@@ -1071,9 +1071,13 @@ is
    ----------------------------------------------------------------------------
    -- RX_SNIFF register file
 
+   type RX_SNIFF_SNIFF_ONT_Field is range 0 .. 15
+     with Size => 4;
+   --  SNIFF Mode ON time. This parameter is specified in units of PAC.
+
    type RX_SNIFF_Type is record
-      SNIFF_ONT  : Types.Bits_4  := 0;
-      SNIFF_OFFT : Types.Bits_8  := 0;
+      SNIFF_ONT  : RX_SNIFF_SNIFF_ONT_Field   := 0;
+      SNIFF_OFFT : System_Time.Sniff_Off_Time := 0.0;
 
       Reserved_1 : Types.Bits_4  := 0;
       Reserved_2 : Types.Bits_16 := 0;

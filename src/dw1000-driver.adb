@@ -1330,13 +1330,13 @@ is
    end Start_Rx_Delayed;
 
    procedure Set_Rx_Mode (Mode        : in Rx_Modes;
-                          Rx_On_Time  : in Types.Bits_4;
-                          Rx_Off_Time : in Coarse_System_Time)
+                          Rx_On_Time  : in RX_SNIFF_SNIFF_ONT_Field;
+                          Rx_Off_Time : in Sniff_Off_Time)
    is
    begin
       if Mode = Normal then
          RX_SNIFF.Write (RX_SNIFF_Type'(SNIFF_ONT  => 0,
-                                        SNIFF_OFFT => 0,
+                                        SNIFF_OFFT => 0.0,
                                         Reserved_1 => 0,
                                         Reserved_2 => 0));
 
@@ -1344,7 +1344,7 @@ is
          RX_SNIFF.Write
            (RX_SNIFF_Type'
               (SNIFF_ONT  => Rx_On_Time,
-               SNIFF_OFFT => Bits_8 (To_Bits_40 (Rx_Off_Time) and 16#FF#),
+               SNIFF_OFFT => Rx_Off_Time,
                Reserved_1 => 0,
                Reserved_2 => 0));
       end if;

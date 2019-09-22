@@ -946,13 +946,11 @@ is
    --    * SYS_CTRL
 
    procedure Set_Rx_Mode (Mode        : in Rx_Modes;
-                          Rx_On_Time  : in Types.Bits_4;
-                          Rx_Off_Time : in Coarse_System_Time)
+                          Rx_On_Time  : in RX_SNIFF_SNIFF_ONT_Field;
+                          Rx_Off_Time : in Sniff_Off_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + (Mode, Rx_On_Time, Rx_Off_Time)),
-     Pre =>
-       ((if Mode = Sniff then Rx_Off_Time > 0.0)
-        and Rx_Off_Time < Coarse_System_Time'Delta * (128.0 * 2.0**8));
+     Pre => (if Mode = Sniff then Rx_Off_Time > 0.0);
    --  Enables or disables the receiver sniff mode.
    --
    --  When Mode is set to Normal then when the receiver is turned on (see
