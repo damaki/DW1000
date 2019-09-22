@@ -108,6 +108,8 @@ is
       subtype Denominator_Range is Long_Float
       range 1.0 .. (2.0**12 - 1.0)**2;
 
+      type CIR_PWR_Range is range 0 .. (2**16 - 1) * 2**17;
+
       type RXPACC_Sq_Range is range 0 .. RX_FINFO_RXPACC_Field'Last**2;
 
       N   : Numerator_Range;
@@ -128,7 +130,7 @@ is
       --    * A is 113.77 for a 16 MHz PRF or 121.74 for a 64 MHz PRF
 
       if CIR_PWR /= 0 then
-         N := Long_Float (Bits_33 (CIR_PWR) * 2**17);
+         N := Long_Float (CIR_PWR_Range (CIR_PWR) * 2**17);
 
          pragma Assert (N in Numerator_Range);
       else
