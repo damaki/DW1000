@@ -2352,9 +2352,18 @@ is
    ----------------------------------------------------------------------------
    -- TX_CAL register file
 
-   -- TC_SARC sub-register
+   ---------------------------
+   -- TC_SARC sub-register  --
+   ---------------------------
+
+   type TC_SARC_SAR_CTRL_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Enable or disable the SAR
+
    type TC_SARC_Type is record
-      SAR_CTRL : Types.Bits_1 := 0;
+      SAR_CTRL : TC_SARC_SAR_CTRL_Field := Disabled;
 
       Reserved : Types.Bits_15 := 0;
    end record
@@ -2368,10 +2377,21 @@ is
       Reserved at 0 range 1 .. 15;
    end record;
 
-   -- TC_SARL sub-register
+   ---------------------------
+   -- TC_SARL sub-register  --
+   ---------------------------
+
+   type TC_SARL_SAR_LVBAT_Field is range 0 .. 255
+     with Size => 8;
+   --  Latest SAR reading for Voltage level.
+
+   type TC_SARL_SAR_LTEMP_Field is range 0 .. 255
+     with Size => 8;
+   --  Latest SAR reading for Temperature level.
+
    type TC_SARL_Type is record
-      SAR_LVBAT : Types.Bits_8 := 0;
-      SAR_LTEMP : Types.Bits_8 := 0;
+      SAR_LVBAT : TC_SARL_SAR_LVBAT_Field := 0;
+      SAR_LTEMP : TC_SARL_SAR_LTEMP_Field := 0;
 
       Reserved  : Types.Bits_8 := 0;
    end record
@@ -2386,10 +2406,21 @@ is
       Reserved  at 0 range 16 .. 23;
    end record;
 
-   -- TC_SARW sub-register
+   ---------------------------
+   -- TC_SARW sub-register  --
+   ---------------------------
+
+   type TC_SARW_WVBAT_Field is range 0 .. 255
+     with Size => 8;
+   --  SAR reading of Voltage level taken at last wakeup event.
+
+   type TC_SARW_WTEMP_Field is range 0 .. 255
+     with Size => 8;
+   --  SAR reading of temperature level taken at last wakeup event.
+
    type TC_SARW_Type is record
-      SAR_WVBAT : Types.Bits_8 := 0;
-      SAR_WTEMP : Types.Bits_8 := 0;
+      SAR_WVBAT : TC_SARW_WVBAT_Field := 0;
+      SAR_WTEMP : TC_SARW_WTEMP_Field := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2400,9 +2431,80 @@ is
       SAR_WTEMP at 0 range 8 .. 15;
    end record;
 
-   -- TC_PGDELAY sub-register
+   -------------------------------
+   --  TC_PG_CTRL sub-register  --
+   -------------------------------
+
+   type TC_PG_CTRL_PG_START_Field is
+     (No_Action,
+      Start)
+     with Size => 1;
+   --  Start the pulse generator calibration.
+
+   type TC_PG_CTRL_PG_TMEAS_Field is range 0 .. 15
+     with Size => 4;
+   --  Number of clock cycles over which to run the pulse generator cal counter.
+
+   type TC_PG_CTRL_Type is record
+      PG_START : TC_PG_CTRL_PG_START_Field := No_Action;
+      PG_TMEAS : TC_PG_CTRL_PG_TMEAS_Field := 0;
+
+      Reserved_1 : Bits_1;
+      Reserved_2 : Bits_2;
+   end record
+     with Size => 8,
+     Bit_Order => System.Low_Order_First,
+     Scalar_Storage_Order => System.Low_Order_First;
+
+   for TC_PG_CTRL_Type use record
+      PG_START   at 0 range 0 .. 0;
+
+      Reserved_1 at 0 range 1 .. 1;
+
+      PG_TMEAS   at 0 range 2 .. 5;
+
+      Reserved_2 at 0 range 6 .. 7;
+   end record;
+
+   ---------------------------------
+   --  TC_PG_STATUS sub-register  --
+   ---------------------------------
+
+   type TC_PG_STATUS_DELAY_CNT_Field is range 0 .. 2**12 - 1
+     with Size => 12;
+   --  Reference value required for temperature bandwidth compensation
+
+   type TC_PG_STATUS_Type is record
+      DELAY_CNT : TC_PG_STATUS_DELAY_CNT_Field := 0;
+
+      Reserved : Bits_4;
+   end record
+     with Size => 16,
+     Bit_Order => System.Low_Order_First,
+     Scalar_Storage_Order => System.Low_Order_First;
+
+   for TC_PG_STATUS_Type use record
+      DELAY_CNT at 0 range 0 .. 11;
+
+      Reserved  at 0 range 12 .. 15;
+   end record;
+
+   ------------------------------
+   -- TC_PGDELAY sub-register  --
+   ------------------------------
+
+   type TC_PGDELAY_Field is new Bits_8;
+   --  8-bit configuration register for setting the Pulse Generator Delay value.
+
+   TC_PGDELAY_Channel_1 : constant TC_PGDELAY_Field := 16#C9#;
+   TC_PGDELAY_Channel_2 : constant TC_PGDELAY_Field := 16#C2#;
+   TC_PGDELAY_Channel_3 : constant TC_PGDELAY_Field := 16#C5#;
+   TC_PGDELAY_Channel_4 : constant TC_PGDELAY_Field := 16#95#;
+   TC_PGDELAY_Channel_5 : constant TC_PGDELAY_Field := 16#B5#;
+   TC_PGDELAY_Channel_7 : constant TC_PGDELAY_Field := 16#93#;
+
    type TC_PGDELAY_Type is record
-      TC_PGDELAY : Types.Bits_8;
+      TC_PGDELAY : TC_PGDELAY_Field;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -2412,9 +2514,19 @@ is
       TC_PGDELAY at 0 range 0 .. 7;
    end record;
 
-   -- TC_PGTEST sub-register
+   -----------------------------
+   -- TC_PGTEST sub-register  --
+   -----------------------------
+
+   type TC_PGTEST_Field is new Bits_8;
+   --  8-bit configuration register for use in setting the transmitter into
+   --  continuous wave (CW) mode.
+
+   TC_PGTEST_Normal_Operation : constant TC_PGTEST_Field := 16#00#;
+   TC_PGTEST_Continuous_Wave  : constant TC_PGTEST_Field := 16#13#;
+
    type TC_PGTEST_Type is record
-      TC_PGTEST : Types.Bits_8;
+      TC_PGTEST : TC_PGTEST_Field := TC_PGTEST_Normal_Operation;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,

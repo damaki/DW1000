@@ -145,14 +145,14 @@ is
          PRF_64MHz => AGC_TUNE1_PRF_64MHz);
 
    -- These values for TC_PGDELAY are given by the user manual
-   TC_PGDELAY_Values : constant array (Positive range 1 .. 7) of Bits_8
-     := (1 => 16#C9#,
-         2 => 16#C2#,
-         3 => 16#C5#,
-         4 => 16#95#,
-         5 => 16#C0#,
+   TC_PGDELAY_Values : constant array (Positive range 1 .. 7) of TC_PGDELAY_Field
+     := (1 => TC_PGDELAY_Channel_1,
+         2 => TC_PGDELAY_Channel_2,
+         3 => TC_PGDELAY_Channel_3,
+         4 => TC_PGDELAY_Channel_4,
+         5 => TC_PGDELAY_Channel_5,
          6 => 0,      --  Channel 6 not in Channel_Number
-         7 => 16#93#);
+         7 => TC_PGDELAY_Channel_7);
 
    -- This value for non-standard SFD lengths are given by the user manual
    Non_Standard_SFD_Lengths : constant array (Data_Rates) of Types.Bits_8
