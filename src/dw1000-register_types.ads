@@ -3126,9 +3126,15 @@ is
    ----------------------------------------------------------------------------
    -- LDE_IF register file
 
-   -- LDE_THRESH sub-register
+   ------------------------------
+   -- LDE_THRESH sub-register  --
+   ------------------------------
+
+   type LDE_THRESH_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+
    type LDE_THRESH_Type is record
-      LDE_THRESH : Types.Bits_16;
+      LDE_THRESH : LDE_THRESH_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -3138,10 +3144,21 @@ is
       LDE_THRESH at 0 range 0 .. 15;
    end record;
 
-   -- LDE_CFG1 sub-register
+   ----------------------------
+   -- LDE_CFG1 sub-register  --
+   ----------------------------
+
+   type LDE_CFG1_NTM_Field is range 0 .. 31
+     with Size => 5;
+   --  Noise Threshold Multiplier.
+
+   type LDE_CFG1_PMULT_Field is range 0 .. 7
+     with Size => 3;
+   --  Peak Multiplier.
+
    type LDE_CFG1_Type is record
-      NTM   : Types.Bits_5 := 2#0_1100#;
-      PMULT : Types.Bits_3 := 2#011#;
+      NTM   : LDE_CFG1_NTM_Field   := 12;
+      PMULT : LDE_CFG1_PMULT_Field := 3;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -3152,9 +3169,15 @@ is
       PMULT at 0 range 5 .. 7;
    end record;
 
-   -- LDE_PPINDX sub-register
+   ------------------------------
+   -- LDE_PPINDX sub-register  --
+   ------------------------------
+
+   type LDE_PPINDX_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+
    type LDE_PPINDX_Type is record
-      LDE_PPINDX : Types.Bits_16;
+      LDE_PPINDX : LDE_PPINDX_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -3164,9 +3187,15 @@ is
       LDE_PPINDX at 0 range 0 .. 15;
    end record;
 
-   -- LDE_PPAMPL sub-register
+   ------------------------------
+   -- LDE_PPAMPL sub-register  --
+   ------------------------------
+
+   type LDE_PPAMLP_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+
    type LDE_PPAMPL_Type is record
-      LDE_PPAMPL : Types.Bits_16;
+      LDE_PPAMPL : LDE_PPAMLP_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -3176,9 +3205,12 @@ is
       LDE_PPAMPL at 0 range 0 .. 15;
    end record;
 
-   -- LDE_RXANTD sub-register
+   ------------------------------
+   -- LDE_RXANTD sub-register  --
+   ------------------------------
+
    type LDE_RXANTD_Type is record
-      LDE_RXANTD : Types.Bits_16;
+      LDE_RXANTD : System_Time.Antenna_Delay_Time;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -3188,9 +3220,17 @@ is
       LDE_RXANTD at 0 range 0 .. 15;
    end record;
 
-   -- LDE_CFG2 sub-register
+   ----------------------------
+   -- LDE_CFG2 sub-register  --
+   ----------------------------
+
+   type LDE_CFG2_Field is new Bits_16;
+
+   LDE_CFG2_16MHz : constant LDE_CFG2_Field := 16#1607#;
+   LDE_CFG2_64MHz : constant LDE_CFG2_Field := 16#0607#;
+
    type LDE_CFG2_Type is record
-      LDE_CFG2 : Types.Bits_16;
+      LDE_CFG2 : LDE_CFG2_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -3200,9 +3240,39 @@ is
       LDE_CFG2 at 0 range 0 .. 15;
    end record;
 
-   -- LDE_REPC sub-register
+   ----------------------------
+   -- LDE_REPC sub-register  --
+   ----------------------------
+
+   type LDE_REPC_Field is new Bits_16;
+
+   LDE_REPC_PCODE_1  : constant LDE_REPC_Field := 16#5998#;
+   LDE_REPC_PCODE_2  : constant LDE_REPC_Field := 16#5998#;
+   LDE_REPC_PCODE_3  : constant LDE_REPC_Field := 16#51EA#;
+   LDE_REPC_PCODE_4  : constant LDE_REPC_Field := 16#428E#;
+   LDE_REPC_PCODE_5  : constant LDE_REPC_Field := 16#451E#;
+   LDE_REPC_PCODE_6  : constant LDE_REPC_Field := 16#2E14#;
+   LDE_REPC_PCODE_7  : constant LDE_REPC_Field := 16#8000#;
+   LDE_REPC_PCODE_8  : constant LDE_REPC_Field := 16#51EA#;
+   LDE_REPC_PCODE_9  : constant LDE_REPC_Field := 16#28F4#;
+   LDE_REPC_PCODE_10 : constant LDE_REPC_Field := 16#3332#;
+   LDE_REPC_PCODE_11 : constant LDE_REPC_Field := 16#3AE0#;
+   LDE_REPC_PCODE_12 : constant LDE_REPC_Field := 16#3D70#;
+   LDE_REPC_PCODE_13 : constant LDE_REPC_Field := 16#3AE0#;
+   LDE_REPC_PCODE_14 : constant LDE_REPC_Field := 16#35C2#;
+   LDE_REPC_PCODE_15 : constant LDE_REPC_Field := 16#2B84#;
+   LDE_REPC_PCODE_16 : constant LDE_REPC_Field := 16#35C2#;
+   LDE_REPC_PCODE_17 : constant LDE_REPC_Field := 16#3332#;
+   LDE_REPC_PCODE_18 : constant LDE_REPC_Field := 16#35C2#;
+   LDE_REPC_PCODE_19 : constant LDE_REPC_Field := 16#35C2#;
+   LDE_REPC_PCODE_20 : constant LDE_REPC_Field := 16#47AE#;
+   LDE_REPC_PCODE_21 : constant LDE_REPC_Field := 16#3AE0#;
+   LDE_REPC_PCODE_22 : constant LDE_REPC_Field := 16#3850#;
+   LDE_REPC_PCODE_23 : constant LDE_REPC_Field := 16#30A2#;
+   LDE_REPC_PCODE_24 : constant LDE_REPC_Field := 16#3850#;
+
    type LDE_REPC_Type is record
-      LDE_REPC : Types.Bits_16;
+      LDE_REPC : LDE_REPC_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,

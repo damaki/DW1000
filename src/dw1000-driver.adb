@@ -37,36 +37,36 @@ is
          PMULT => 3);
 
    -- These values for LDE_CFG2 are given by the user manual
-   LDE_CFG2_Values : constant array (PRF_Type) of Types.Bits_16
-     := (PRF_16MHz => 16#1607#,
-         PRF_64MHz => 16#0607#);
+   LDE_CFG2_Values : constant array (PRF_Type) of LDE_CFG2_Field
+     := (PRF_16MHz => LDE_CFG2_16MHz,
+         PRF_64MHz => LDE_CFG2_64MHz);
 
    LDE_Replica_Coeffs : constant
-     array (Preamble_Code_Number) of Bits_16
-       := (1  => Bits_16 (0.35 * 2**16),
-           2  => Bits_16 (0.35 * 2**16),
-           3  => Bits_16 (0.32 * 2**16),
-           4  => Bits_16 (0.26 * 2**16),
-           5  => Bits_16 (0.27 * 2**16),
-           6  => Bits_16 (0.18 * 2**16),
-           7  => Bits_16 (0.50 * 2**16),
-           8  => Bits_16 (0.32 * 2**16),
-           9  => Bits_16 (0.16 * 2**16),
-           10 => Bits_16 (0.20 * 2**16),
-           11 => Bits_16 (0.23 * 2**16),
-           12 => Bits_16 (0.24 * 2**16),
-           13 => Bits_16 (0.23 * 2**16),
-           14 => Bits_16 (0.21 * 2**16),
-           15 => Bits_16 (0.27 * 2**16),
-           16 => Bits_16 (0.21 * 2**16),
-           17 => Bits_16 (0.20 * 2**16),
-           18 => Bits_16 (0.21 * 2**16),
-           19 => Bits_16 (0.21 * 2**16),
-           20 => Bits_16 (0.28 * 2**16),
-           21 => Bits_16 (0.23 * 2**16),
-           22 => Bits_16 (0.22 * 2**16),
-           23 => Bits_16 (0.19 * 2**16),
-           24 => Bits_16 (0.22 * 2**16));
+     array (Preamble_Code_Number) of LDE_REPC_Field
+       := (1  => LDE_REPC_Field (0.35 * 2**16),
+           2  => LDE_REPC_Field (0.35 * 2**16),
+           3  => LDE_REPC_Field (0.32 * 2**16),
+           4  => LDE_REPC_Field (0.26 * 2**16),
+           5  => LDE_REPC_Field (0.27 * 2**16),
+           6  => LDE_REPC_Field (0.18 * 2**16),
+           7  => LDE_REPC_Field (0.50 * 2**16),
+           8  => LDE_REPC_Field (0.32 * 2**16),
+           9  => LDE_REPC_Field (0.16 * 2**16),
+           10 => LDE_REPC_Field (0.20 * 2**16),
+           11 => LDE_REPC_Field (0.23 * 2**16),
+           12 => LDE_REPC_Field (0.24 * 2**16),
+           13 => LDE_REPC_Field (0.23 * 2**16),
+           14 => LDE_REPC_Field (0.21 * 2**16),
+           15 => LDE_REPC_Field (0.27 * 2**16),
+           16 => LDE_REPC_Field (0.21 * 2**16),
+           17 => LDE_REPC_Field (0.20 * 2**16),
+           18 => LDE_REPC_Field (0.21 * 2**16),
+           19 => LDE_REPC_Field (0.21 * 2**16),
+           20 => LDE_REPC_Field (0.28 * 2**16),
+           21 => LDE_REPC_Field (0.23 * 2**16),
+           22 => LDE_REPC_Field (0.22 * 2**16),
+           23 => LDE_REPC_Field (0.19 * 2**16),
+           24 => LDE_REPC_Field (0.22 * 2**16));
 
    -- These values for FS_PLLCFG are given by the user manual
    FS_PLLCFG_Values : constant array (Positive range 1 .. 7) of FS_PLLCFG_Field
@@ -422,7 +422,7 @@ is
    begin
       LDE_RXANTD.Read (LDE_RXANTD_Reg);
 
-      Antenna_Delay := To_Antenna_Delay_Time (LDE_RXANTD_Reg.LDE_RXANTD);
+      Antenna_Delay := LDE_RXANTD_Reg.LDE_RXANTD;
    end Read_Rx_Antenna_Delay;
 
 
@@ -430,7 +430,7 @@ is
    procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
    is
    begin
-      LDE_RXANTD.Write ( (LDE_RXANTD => To_Bits_16 (Antenna_Delay)) );
+      LDE_RXANTD.Write ( (LDE_RXANTD => Antenna_Delay) );
    end Write_Rx_Antenna_Delay;
 
 
@@ -438,7 +438,7 @@ is
                             Rx_Preamble_Code : in Preamble_Code_Number;
                             Data_Rate        : in Data_Rates)
    is
-      REPC_Coeff : Bits_16;
+      REPC_Coeff : LDE_REPC_Field;
 
    begin
       LDE_CFG1.Write (LDE_CFG1_Value);
