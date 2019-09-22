@@ -1099,7 +1099,7 @@ is
 
    begin
       RX_TIME.Read (RX_TIME_Reg);
-      Timestamp := To_Fine_System_Time (RX_TIME_Reg.RX_STAMP);
+      Timestamp := RX_TIME_Reg.RX_STAMP;
    end Read_Rx_Adjusted_Timestamp;
 
 
@@ -1109,7 +1109,7 @@ is
 
    begin
       RX_TIME.Read (RX_TIME_Reg);
-      Timestamp := To_Coarse_System_Time (RX_TIME_Reg.RX_RAWST);
+      Timestamp := RX_TIME_Reg.RX_RAWST;
    end Read_Rx_Raw_Timestamp;
 
 
@@ -1120,8 +1120,8 @@ is
 
    begin
       RX_TIME.Read (RX_TIME_Reg);
-      Adjusted := To_Fine_System_Time (RX_TIME_Reg.RX_STAMP);
-      Raw      := To_Coarse_System_Time (RX_TIME_Reg.RX_RAWST);
+      Adjusted := RX_TIME_Reg.RX_STAMP;
+      Raw      := RX_TIME_Reg.RX_RAWST;
    end Read_Rx_Timestamps;
 
 

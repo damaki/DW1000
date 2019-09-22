@@ -174,7 +174,7 @@ is
 
 
    function First_Path_Signal_Power (Use_16MHz_PRF : in Boolean;
-                                     F1            : in Bits_16;
+                                     F1            : in RX_TIME_FP_AMPL1_Field;
                                      F2            : in RX_FQUAL_FP_AMPL2_Field;
                                      F3            : in RX_FQUAL_FP_AMPL3_Field;
                                      RXPACC        : in RX_FINFO_RXPACC_Field)

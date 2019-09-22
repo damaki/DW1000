@@ -35,10 +35,7 @@ is
    Default_SFD_Timeout : constant DW1000.Driver.SFD_Timeout_Number := 16#1041#;
 
    Null_Frame_Info : constant Frame_Info_Type
-     := (RX_TIME_Reg      => (RX_STAMP => 0,
-                              FP_INDEX => 0,
-                              FP_AMPL1 => 0,
-                              RX_RAWST => 0),
+     := (RX_TIME_Reg      => (others   => <>),
          RX_FINFO_Reg     => (others   => <>),
          RX_FQUAL_Reg     => (STD_NOISE => 0,
                               FP_AMPL2  => 0,
@@ -62,7 +59,7 @@ is
                                return Fine_System_Time
    is
    begin
-      return To_Fine_System_Time (Frame_Info.RX_TIME_Reg.RX_STAMP);
+      return Frame_Info.RX_TIME_Reg.RX_STAMP;
    end Receive_Timestamp;
 
    ----------------------------

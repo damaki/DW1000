@@ -883,11 +883,19 @@ is
    ----------------------------------------------------------------------------
    -- RX_TIME register file
 
+   type RX_TIME_FP_INDEX_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  First path index.
+
+   type RX_TIME_FP_AMPL1_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  First Path Amplitude point 1.
+
    type RX_TIME_Type is record
-      RX_STAMP : Types.Bits_40 := 0;
-      FP_INDEX : Types.Bits_16 := 0;
-      FP_AMPL1 : Types.Bits_16 := 0;
-      RX_RAWST : Types.Bits_40 := 0;
+      RX_STAMP : System_Time.Fine_System_Time   := 0.0;
+      FP_INDEX : RX_TIME_FP_INDEX_Field         := 0;
+      FP_AMPL1 : RX_TIME_FP_AMPL1_Field         := 0;
+      RX_RAWST : System_Time.Coarse_System_Time := 0.0;
    end record
      with Size => 8*14,
      Bit_Order => System.Low_Order_First,
