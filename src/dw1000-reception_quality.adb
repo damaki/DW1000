@@ -30,7 +30,7 @@ is
 
 
    function Adjust_RXPACC (RXPACC              : in RX_FINFO_RXPACC_Field;
-                           RXPACC_NOSAT        : in Bits_16;
+                           RXPACC_NOSAT        : in RXPACC_NOSAT_Field;
                            RXBR                : in RX_FINFO_RXBR_Field;
                            SFD_LENGTH          : in Bits_8;
                            Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field
@@ -38,7 +38,7 @@ is
       RXPACC_Adjustment : RX_FINFO_RXPACC_Field;
 
    begin
-      if Bits_16 (RXPACC) = RXPACC_NOSAT then
+      if RXPACC_NOSAT_Field (RXPACC) = RXPACC_NOSAT then
          if Non_Standard_SFD then
             --  DecaWave-defined SFD sequence is used
             if RXBR = Data_Rate_110K then

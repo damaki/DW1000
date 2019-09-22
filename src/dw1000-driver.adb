@@ -114,39 +114,30 @@ is
          6      => 0);
 
    -- These values for DRX_TUNE0b are given by the user manual
-   DRX_TUNE0b_Values : constant array (Data_Rates, Boolean) of Types.Bits_16
-     := (Data_Rate_110k =>
-           (False => 16#000A#, -- standard SFD
-            True  => 16#0016#),-- non-standard SFD
-         Data_Rate_850k =>
-           (False => 16#0001#, -- standard SFD
-            True  => 16#0006#),-- non-standard SFD
-         Data_Rate_6M8  =>
-           (False => 16#0001#, -- standard SFD
-            True  => 16#0002#) -- non-standard SFD
-        );
+   DRX_TUNE0b_Values : constant array (Data_Rates, Boolean) of DRX_TUNE0b_Field
+     := (Data_Rate_110k => (False => DRX_TUNE0b_110K_STD,
+                            True  => DRX_TUNE0b_110K_Non_STD),
+         Data_Rate_850k => (False => DRX_TUNE0b_850K_STD,
+                            True  => DRX_TUNE0b_850K_Non_STD),
+         Data_Rate_6M8  => (False => DRX_TUNE0b_6M8_STD,
+                            True  => DRX_TUNE0b_6M8_Non_STD));
 
    -- These values for DRX_TUNE1a are given by the user manual
-   DRX_TUNE1a_Values : constant array (PRF_Type) of Types.Bits_16
-     := (PRF_16MHz => 16#0087#,
-         PRF_64MHz => 16#008D#);
+   DRX_TUNE1a_Values : constant array (PRF_Type) of DRX_TUNE1a_Field
+     := (PRF_16MHz => DRX_TUNE1a_16MHz,
+         PRF_64MHz => DRX_TUNE1a_64MHz);
 
    -- These values for DRX_TUNE2 are given by the user manual
    DRX_TUNE2_Values : constant array (Preamble_Acq_Chunk_Length,
-                                      PRF_Type) of Types.Bits_32
-     := (PAC_8  =>
-           (PRF_16MHz => 16#311A002D#,
-            PRF_64MHz => 16#313B006B#),
-         PAC_16 =>
-           (PRF_16MHz => 16#331A0052#,
-            PRF_64MHz => 16#333B00BE#),
-         PAC_32 =>
-           (PRF_16MHz => 16#351A009A#,
-            PRF_64MHz => 16#353B015E#),
-         PAC_64 =>
-           (PRF_16MHz => 16#371A011D#,
-            PRF_64MHz => 16#373B0296#)
-        );
+                                      PRF_Type) of DRX_TUNE2_Field
+     := (PAC_8  => (PRF_16MHz => DRX_TUNE2_PAC8_16MHz,
+                    PRF_64MHz => DRX_TUNE2_PAC8_64MHz),
+         PAC_16 => (PRF_16MHz => DRX_TUNE2_PAC16_16MHz,
+                    PRF_64MHz => DRX_TUNE2_PAC16_64MHz),
+         PAC_32 => (PRF_16MHz => DRX_TUNE2_PAC32_16MHz,
+                    PRF_64MHz => DRX_TUNE2_PAC32_64MHz),
+         PAC_64 => (PRF_16MHz => DRX_TUNE2_PAC64_16MHz,
+                    PRF_64MHz => DRX_TUNE2_PAC64_64MHz));
 
    -- These values for AGC_TUNE1 are given by the user manual
    AGC_TUNE1_Values : constant array (PRF_Type) of AGC_TUNE1_Field
@@ -435,8 +426,7 @@ is
    procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
    is
    begin
-      LDE_RXANTD.Write
-        ( (LDE_RXANTD => To_Bits_16 (Antenna_Delay)) );
+      LDE_RXANTD.Write ( (LDE_RXANTD => To_Bits_16 (Antenna_Delay)) );
    end Write_Rx_Antenna_Delay;
 
 
@@ -454,14 +444,10 @@ is
 
       if Data_Rate = Data_Rate_110k then
          --  110 k data rate has special handling
-         LDE_REPC.Write
-           (LDE_REPC_Type'
-              (LDE_REPC => REPC_Coeff / 8));
+         LDE_REPC.Write ( (LDE_REPC => REPC_Coeff / 8) );
 
       else
-         LDE_REPC.Write
-           (LDE_REPC_Type'
-              (LDE_REPC => REPC_Coeff));
+         LDE_REPC.Write ( (LDE_REPC => REPC_Coeff) );
       end if;
 
    end Configure_LDE;
@@ -469,26 +455,16 @@ is
    procedure Configure_PLL (Channel : in Channel_Number)
    is
    begin
-      FS_PLLCFG.Write ( (FS_PLLCFG => FS_PLLCFG_Values (Positive (Channel))) );
-
-      FS_PLLTUNE.Write
-        ( (FS_PLLTUNE => FS_PLLTUNE_Values (Positive (Channel))) );
-
+      FS_PLLCFG.Write  ( (FS_PLLCFG  => FS_PLLCFG_Values  (Positive (Channel))) );
+      FS_PLLTUNE.Write ( (FS_PLLTUNE => FS_PLLTUNE_Values (Positive (Channel))) );
       FS_XTALT.Write (FS_XTALT_Value);
    end Configure_PLL;
 
    procedure Configure_RF (Channel : in Channel_Number)
    is
    begin
-      RF_RXCTRLH.Write
-        (RF_RXCTRLH_Type'
-           (RF_RXCTRLH => RF_RXCTRLH_Values (Positive (Channel)))
-        );
-
-      RF_TXCTRL.Write
-        (RF_TXCTRL_Type'
-           (RF_TXCTRL => RF_TXCTRL_Values (Positive (Channel)))
-        );
+      RF_RXCTRLH.Write ( (RF_RXCTRLH => RF_RXCTRLH_Values (Positive (Channel))) );
+      RF_TXCTRL.Write  ( (RF_TXCTRL  => RF_TXCTRL_Values (Positive (Channel))) );
 
    end Configure_RF;
 
@@ -500,53 +476,23 @@ is
                             Nonstandard_SFD    : in Boolean)
    is
    begin
-      DRX_TUNE0b.Write
-        (DRX_TUNE0b_Type'
-           (DRX_TUNE0b => DRX_TUNE0b_Values (Data_Rate, Nonstandard_SFD))
-        );
-
-      DRX_TUNE1a.Write
-        (DRX_TUNE1a_Type'
-           (DRX_TUNE1a => DRX_TUNE1a_Values (PRF))
-        );
+      DRX_TUNE0b.Write ( (DRX_TUNE0b => DRX_TUNE0b_Values (Data_Rate,
+                                                           Nonstandard_SFD)) );
+      DRX_TUNE1a.Write ( (DRX_TUNE1a => DRX_TUNE1a_Values (PRF)) );
 
       if Data_Rate = Data_Rate_110k then
-         DRX_TUNE1b.Write
-           (DRX_TUNE1b_Type'
-              (DRX_TUNE1b => 16#0064#)
-           );
+         DRX_TUNE1b.Write ( (DRX_TUNE1b => DRX_TUNE1b_110K) );
 
       elsif Tx_Preamble_Length = PLEN_64 then
-         DRX_TUNE1b.Write
-           (DRX_TUNE1b_Type'
-              (DRX_TUNE1b => 16#0010#)
-           );
-
-         DRX_TUNE4H.Write
-           (DRX_TUNE4H_Type'
-              (DRX_TUNE4H => 16#0010#)
-           );
+         DRX_TUNE1b.Write ( (DRX_TUNE1b => DRX_TUNE1b_6M8) );
+         DRX_TUNE4H.Write ( (DRX_TUNE4H => DRX_TUNE4H_Preamble_64) );
       else
-         DRX_TUNE1b.Write
-           (DRX_TUNE1b_Type'
-              (DRX_TUNE1b => 16#0020#)
-           );
-
-         DRX_TUNE4H.Write
-           (DRX_TUNE4H_Type'
-              (DRX_TUNE4H => 16#0028#)
-           );
+         DRX_TUNE1b.Write ( (DRX_TUNE1b => DRX_TUNE1b_850K_6M8) );
+         DRX_TUNE4H.Write ( (DRX_TUNE4H => DRX_TUNE4H_Others) );
       end if;
 
-      DRX_TUNE2.Write
-        (DRX_TUNE2_Type'
-           (DRX_TUNE2 => DRX_TUNE2_Values (PAC, PRF))
-        );
-
-      DRX_SFDTOC.Write
-        (DRX_SFDTOC_Type'
-           (DRX_SFDTOC => Types.Bits_16 (SFD_Timeout))
-        );
+      DRX_TUNE2.Write  ( (DRX_TUNE2  => DRX_TUNE2_Values (PAC, PRF)) );
+      DRX_SFDTOC.Write ( (DRX_SFDTOC => DRX_SFDTOC_Field (SFD_Timeout)) );
    end Configure_DRX;
 
 
@@ -554,20 +500,9 @@ is
    is
    begin
 
-      AGC_TUNE2.Write
-        (AGC_TUNE2_Type'
-           (AGC_TUNE2 => AGC_TUNE2_Value)
-        );
-
-      AGC_TUNE1.Write
-        (AGC_TUNE1_Type'
-           (AGC_TUNE1 => AGC_TUNE1_Values (PRF))
-        );
-
-      AGC_TUNE3.Write
-        (AGC_TUNE3_Type'
-           (AGC_TUNE3 => AGC_TUNE3_Value)
-        );
+      AGC_TUNE2.Write ( (AGC_TUNE2 => AGC_TUNE2_Value) );
+      AGC_TUNE1.Write ( (AGC_TUNE1 => AGC_TUNE1_Values (PRF)) );
+      AGC_TUNE3.Write ( (AGC_TUNE3 => AGC_TUNE3_Value) );
 
    end Configure_AGC;
 
@@ -1320,7 +1255,7 @@ is
    procedure Set_Preamble_Detect_Timeout (Timeout : in Types.Bits_16)
    is
    begin
-      DRX_PRETOC.Write ( (DRX_PRETOC => Timeout) );
+      DRX_PRETOC.Write ( (DRX_PRETOC => DRX_PRETOC_Field (Timeout)) );
    end Set_Preamble_Detect_Timeout;
 
    procedure Calibrate_Sleep_Count

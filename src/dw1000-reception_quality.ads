@@ -30,7 +30,7 @@ with SPARK_Mode => On
 is
 
    function Adjust_RXPACC (RXPACC              : in RX_FINFO_RXPACC_Field;
-                           RXPACC_NOSAT        : in Bits_16;
+                           RXPACC_NOSAT        : in RXPACC_NOSAT_Field;
                            RXBR                : in RX_FINFO_RXBR_Field;
                            SFD_LENGTH          : in Bits_8;
                            Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field

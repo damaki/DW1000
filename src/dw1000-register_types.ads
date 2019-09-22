@@ -2016,9 +2016,21 @@ is
    ----------------------------------------------------------------------------
    -- DRX_CONF register file
 
-   -- DRX_TUNE0b sub-register
+   ------------------------------
+   -- DRX_TUNE0b sub-register  --
+   ------------------------------
+
+   type DRX_TUNE0b_Field is new Bits_16;
+
+   DRX_TUNE0b_110K_STD     : constant DRX_TUNE0b_Field := 16#000A#;
+   DRX_TUNE0b_110K_Non_STD : constant DRX_TUNE0b_Field := 16#0016#;
+   DRX_TUNE0b_850K_STD     : constant DRX_TUNE0b_Field := 16#0001#;
+   DRX_TUNE0b_850K_Non_STD : constant DRX_TUNE0b_Field := 16#0006#;
+   DRX_TUNE0b_6M8_STD      : constant DRX_TUNE0b_Field := 16#0001#;
+   DRX_TUNE0b_6M8_Non_STD  : constant DRX_TUNE0b_Field := 16#0002#;
+
    type DRX_TUNE0b_Type is record
-      DRX_TUNE0b : Types.Bits_16;
+      DRX_TUNE0b : DRX_TUNE0b_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2028,9 +2040,17 @@ is
       DRX_TUNE0b at 0 range 0 .. 15;
    end record;
 
-   -- DRX_TUNE1a sub-register
+   ------------------------------
+   -- DRX_TUNE1a sub-register  --
+   ------------------------------
+
+   type DRX_TUNE1a_Field is new Bits_16;
+
+   DRX_TUNE1a_16MHz : constant DRX_TUNE1a_Field := 16#0087#;
+   DRX_TUNE1a_64MHz : constant DRX_TUNE1a_Field := 16#008D#;
+
    type DRX_TUNE1a_Type is record
-      DRX_TUNE1a : Types.Bits_16;
+      DRX_TUNE1a : DRX_TUNE1a_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2040,9 +2060,23 @@ is
       DRX_TUNE1a at 0 range 0 .. 15;
    end record;
 
-   -- DRX_TUNE1b sub-register
+   ------------------------------
+   -- DRX_TUNE1b sub-register  --
+   ------------------------------
+
+   type DRX_TUNE1b_Field is new Bits_16;
+
+   DRX_TUNE1b_110K     : constant DRX_TUNE1b_Field := 16#0064#;
+   --  Preamble lengths > 1024 symbols, for 110 kbps operation
+
+   DRX_TUNE1b_850K_6M8 : constant DRX_TUNE1b_Field := 16#0020#;
+   -- Preamble lengths 128 to 1024 symbols, for 850 kbps and 6.8 Mbps operation
+
+   DRX_TUNE1b_6M8      : constant DRX_TUNE1b_Field := 16#0010#;
+   --  Preamble length = 64 symbols, for 6.8 Mbps operation
+
    type DRX_TUNE1b_Type is record
-      DRX_TUNE1b : Types.Bits_16;
+      DRX_TUNE1b : DRX_TUNE1b_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2052,9 +2086,23 @@ is
       DRX_TUNE1b at 0 range 0 .. 15;
    end record;
 
-   -- DRX_TUNE2 sub-register
+   ------------------------------
+   -- DRX_TUNE2 sub-register  --
+   ------------------------------
+
+   type DRX_TUNE2_Field is new Bits_32;
+
+   DRX_TUNE2_PAC8_16MHz  : constant DRX_TUNE2_Field := 16#311A002D#;
+   DRX_TUNE2_PAC8_64MHz  : constant DRX_TUNE2_Field := 16#313B006B#;
+   DRX_TUNE2_PAC16_16MHz : constant DRX_TUNE2_Field := 16#331A0052#;
+   DRX_TUNE2_PAC16_64MHz : constant DRX_TUNE2_Field := 16#333B00BE#;
+   DRX_TUNE2_PAC32_16MHz : constant DRX_TUNE2_Field := 16#351A009A#;
+   DRX_TUNE2_PAC32_64MHz : constant DRX_TUNE2_Field := 16#353B015E#;
+   DRX_TUNE2_PAC64_16MHz : constant DRX_TUNE2_Field := 16#371A011D#;
+   DRX_TUNE2_PAC64_64MHz : constant DRX_TUNE2_Field := 16#373B0296#;
+
    type DRX_TUNE2_Type is record
-      DRX_TUNE2 : Types.Bits_32;
+      DRX_TUNE2 : DRX_TUNE2_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -2064,9 +2112,16 @@ is
       DRX_TUNE2 at 0 range 0 .. 31;
    end record;
 
-   -- DRX_SFDTOC sub-register
+   ------------------------------
+   -- DRX_SFDTOC sub-register  --
+   ------------------------------
+
+   type DRX_SFDTOC_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  SFD detection timeout count (in units of preamble symbols)
+
    type DRX_SFDTOC_Type is record
-      DRX_SFDTOC : Types.Bits_16;
+      DRX_SFDTOC : DRX_SFDTOC_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2076,9 +2131,16 @@ is
       DRX_SFDTOC at 0 range 0 .. 15;
    end record;
 
-   -- DRX_PRETOC sub-register
+   ------------------------------
+   -- DRX_PRETOC sub-register  --
+   ------------------------------
+
+   type DRX_PRETOC_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  Preamble detection timeout count (in units of PAC size symbols)
+
    type DRX_PRETOC_Type is record
-      DRX_PRETOC : Types.Bits_16;
+      DRX_PRETOC : DRX_PRETOC_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2088,9 +2150,17 @@ is
       DRX_PRETOC at 0 range 0 .. 15;
    end record;
 
-   -- DRX_TUNE4H sub-register
+   ------------------------------
+   -- DRX_TUNE4H sub-register  --
+   ------------------------------
+
+   type DRX_TUNE4H_Field is new Bits_16;
+
+   DRX_TUNE4H_Preamble_64 : constant DRX_TUNE4H_Field := 16#0010#; --  64
+   DRX_TUNE4H_Others      : constant DRX_TUNE4H_Field := 16#0028#; --  128 or greater
+
    type DRX_TUNE4H_Type is record
-      DRX_TUNE4H : Types.Bits_16;
+      DRX_TUNE4H : DRX_TUNE4H_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2100,9 +2170,15 @@ is
       DRX_TUNE4H at 0 range 0 .. 15;
    end record;
 
-   -- RXPACC_NOSAT sub-register
+   --------------------------------
+   -- RXPACC_NOSAT sub-register  --
+   --------------------------------
+
+   type RXPACC_NOSAT_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+
    type RXPACC_NOSAT_Type is record
-      RXPACC_NOSAT : Types.Bits_16;
+      RXPACC_NOSAT : RXPACC_NOSAT_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
