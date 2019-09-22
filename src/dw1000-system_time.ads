@@ -180,6 +180,31 @@ is
    --  The resolution of this type is 128 system block cycle
    --  (about 1 microsecond).
 
+   type Snooze_Time is
+   delta 1.0 / 37_500.0
+   range 0.0 .. (2.0**8 - 1.0) / 37_500.0
+     with Small => 1.0 / 37_500.0,
+     Size => 8;
+   --  Type to represent the snooze time (in seconds).
+   --
+   --  This represents the upper 8 bits of a 17-bit timer clocked from the
+   --  19.2 MHz XTI internal clock. This means that this snooze time value
+   --  is in units of 37.5 KHz, i.e. about 26.7 microseconds.
+   --
+   --  The maximum value of this type is 0.0068 (6.8 milliseconds).
+
+   type Blink_Time is
+   delta 0.014
+   range 0.0 .. (2.0**8 - 1.0) * 0.014
+     with Small => 0.014,
+     Size => 8;
+   --  Type to represent the LED blink time (in seconds).
+   --
+   --  This is in units of 14 milliseconds, so a value of 0.4 will give a
+   --  blink time of 400 ms followed by an off blink of 400 ms.
+   --
+   --  The maximum value of this type is 3.57 seconds.
+
    function To_Bits_40 (Time : in Fine_System_Time) return Bits_40 is
      (Bits_40 (Time / Fine_System_Time (Fine_System_Time'Delta)));
    --  Convert a Fine_System_Time value to its equivalent Bits_40

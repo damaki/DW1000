@@ -3285,10 +3285,25 @@ is
    ----------------------------------------------------------------------------
    -- DIG_DIAG register file
 
-   -- EVC_CTRL sub-register
+   ----------------------------
+   -- EVC_CTRL sub-register  --
+   ----------------------------
+
+   type EVC_CTRL_EVC_EN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Event Counters Enable.
+
+   type EVC_CTRL_EVC_CLR_Field is
+     (No_action,
+      Clear_Counters)
+     with Size => 1;
+   --  Event Counters Clear.
+
    type EVC_CTRL_Type is record
-      EVC_EN  : Types.Bits_1   := 0;
-      EVC_CLR : Types.Bits_1   := 0;
+      EVC_EN  : EVC_CTRL_EVC_EN_Field  := Disabled;
+      EVC_CLR : EVC_CTRL_EVC_CLR_Field := No_Action;
 
       Reserved : Types.Bits_30 := 0;
    end record
@@ -3303,9 +3318,16 @@ is
       Reserved at 0 range 2 .. 31;
    end record;
 
-   -- EVC_PHE sub-register
+   ---------------------------
+   -- EVC_PHE sub-register  --
+   ---------------------------
+
+   type EVC_Counter_Field is range 0 .. 2**12 - 1
+     with Size => 12;
+   --  Event counter field
+
    type EVC_PHE_Type is record
-      EVC_PHE : Types.Bits_12 := 0;
+      EVC_PHE : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3319,9 +3341,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_RSE sub-register
+   ---------------------------
+   -- EVC_RSE sub-register  --
+   ---------------------------
+
    type EVC_RSE_Type is record
-      EVC_RSE : Types.Bits_12 := 0;
+      EVC_RSE : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3335,9 +3360,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_FCG sub-register
+   ---------------------------
+   -- EVC_FCG sub-register  --
+   ---------------------------
+
    type EVC_FCG_Type is record
-      EVC_FCG : Types.Bits_12 := 0;
+      EVC_FCG : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3351,9 +3379,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_FCE sub-register
+   ---------------------------
+   -- EVC_FCE sub-register  --
+   ---------------------------
+
    type EVC_FCE_Type is record
-      EVC_FCE : Types.Bits_12 := 0;
+      EVC_FCE : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3367,9 +3398,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_FFR sub-register
+   ---------------------------
+   -- EVC_FFR sub-register  --
+   ---------------------------
+
    type EVC_FFR_Type is record
-      EVC_FFR : Types.Bits_12 := 0;
+      EVC_FFR : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3383,9 +3417,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_OVR sub-register
+   ---------------------------
+   -- EVC_OVR sub-register  --
+   ---------------------------
+
    type EVC_OVR_Type is record
-      EVC_OVR : Types.Bits_12 := 0;
+      EVC_OVR : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3399,9 +3436,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_STO sub-register
+   ---------------------------
+   -- EVC_STO sub-register  --
+   ---------------------------
+
    type EVC_STO_Type is record
-      EVC_STO : Types.Bits_12 := 0;
+      EVC_STO : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3415,9 +3455,11 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_PTO sub-register
+   ---------------------------
+   -- EVC_PTO sub-register  --
+   ---------------------------
    type EVC_PTO_Type is record
-      EVC_PTO : Types.Bits_12 := 0;
+      EVC_PTO : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3431,9 +3473,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_FWTO sub-register
+   ----------------------------
+   -- EVC_FWTO sub-register  --
+   ----------------------------
+
    type EVC_FWTO_Type is record
-      EVC_FWTO : Types.Bits_12 := 0;
+      EVC_FWTO : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3447,9 +3492,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_TXFS sub-register
+   ----------------------------
+   -- EVC_TXFS sub-register  --
+   ----------------------------
+
    type EVC_TXFS_Type is record
-      EVC_TXFS : Types.Bits_12 := 0;
+      EVC_TXFS : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3463,9 +3511,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_HPW sub-register
+   ---------------------------
+   -- EVC_HPW sub-register  --
+   ---------------------------
+
    type EVC_HPW_Type is record
-      EVC_HPW : Types.Bits_12 := 0;
+      EVC_HPW : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -3479,9 +3530,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_TPW sub-register
+   ---------------------------
+   -- EVC_TPW sub-register  --
+   ---------------------------
+
    type EVC_TPW_Type is record
-      EVC_TPW : Types.Bits_12;
+      EVC_TPW : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4;
    end record
@@ -3495,9 +3549,18 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- DIAG_TMC sub-register
+   ----------------------------
+   -- DIAG_TMC sub-register  --
+   ----------------------------
+
+   type DIAG_TMC_TX_PSTM_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Transmit Power Spectrum Test Mode.
+
    type DIAG_TMC_Type is record
-      TX_PSTM : Types.Bits_1 := 0;
+      TX_PSTM : DIAG_TMC_TX_PSTM_Field := Disabled;
 
       Reserved_1 : Types.Bits_4  := 0;
       Reserved_2 : Types.Bits_11 := 0;
@@ -3517,67 +3580,202 @@ is
    ----------------------------------------------------------------------------
    -- PMSC register file
 
+   type PMSC_CTRL0_SYSCLKS_Field is
+     (Auto,
+      Force_XTI,
+      Force_PLL,
+      Reserved)
+     with Size => 2;
+   --  System Clock Selection.
+
+   type PMSC_CTRL0_RXCLKS_Field is
+     (Auto,
+      Force_XTI,
+      Force_PLL,
+      Force_Off)
+     with Size => 2;
+   --  Receiver Clock Selection.
+
+   type PMSC_CTRL0_TXCLKS_Field is new PMSC_CTRL0_RXCLKS_Field;
+   --  Transmitter Clock Selection.
+
+   type PMSC_CTRL0_FACE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Force Accumulator Clock Enable.
+
+   type PMSC_CTRL0_ADCCE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  (temperature and voltage) Analog-to-Digital Convertor Clock Enable.
+
+   type PMSC_CTRL0_AMCE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Accumulator Memory Clock Enable.
+
+   type PMSC_CTRL0_GPCE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO clock Enable.
+
+   type PMSC_CTRL0_GPRN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO reset (NOT), active low.
+
+   type PMSC_CTRL0_GPDCE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO De-bounce Clock Enable.
+
+   type PMSC_CTRL0_GPDRN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO de-bounce reset (NOT), active low.
+
+   type PMSC_CTRL0_KHZCLKEN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Kilohertz clock Enable.
+
+   type PMSC_CTRL0_PLL2_SEQ_EN_Field is
+     (Normal,
+      Sniff)
+     with Size => 1;
+
+   type PMSC_CTRL0_SOFTRESET_Field is new Bits_4;
+   --  These four bits reset the IC TX, RX, Host Interface and the PMSC itself,
+   --  essentially allowing a reset of the IC under software control.
+
+   PMSC_CTRL0_SOFTRESET_Reset     : constant PMSC_CTRL0_SOFTRESET_Field := 2#0000#;
+   PMSC_CTRL0_SOFTRESET_Reset_Rx  : constant PMSC_CTRL0_SOFTRESET_Field := 2#0111#;
+   PMSC_CTRL0_SOFTRESET_Set_All   : constant PMSC_CTRL0_SOFTRESET_Field := 2#1111#;
+
    type PMSC_CTRL0_Type is record
-      SYSCLKS   : Types.Bits_2 := 0;
-      RXCLKS    : Types.Bits_2 := 0;
-      TXCLKS    : Types.Bits_2 := 0;
-      FACE      : Types.Bits_1 := 0;
-      ADCCE     : Types.Bits_1 := 0;
-      AMCE      : Types.Bits_1 := 0;
-      GPCE      : Types.Bits_1 := 0;
-      GPRN      : Types.Bits_1 := 0;
-      GPDCE     : Types.Bits_1 := 0;
-      GPDRN     : Types.Bits_1 := 0;
-      KHZCLKEN  : Types.Bits_1 := 0;
-      SOFTRESET : Types.Bits_4 := 2#1111#;
+      SYSCLKS     : PMSC_CTRL0_SYSCLKS_Field     := Auto;
+      RXCLKS      : PMSC_CTRL0_RXCLKS_Field      := Auto;
+      TXCLKS      : PMSC_CTRL0_TXCLKS_Field      := Auto;
+      FACE        : PMSC_CTRL0_FACE_Field        := Disabled;
+      ADCCE       : PMSC_CTRL0_ADCCE_Field       := Disabled;
+      AMCE        : PMSC_CTRL0_AMCE_Field        := Disabled;
+      GPCE        : PMSC_CTRL0_GPCE_Field        := Disabled;
+      GPRN        : PMSC_CTRL0_GPRN_Field        := Disabled;
+      GPDCE       : PMSC_CTRL0_GPDCE_Field       := Disabled;
+      GPDRN       : PMSC_CTRL0_GPDRN_Field       := Disabled;
+      KHZCLKEN    : PMSC_CTRL0_KHZCLKEN_Field    := Disabled;
+      PLL2_SEQ_EN : PMSC_CTRL0_PLL2_SEQ_EN_Field := Normal;
+      SOFTRESET   : PMSC_CTRL0_SOFTRESET_Field   := PMSC_CTRL0_SOFTRESET_Set_All;
 
       Reserved_1 : Types.Bits_3 := 2#100#;
       Reserved_2 : Types.Bits_4 := 0;
       Reserved_3 : Types.Bits_3 := 2#011#;
-      Reserved_4 : Types.Bits_4 := 0;
+      Reserved_4 : Types.Bits_3 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
      Scalar_Storage_Order => System.Low_Order_First;
 
    for PMSC_CTRL0_Type use record
-      SYSCLKS    at 0 range  0 ..  1;
-      RXCLKS     at 0 range  2 ..  3;
-      TXCLKS     at 0 range  4 ..  5;
-      FACE       at 0 range  6 ..  6;
+      SYSCLKS     at 0 range  0 ..  1;
+      RXCLKS      at 0 range  2 ..  3;
+      TXCLKS      at 0 range  4 ..  5;
+      FACE        at 0 range  6 ..  6;
 
-      Reserved_1 at 0 range  7 ..  9;
+      Reserved_1  at 0 range  7 ..  9;
 
-      ADCCE      at 0 range 10 .. 10;
+      ADCCE       at 0 range 10 .. 10;
 
-      Reserved_2 at 0 range 11 .. 14;
+      Reserved_2  at 0 range 11 .. 14;
 
-      AMCE       at 0 range 15 .. 15;
-      GPCE       at 0 range 16 .. 16;
-      GPRN       at 0 range 17 .. 17;
-      GPDCE      at 0 range 18 .. 18;
-      GPDRN      at 0 range 19 .. 19;
+      AMCE        at 0 range 15 .. 15;
+      GPCE        at 0 range 16 .. 16;
+      GPRN        at 0 range 17 .. 17;
+      GPDCE       at 0 range 18 .. 18;
+      GPDRN       at 0 range 19 .. 19;
 
-      Reserved_3 at 0 range 20 .. 22;
+      Reserved_3  at 0 range 20 .. 22;
 
-      KHZCLKEN   at 0 range 23 .. 23;
+      KHZCLKEN    at 0 range 23 .. 23;
+      PLL2_SEQ_EN at 0 range 24 .. 24;
 
-      Reserved_4 at 0 range 24 .. 27;
+      Reserved_4  at 0 range 25 .. 27;
 
-      SOFTRESET  at 0 range 28 .. 31;
+      SOFTRESET   at 0 range 28 .. 31;
    end record;
 
-   -- PMSC_CTRL1 sub-register
+   ------------------------------
+   -- PMSC_CTRL1 sub-register  --
+   ------------------------------
+
+   type PMSC_CTRL1_ARX2INIT_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Automatic transition from receive mode into the INIT state.
+
+   type PMSC_CTRL1_PKTSEQ_Field is new Bits_8;
+
+   PMSC_CTRL1_Disabled : constant PMSC_CTRL1_PKTSEQ_Field := 16#00#;
+   PMSC_CTRL1_Enabled  : constant PMSC_CTRL1_PKTSEQ_Field := 16#E7#;
+
+   type PMSC_CTRL1_ATXSLP_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  After TX automatically Sleep.
+
+   type PMSC_CTRL1_ARXSLP_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  After RX automatically Sleep.
+
+   type PMSC_CTRL1_SNOZE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Snooze Enable.
+
+   type PMSC_CTRL1_SNOZR_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Snooze Repeat.
+
+   type PMSC_CTRL1_PLLSYN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   -- This enables a special 1 GHz clock used for some external SYNC modes.
+
+   type PMSC_CTRL1_LDERUNE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  LDE run enable.
+
+   type PMSC_CTRL1_KHZCLKDIV_Field is range 0 .. 2**6 - 1
+     with Size => 6;
+
    type PMSC_CTRL1_Type is record
-      ARX2INIT  : Types.Bits_1 := 0;
-      PKTSEQ    : Types.Bits_8 := 2#1110_0111#;
-      ATXSLP    : Types.Bits_1 := 0;
-      ARXSLP    : Types.Bits_1 := 0;
-      SNOZE     : Types.Bits_1 := 0;
-      SNOZR     : Types.Bits_1 := 0;
-      PLLSYN    : Types.Bits_1 := 0;
-      LDERUNE   : Types.Bits_1 := 1;
-      KHZCLKDIV : Types.Bits_6 := 2#10_0000#;
+      ARX2INIT  : PMSC_CTRL1_ARX2INIT_Field  := Disabled;
+      PKTSEQ    : PMSC_CTRL1_PKTSEQ_Field    := PMSC_CTRL1_Enabled;
+      ATXSLP    : PMSC_CTRL1_ATXSLP_Field    := Disabled;
+      ARXSLP    : PMSC_CTRL1_ARXSLP_Field    := Disabled;
+      SNOZE     : PMSC_CTRL1_SNOZE_Field     := Disabled;
+      SNOZR     : PMSC_CTRL1_SNOZR_Field     := Disabled;
+      PLLSYN    : PMSC_CTRL1_PLLSYN_Field    := Disabled;
+      LDERUNE   : PMSC_CTRL1_LDERUNE_Field   := Enabled;
+      KHZCLKDIV : PMSC_CTRL1_KHZCLKDIV_Field := 32;
 
       Reserved_1 : Types.Bits_1 := 0;
       Reserved_2 : Types.Bits_1 := 0;
@@ -3611,9 +3809,12 @@ is
       KHZCLKDIV  at 0 range 26 .. 31;
    end record;
 
-   -- PMSC_SNOZT sub-register
+   ------------------------------
+   -- PMSC_SNOZT sub-register  --
+   ------------------------------
+
    type PMSC_SNOZT_Type is record
-      SNOZ_TIM : Types.Bits_8 := 2#0100_0000#;
+      SNOZ_TIM : System_Time.Snooze_Time := 0.001_706_667;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -3623,9 +3824,14 @@ is
       SNOZ_TIM at 0 range 0 .. 7;
    end record;
 
-   -- PMSC_TXFSEQ sub-register
+   -------------------------------
+   -- PMSC_TXFSEQ sub-register  --
+   -------------------------------
+
+   type PMSC_TXFSEQ_Field is new Bits_16;
+
    type PMSC_TXFSEQ_Type is record
-      TXFINESEQ : Types.Bits_16 := 2#0000_1011_0011_1100#;
+      TXFINESEQ : PMSC_TXFSEQ_Field := 2#0000_1011_0011_1100#;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -3635,11 +3841,28 @@ is
       TXFINESEQ at 0 range 0 .. 15;
    end record;
 
-   -- PMSC_LEDC sub-register
+   -----------------------------
+   -- PMSC_LEDC sub-register  --
+   -----------------------------
+
+   type PMSC_LEDC_BLINKEN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Blink Enable.
+
+   type PMSC_LEDC_BLNKNOW_Field is
+     (No_Action,
+      Blink_Now)
+     with Size => 1;
+
    type PMSC_LEDC_Type is record
-      BLINK_TIM : Types.Bits_8 := 2#0010_0000#;
-      BLNKEN    : Types.Bits_1 := 0;
-      BLNKNOW   : Types.Bits_4 := 0;
+      BLINK_TIM       : System_Time.Blink_Time  := 0.448;
+      BLNKEN          : PMSC_LEDC_BLINKEN_Field := Disabled;
+      BLNKNOW_RXOKLED : PMSC_LEDC_BLNKNOW_Field := No_Action;
+      BLNKNOW_SFDLED  : PMSC_LEDC_BLNKNOW_Field := No_Action;
+      BLNKNOW_RXLED   : PMSC_LEDC_BLNKNOW_Field := No_Action;
+      BLNKNOW_TXLED   : PMSC_LEDC_BLNKNOW_Field := No_Action;
 
       Reserved_1 : Types.Bits_7  := 0;
       Reserved_2 : Types.Bits_12 := 0;
@@ -3649,14 +3872,17 @@ is
      Scalar_Storage_Order => System.Low_Order_First;
 
    for PMSC_LEDC_Type use record
-      BLINK_TIM  at 0 range 0 .. 7;
-      BLNKEN     at 0 range 8 .. 8;
+      BLINK_TIM        at 0 range 0 .. 7;
+      BLNKEN           at 0 range 8 .. 8;
 
-      Reserved_1 at 0 range 9 .. 15;
+      Reserved_1       at 0 range 9 .. 15;
 
-      BLNKNOW    at 0 range 16 .. 19;
+      BLNKNOW_RXOKLED  at 0 range 16 .. 16;
+      BLNKNOW_SFDLED   at 0 range 17 .. 17;
+      BLNKNOW_RXLED    at 0 range 18 .. 18;
+      BLNKNOW_TXLED    at 0 range 19 .. 19;
 
-      Reserved_2 at 0 range 20 .. 31;
+      Reserved_2       at 0 range 20 .. 31;
    end record;
 
 end DW1000.Register_Types;

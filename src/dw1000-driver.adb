@@ -176,11 +176,11 @@ is
    begin
       --  Set up clocks
       PMSC_CTRL0.Read (PMSC_CTRL0_Reg);
-      PMSC_CTRL0_Reg.SYSCLKS := 1;
-      PMSC_CTRL0_Reg.RXCLKS  := 0;
-      PMSC_CTRL0_Reg.TXCLKS  := 0;
-      PMSC_CTRL0_Reg.FACE    := 0;
-      PMSC_CTRL0_Reg.ADCCE   := 0;
+      PMSC_CTRL0_Reg.SYSCLKS := Force_XTI;
+      PMSC_CTRL0_Reg.RXCLKS  := Auto;
+      PMSC_CTRL0_Reg.TXCLKS  := Auto;
+      PMSC_CTRL0_Reg.FACE    := Disabled;
+      PMSC_CTRL0_Reg.ADCCE   := Disabled;
       PMSC_CTRL0_Reg.Reserved_1 := 2#110#;
       --  Writing to these Reserved bits is undocumented in the User Manual,
       --  but the DecaWave C code sets these bits, so it serves some purpose.
@@ -218,7 +218,7 @@ is
       pragma Warnings (GNATprove, On, "statement has no effect");
 
       --  Default clocks
-      PMSC_CTRL0_Reg.SYSCLKS    := 0;
+      PMSC_CTRL0_Reg.SYSCLKS    := Auto;
       PMSC_CTRL0_Reg.Reserved_1 := 2#100#;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
    end Load_LDE_From_ROM;
@@ -233,10 +233,10 @@ is
 
       case Clock is
          when Enable_All_Seq =>
-            PMSC_CTRL0_Reg.SYSCLKS := 2#00#;
-            PMSC_CTRL0_Reg.RXCLKS  := 2#00#;
-            PMSC_CTRL0_Reg.TXCLKS  := 2#00#;
-            PMSC_CTRL0_Reg.FACE    := 0;
+            PMSC_CTRL0_Reg.SYSCLKS := Auto;
+            PMSC_CTRL0_Reg.RXCLKS  := Auto;
+            PMSC_CTRL0_Reg.TXCLKS  := Auto;
+            PMSC_CTRL0_Reg.FACE    := Disabled;
 
             -- Need to write the above changes before setting GPCE
             PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
@@ -246,14 +246,14 @@ is
             --  but the DecaWave C code masks these bits.
 
          when Force_Sys_XTI =>
-            PMSC_CTRL0_Reg.SYSCLKS := 2#01#;
+            PMSC_CTRL0_Reg.SYSCLKS := Force_XTI;
 
          when Force_Sys_PLL =>
-            PMSC_CTRL0_Reg.SYSCLKS := 2#10#;
+            PMSC_CTRL0_Reg.SYSCLKS := Force_PLL;
 
          when Read_Acc_On =>
-            PMSC_CTRL0_Reg.RXCLKS    := 2#10#;
-            PMSC_CTRL0_Reg.FACE      := 1;
+            PMSC_CTRL0_Reg.RXCLKS    := Force_PLL;
+            PMSC_CTRL0_Reg.FACE      := Enabled;
 
             -- Need to write the above changes before setting SOFTRESET
             PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
@@ -261,8 +261,8 @@ is
             PMSC_CTRL0_Reg.SOFTRESET := PMSC_CTRL0_Reg.SOFTRESET or 2#1000#;
 
          when Read_Acc_Off =>
-            PMSC_CTRL0_Reg.RXCLKS    := 2#00#;
-            PMSC_CTRL0_Reg.FACE      := 0;
+            PMSC_CTRL0_Reg.RXCLKS    := Auto;
+            PMSC_CTRL0_Reg.FACE      := Disabled;
 
             -- Need to write the above changes before clearing SOFTRESET
             PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
@@ -276,7 +276,7 @@ is
             PMSC_CTRL0_Reg.Reserved_1 := PMSC_CTRL0_Reg.Reserved_1 and 2#011#;
 
          when Force_Tx_PLL =>
-            PMSC_CTRL0_Reg.TXCLKS := 2#10#;
+            PMSC_CTRL0_Reg.TXCLKS := Force_PLL;
 
       end case;
 
@@ -951,7 +951,9 @@ is
 
    begin
       PMSC_CTRL1.Read (PMSC_CTRL1_Reg);
-      PMSC_CTRL1_Reg.ATXSLP := (if Enabled then 1 else 0);
+      PMSC_CTRL1_Reg.ATXSLP := (if Enabled
+                                then Register_Types.Enabled
+                                else Register_Types.Disabled);
       PMSC_CTRL1.Write (PMSC_CTRL1_Reg);
    end Set_Sleep_After_Tx;
 
@@ -1285,8 +1287,8 @@ is
       Upload_AON_Config;
 
       PMSC_CTRL0.Read (PMSC_CTRL0_Reg);
-      PMSC_CTRL0_Reg.SYSCLKS := 2#01#;
-      PMSC_CTRL0_Reg.RXCLKS  := 2#00#;
+      PMSC_CTRL0_Reg.SYSCLKS := Force_XTI;
+      PMSC_CTRL0_Reg.RXCLKS  := Auto;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
       -- Read number of XTAL/2 cycles per LP osc cycle
@@ -1298,7 +1300,7 @@ is
             or Shift_Left (Types.Bits_16 (Data (2)), 8));
 
       -- Reset PMSC_CTRL0
-      PMSC_CTRL0_Reg.SYSCLKS := 2#00#;
+      PMSC_CTRL0_Reg.SYSCLKS := Auto;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
    end Calibrate_Sleep_Count;
@@ -1474,8 +1476,8 @@ is
 
    begin
       PMSC_CTRL0.Read (PMSC_CTRL0_Reg);
-      PMSC_CTRL0_Reg.SYSCLKS := 2#01#;
-      PMSC_CTRL0_Reg.RXCLKS  := 2#00#;
+      PMSC_CTRL0_Reg.SYSCLKS := Force_XTI;
+      PMSC_CTRL0_Reg.RXCLKS  := Auto;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
       -- Make sure we don't accidentally sleep
@@ -1511,7 +1513,7 @@ is
                                      LPOSC_C  => Disabled,
                                      Reserved => 0));
 
-      PMSC_CTRL0_Reg.SYSCLKS := 2#00#;
+      PMSC_CTRL0_Reg.SYSCLKS := Auto;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
    end Configure_Sleep_Count;
@@ -1552,23 +1554,29 @@ is
 
       --  Enable LP oscillator to run from counter, turn on debounce clock
       PMSC_CTRL0.Read (PMSC_CTRL0_Reg);
-      PMSC_CTRL0_Reg.GPDCE := 1;
-      PMSC_CTRL0_Reg.KHZCLKEN := 1;
+      PMSC_CTRL0_Reg.GPDCE := Enabled;
+      PMSC_CTRL0_Reg.KHZCLKEN := Enabled;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
       -- Enable LEDs
       PMSC_LEDC.Read (PMSC_LEDC_Reg);
-      PMSC_LEDC_Reg.BLINK_TIM := 16; -- 16 * 14 ms = 224 ms
-      PMSC_LEDC_Reg.BLNKEN    := (if LED_Enabled then 1 else 0);
+      PMSC_LEDC_Reg.BLINK_TIM := 0.224;
+      PMSC_LEDC_Reg.BLNKEN    := (if LED_Enabled then Enabled else Disabled);
       PMSC_LEDC.Write (PMSC_LEDC_Reg);
 
       if Test_Flash then
          --  Blink each LED
-         PMSC_LEDC_Reg.BLNKNOW := 2#1111#;
+         PMSC_LEDC_Reg.BLNKNOW_RXOKLED := Blink_Now;
+         PMSC_LEDC_Reg.BLNKNOW_SFDLED  := Blink_Now;
+         PMSC_LEDC_Reg.BLNKNOW_RXLED   := Blink_Now;
+         PMSC_LEDC_Reg.BLNKNOW_TXLED   := Blink_Now;
          PMSC_LEDC.Write (PMSC_LEDC_Reg);
 
          --  Clear forced bits
-         PMSC_LEDC_Reg.BLNKNOW := 2#0000#;
+         PMSC_LEDC_Reg.BLNKNOW_RXOKLED := No_Action;
+         PMSC_LEDC_Reg.BLNKNOW_SFDLED  := No_Action;
+         PMSC_LEDC_Reg.BLNKNOW_RXLED   := No_Action;
+         PMSC_LEDC_Reg.BLNKNOW_TXLED   := No_Action;
          PMSC_LEDC.Write (PMSC_LEDC_Reg);
       end if;
    end Configure_LEDs;

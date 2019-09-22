@@ -201,7 +201,7 @@ is
          else
             -- Should disable LDERUN bit, since the LDE isn't loaded.
             DW1000.Registers.PMSC_CTRL1.Read (PMSC_CTRL1_Reg);
-            PMSC_CTRL1_Reg.LDERUNE := 0;
+            PMSC_CTRL1_Reg.LDERUNE := Disabled;
             DW1000.Registers.PMSC_CTRL1.Write (PMSC_CTRL1_Reg);
          end if;
 
