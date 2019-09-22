@@ -630,15 +630,21 @@ is
       Rx_Preamble_Code        : in Preamble_Code_Number)
    is
    begin
-      CHAN_CTRL.Write ((TX_CHAN  => Bits_4 (Tx_Channel),
-                        RX_CHAN  => Bits_4 (Rx_Channel),
-                        DWSFD    => (if Use_DecaWave_SFD then 1 else 0),
+      CHAN_CTRL.Write ((TX_CHAN  => CHAN_CTRL_Channel_Field (Tx_Channel),
+                        RX_CHAN  => CHAN_CTRL_Channel_Field (Rx_Channel),
+                        DWSFD    => (if Use_DecaWave_SFD
+                                     then Enabled
+                                     else Disabled),
                         RXPRF    => (if Rx_PRF = PRF_16MHz
-                                     then 2#01# else 2#10#),
-                        TNSSFD   => (if Use_Tx_User_Defined_SFD then 1 else 0),
-                        RNSSFD   => (if Use_Rx_User_Defined_SFD then 1 else 0),
-                        TX_PCODE => Bits_5 (Tx_Preamble_Code),
-                        RX_PCODE => Bits_5 (Rx_Preamble_Code),
+                                     then PRF_16MHz else PRF_64MHz),
+                        TNSSFD   => (if Use_Tx_User_Defined_SFD
+                                     then Enabled
+                                     else Disabled),
+                        RNSSFD   => (if Use_Rx_User_Defined_SFD
+                                     then Enabled
+                                     else Disabled),
+                        TX_PCODE => CHAN_CTRL_PCODE_Field (Tx_Preamble_Code),
+                        RX_PCODE => CHAN_CTRL_PCODE_Field (Rx_Preamble_Code),
                         Reserved => 0));
    end Configure_CHAN_CTRL;
 

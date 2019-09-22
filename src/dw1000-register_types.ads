@@ -1154,15 +1154,51 @@ is
    ----------------------------------------------------------------------------
    -- CHAN_CTRL register file
 
+   type CHAN_CTRL_Channel_Field is range 0 .. 15
+     with Size => 4;
+   --  This selects the transmit/receive channel.
+
+   type CHAN_CTRL_DWSFD_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables a non-standard Decawave proprietary SFD sequence.
+
+   type CHAN_CTRL_RXPRF_Field is
+     (Reserved_00,
+      PRF_16MHz,
+      PRF_64MHz,
+      Reserved_11)
+     with Size => 2;
+   --  This two bit field selects the PRF used in the receiver.
+
+   type CHAN_CTRL_TNSSFD_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables the use of a user specified (non-standard) SFD in the
+   --  transmitter.
+
+   type CHAN_CTRL_RNSSFD_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables the use of a user specified (non-standard) SFD in the
+   --  receiver.
+
+   type CHAN_CTRL_PCODE_Field is range 0 .. 31
+     with Size => 5;
+   --  This field selects the preamble code used in the transmitter/receiver.
+
    type CHAN_CTRL_Type is record
-      TX_CHAN  : Types.Bits_4 := 5;
-      RX_CHAN  : Types.Bits_4 := 5;
-      DWSFD    : Types.Bits_1 := 0;
-      RXPRF    : Types.Bits_2 := 0;
-      TNSSFD   : Types.Bits_1 := 0;
-      RNSSFD   : Types.Bits_1 := 0;
-      TX_PCODE : Types.Bits_5 := 0;
-      RX_PCODE : Types.Bits_5 := 0;
+      TX_CHAN  : CHAN_CTRL_Channel_Field := 5;
+      RX_CHAN  : CHAN_CTRL_Channel_Field := 5;
+      DWSFD    : CHAN_CTRL_DWSFD_Field   := Disabled;
+      RXPRF    : CHAN_CTRL_RXPRF_Field   := Reserved_00;
+      TNSSFD   : CHAN_CTRL_TNSSFD_Field  := Disabled;
+      RNSSFD   : CHAN_CTRL_RNSSFD_Field  := Disabled;
+      TX_PCODE : CHAN_CTRL_PCODE_Field   := 0;
+      RX_PCODE : CHAN_CTRL_PCODE_Field   := 0;
 
       Reserved : Types.Bits_9 := 0;
    end record

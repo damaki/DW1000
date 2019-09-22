@@ -285,14 +285,22 @@ is
          --  Configure the channel, Rx PRF, non-std SFD, and preamble codes
          DW1000.Registers.CHAN_CTRL.Write
            (DW1000.Register_Types.CHAN_CTRL_Type'
-              (TX_CHAN  => Bits_4 (Config.Channel),
-               RX_CHAN  => Bits_4 (Config.Channel),
-               DWSFD    => (if Config.Use_Nonstandard_SFD then 1 else 0),
-               RXPRF    => (if Config.PRF = PRF_16MHz then 2#01# else 2#10#),
-               TNSSFD   => (if Config.Use_Nonstandard_SFD then 1 else 0),
-               RNSSFD   => (if Config.Use_Nonstandard_SFD then 1 else 0),
-               TX_PCODE => Bits_5 (Config.Tx_Preamble_Code),
-               RX_PCODE => Bits_5 (Config.Rx_Preamble_Code),
+              (TX_CHAN  => CHAN_CTRL_Channel_Field (Config.Channel),
+               RX_CHAN  => CHAN_CTRL_Channel_Field (Config.Channel),
+               DWSFD    => (if Config.Use_Nonstandard_SFD
+                            then Enabled
+                            else Disabled),
+               RXPRF    => (if Config.PRF = PRF_16MHz
+                            then PRF_16MHz
+                            else PRF_64MHz),
+               TNSSFD   => (if Config.Use_Nonstandard_SFD
+                            then Enabled
+                            else Disabled),
+               RNSSFD   => (if Config.Use_Nonstandard_SFD
+                            then Enabled
+                            else Disabled),
+               TX_PCODE => CHAN_CTRL_PCODE_Field (Config.Tx_Preamble_Code),
+               RX_PCODE => CHAN_CTRL_PCODE_Field (Config.Rx_Preamble_Code),
                Reserved => 0));
 
          --  Set the Tx frame control (transmit data rate, PRF, ranging bit)
@@ -602,7 +610,7 @@ is
                begin
                   DW1000.Registers.CHAN_CTRL.Read (CHAN_CTRL_Reg);
                   Frame_Queue (Next_Idx).Frame_Info.Non_Standard_SFD
-                    := CHAN_CTRL_Reg.DWSFD = 1;
+                    := CHAN_CTRL_Reg.DWSFD = Enabled;
                end;
             end if;
 
