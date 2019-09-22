@@ -1237,9 +1237,17 @@ is
    ----------------------------------------------------------------------------
    -- AGC_CTRL register file
 
-   -- AGC_CTRL1 sub-register
+   ------------------------------
+   --  AGC_CTRL1 sub-register  --
+   ------------------------------
+
+   type AGC_CTRL1_DIS_AM_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+
    type AGC_CTRL1_Type is record
-      DIS_AM : Types.Bits_1    := 1;
+      DIS_AM : AGC_CTRL1_DIS_AM_Field := Disabled;
 
       Reserved : Types.Bits_15 := 0;
    end record
@@ -1253,9 +1261,17 @@ is
       Reserved at 0 range 1 .. 15;
    end record;
 
-   -- AGC_TUNE1 sub-register
+   ------------------------------
+   --  AGC_TUNE1 sub-register  --
+   ------------------------------
+
+   type AGC_TUNE1_Field is new Bits_16;
+
+   AGC_TUNE1_PRF_16MHz : constant AGC_TUNE1_Field := 16#8870#;
+   AGC_TUNE1_PRF_64MHz : constant AGC_TUNE1_Field := 16#889B#;
+
    type AGC_TUNE1_Type is record
-      AGC_TUNE1 : Types.Bits_16;
+      AGC_TUNE1 : AGC_TUNE1_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1265,9 +1281,16 @@ is
       AGC_TUNE1 at 0 range 0 .. 15;
    end record;
 
-   -- AGC_TUNE2 sub-register
+   ------------------------------
+   --  AGC_TUNE2 sub-register  --
+   ------------------------------
+
+   type AGC_TUNE2_Field is new Bits_32;
+
+   AGC_TUNE2_Value : constant AGC_TUNE2_Field := 16#2502A907#;
+
    type AGC_TUNE2_Type is record
-      AGC_TUNE2 : Types.Bits_32;
+      AGC_TUNE2 : AGC_TUNE2_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1277,9 +1300,16 @@ is
       AGC_TUNE2 at 0 range 0 .. 31;
    end record;
 
-   -- AGC_TUNE3 sub-register
+   ------------------------------
+   --  AGC_TUNE3 sub-register  --
+   ------------------------------
+
+   type AGC_TUNE3_Field is new Bits_16;
+
+   AGC_TUNE3_Value : constant AGC_TUNE3_Field := 16#0035#;
+
    type AGC_TUNE3_Type is record
-      AGC_TUNE3 : Types.Bits_16;
+      AGC_TUNE3 : AGC_TUNE3_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1289,10 +1319,21 @@ is
       AGC_TUNE3 at 0 range 0 .. 15;
    end record;
 
-   -- AGC_STAT1 sub-register
+   ------------------------------
+   --  AGC_STAT1 sub-register  --
+   ------------------------------
+
+   type AGC_STAT1_EDG1_Field is range 0 .. 2**5 - 1
+     with Size => 5;
+   --  This 5-bit gain value relates to input noise power measurement.
+
+   type AGC_STAT1_EDV2_Field is range 0 .. 2**9 - 1
+     with Size => 9;
+   --  This 9-bit value relates to the input noise power measurement.
+
    type AGC_STAT1_Type is record
-      EDG1 : Types.Bits_5;
-      EDV2 : Types.Bits_9;
+      EDG1 : AGC_STAT1_EDG1_Field;
+      EDV2 : AGC_STAT1_EDV2_Field;
 
       Reserved_1 : Types.Bits_6;
       Reserved_2 : Types.Bits_4;

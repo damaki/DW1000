@@ -149,15 +149,9 @@ is
         );
 
    -- These values for AGC_TUNE1 are given by the user manual
-   AGC_TUNE1_Values : constant array (PRF_Type) of Types.Bits_16
-     := (PRF_16MHz => 16#8870#,
-         PRF_64MHz => 16#889B#);
-
-   -- This value for AGC_TUNE2 is given by the user manual
-   AGC_TUNE2_Value : constant Types.Bits_32 := 16#2502A907#;
-
-   -- This value for AGC_TUNE3 is given by the user manual
-   AGC_TUNE3_Value : constant Types.Bits_16 := 16#0035#;
+   AGC_TUNE1_Values : constant array (PRF_Type) of AGC_TUNE1_Field
+     := (PRF_16MHz => AGC_TUNE1_PRF_16MHz,
+         PRF_64MHz => AGC_TUNE1_PRF_64MHz);
 
    -- These values for TC_PGDELAY are given by the user manual
    TC_PGDELAY_Values : constant array (Positive range 1 .. 7) of Bits_8
