@@ -821,8 +821,12 @@ is
    ----------------------------------------------------------------------------
    -- RX_TTCKI register file
 
+   type RX_TTCKI_RXTTCKI_Field is range 0 .. 2**32 - 1
+     with Size => 32;
+   --  RX time tracking interval.
+
    type RX_TTCKI_Type is record
-      RXTTCKI : Types.Bits_32 := 0;
+      RXTTCKI : RX_TTCKI_RXTTCKI_Field := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,

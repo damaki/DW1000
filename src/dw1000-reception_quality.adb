@@ -127,19 +127,31 @@ is
 
       if CIR_PWR /= 0 then
          N := Long_Float (Bits_33 (CIR_PWR) * 2**17);
+
+         pragma Assert (N in Numerator_Range);
       else
          --  Prevent value of 0 for the numerator, otherwise the input
          --  to the Log function would be 0, which is not permitted.
          N := 2.0**17;
+
+         pragma Assert (N in Numerator_Range);
       end if;
+
+      pragma Assert_And_Cut (N in Numerator_Range);
 
       if RXPACC /= 0 then
          D := Long_Float (Bits_24 (RXPACC) * Bits_24 (RXPACC));
+
+         pragma Assert (D in Denominator_Range);
       else
          --  Prevent division by zero.
          --  In theory, this should never happen.
          D := 1.0;
+
+         pragma Assert (D in Denominator_Range);
       end if;
+
+      pragma Assert_And_Cut (N in Numerator_Range and D in Denominator_Range);
 
       R := Log10 (N / D);
 
@@ -176,10 +188,6 @@ is
       subtype Denominator_Range is Long_Float
       range 1.0 .. (2.0**12 - 1.0)**2;
 
-      subtype Division_Result_Range is Long_Float
-      range Numerator_Range'First / Denominator_Range'Last ..
-            Numerator_Range'Last  / Denominator_Range'First;
-
       N   : Numerator_Range;
       D   : Denominator_Range;
       R   : Long_Float;
@@ -203,17 +211,29 @@ is
          N := Numerator_Range (Bits_33 (Bits_32 (F1) * Bits_32 (F1)) +
                                Bits_33 (Bits_32 (F2) * Bits_32 (F2)) +
                                Bits_33 (Bits_32 (F3) * Bits_32 (F3)));
+
+         pragma Assert (N in Numerator_Range);
       else
          N := 1.0;
+
+         pragma Assert (N in Numerator_Range);
       end if;
 
+      pragma Assert_And_Cut (N in Numerator_Range);
+
       if RXPACC /= 0 then
-         D := Long_Float (Bits_24 (RXPACC) * Bits_24 (RXPACC));
+         D := Denominator_Range (Bits_24 (RXPACC) * Bits_24 (RXPACC));
+
+         pragma Assert (D in Denominator_Range);
       else
          --  Prevent division by zero.
          --  In theory, this should never happen.
          D := 1.0;
+
+         pragma Assert (D in Denominator_Range);
       end if;
+
+      pragma Assert_And_Cut (N in Numerator_Range and D in Denominator_Range);
 
       R := Log10 (N / D);
 
@@ -236,7 +256,8 @@ is
 
 
    function Transmitter_Clock_Offset (RXTOFS  : in Bits_19;
-                                      RXTTCKI : in Bits_32) return Long_Float
+                                      RXTTCKI : in RX_TTCKI_RXTTCKI_Field)
+                                      return Long_Float
    is
       Offset   : Long_Float;
       Interval : Long_Float;
@@ -270,7 +291,7 @@ is
       --     16#01FC0000# for a 64 MHz PRF
       --  Based on this assumption, we can constrain the potential range of
       --  Interval to prove absence of overflow and range errors.
-      Interval := Long_Float (RXTTCKI and 16#01FC0000#);
+      Interval := Long_Float (Bits_32 (RXTTCKI) and 16#01FC0000#);
 
       pragma Assert_And_Cut
         (Offset in -(2.0**18 - 1.0) .. 2.0**18 - 1.0
