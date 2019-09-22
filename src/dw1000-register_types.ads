@@ -2539,9 +2539,21 @@ is
    ----------------------------------------------------------------------------
    -- FS_CTRL register file
 
-   -- FS_PLLCFG sub-register
+   -----------------------------
+   -- FS_PLLCFG sub-register  --
+   -----------------------------
+
+   type FS_PLLCFG_Field is new Bits_32;
+
+   FS_PLLCFG_Channel_1 : constant FS_PLLCFG_Field := 16#09000407#;
+   FS_PLLCFG_Channel_2 : constant FS_PLLCFG_Field := 16#08400508#;
+   FS_PLLCFG_Channel_3 : constant FS_PLLCFG_Field := 16#08401009#;
+   FS_PLLCFG_Channel_4 : constant FS_PLLCFG_Field := 16#08400508#;
+   FS_PLLCFG_Channel_5 : constant FS_PLLCFG_Field := 16#0800041D#;
+   FS_PLLCFG_Channel_7 : constant FS_PLLCFG_Field := 16#0800041D#;
+
    type FS_PLLCFG_Type is record
-      FS_PLLCFG : Types.Bits_32;
+      FS_PLLCFG : FS_PLLCFG_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -2551,9 +2563,21 @@ is
       FS_PLLCFG at 0 range 0 .. 31;
    end record;
 
-   -- FS_PLLTUNE sub-register
+   ------------------------------
+   -- FS_PLLTUNE sub-register  --
+   ------------------------------
+
+   type FS_PLLTUNE_Field is new Bits_8;
+
+   FS_PLLTUNE_Channel_1 : constant FS_PLLTUNE_Field := 16#1E#;
+   FS_PLLTUNE_Channel_2 : constant FS_PLLTUNE_Field := 16#26#;
+   FS_PLLTUNE_Channel_3 : constant FS_PLLTUNE_Field := 16#56#;
+   FS_PLLTUNE_Channel_4 : constant FS_PLLTUNE_Field := 16#26#;
+   FS_PLLTUNE_Channel_5 : constant FS_PLLTUNE_Field := 16#BE#;
+   FS_PLLTUNE_Channel_7 : constant FS_PLLTUNE_Field := 16#BE#;
+
    type FS_PLLTUNE_Type is record
-      FS_PLLTUNE : Types.Bits_8;
+      FS_PLLTUNE : FS_PLLTUNE_Field;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -2563,9 +2587,16 @@ is
       FS_PLLTUNE at 0 range 0 .. 7;
    end record;
 
-   -- FS_XTALT sub-register
+   ----------------------------
+   -- FS_XTALT sub-register  --
+   ----------------------------
+
+   type FS_XTALT_Field is range 0 .. 2**5 - 1
+     with Size => 5;
+   --  Crystal Trim.
+
    type FS_XTALT_Type is record
-      XTALT    : Types.Bits_5 := 0;
+      XTALT    : FS_XTALT_Field := 0;
 
       Reserved : Types.Bits_3 := 2#011#;
    end record

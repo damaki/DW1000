@@ -69,24 +69,28 @@ is
            24 => Bits_16 (0.22 * 2**16));
 
    -- These values for FS_PLLCFG are given by the user manual
-   FS_PLLCFG_Values : constant array (Positive range 1 .. 7) of Types.Bits_32
-     := (1   => 16#09000407#,
-         2|4 => 16#08400508#,
-         3   => 16#08401009#,
-         5|7 => 16#0800041D#,
+   FS_PLLCFG_Values : constant array (Positive range 1 .. 7) of FS_PLLCFG_Field
+     := (1 => FS_PLLCFG_Channel_1,
+         2 => FS_PLLCFG_Channel_2,
+         3 => FS_PLLCFG_Channel_3,
+         4 => FS_PLLCFG_Channel_4,
+         5 => FS_PLLCFG_Channel_5,
+         7 => FS_PLLCFG_Channel_7,
          -- Note that channel 6 is not a valid channel. However, Channel_Number
          -- cannot be used as the array index type since it has a predicate.
-         6   => 0);
+         6 => 0);
 
    -- These values for FS_PLLTUNE are given by the user manual
-   FS_PLLTUNE_Values : constant array (Positive range 1 .. 7) of Types.Bits_8
-     := (1   => 16#1E#,
-         2|4 => 16#26#,
-         3   => 16#5E#,
-         5|7 => 16#BE#,
+   FS_PLLTUNE_Values : constant array (Positive range 1 .. 7) of FS_PLLTUNE_Field
+     := (1 => FS_PLLTUNE_Channel_1,
+         2 => FS_PLLTUNE_Channel_2,
+         3 => FS_PLLTUNE_Channel_3,
+         4 => FS_PLLTUNE_Channel_4,
+         5 => FS_PLLTUNE_Channel_5,
+         7 => FS_PLLTUNE_Channel_7,
          -- Note that channel 6 is not a valid channel. However, Channel_Number
          -- cannot be used as the array index type since it has a predicate.
-         6   => 0);
+         6 => 0);
 
    -- These values for FS_PLLCFG are ported from the C decadriver
    FS_XTALT_Value : constant FS_XTALT_Type
@@ -1513,7 +1517,7 @@ is
    end Configure_Sleep_Count;
 
 
-   procedure Set_XTAL_Trim (Trim : in Types.Bits_5)
+   procedure Set_XTAL_Trim (Trim : in FS_XTALT_Field)
    is
       FS_XTALT_Reg : FS_XTALT_Type;
 

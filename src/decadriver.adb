@@ -190,7 +190,7 @@ is
 
          if Load_XTAL_Trim then
             DW1000.Driver.Read_OTP (OTP_ADDR_XTAL_TRIM, Word);
-            XTAL_Trim := Bits_5 (Word and 2#1_1111#);
+            XTAL_Trim := FS_XTALT_Field (Word and 2#1_1111#);
          else
             XTAL_Trim := 2#1_0000#; -- Set to midpoint
          end if;

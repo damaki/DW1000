@@ -1065,7 +1065,7 @@ is
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Sleep_Count);
 
-   procedure Set_XTAL_Trim (Trim : in Types.Bits_5)
+   procedure Set_XTAL_Trim (Trim : in FS_XTALT_Field)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => + Trim);
 

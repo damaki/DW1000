@@ -650,7 +650,7 @@ is
 
       Antenna_Delay_PRF_64 : Antenna_Delay_Time := 0.0;
       Antenna_Delay_PRF_16 : Antenna_Delay_Time := 0.0;
-      XTAL_Trim            : Bits_5  := 2#1_0000#;
+      XTAL_Trim            : FS_XTALT_Field     := 2#1_0000#;
 
       Long_Frames : Boolean := False;
 
