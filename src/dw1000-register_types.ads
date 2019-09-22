@@ -1046,9 +1046,13 @@ is
    ----------------------------------------------------------------------------
    -- ACK_RESP_T register file
 
+   type ACK_RESP_T_ACK_TIM_Field is range 0 .. 255
+     with Size => 8;
+   --  Auto-Acknowledgement turn-around Time (in number of preamble symbols).
+
    type ACK_RESP_T_Type is record
-      W4D_TIM : Types.Bits_20 := 0;
-      ACK_TIM : Types.Bits_8  := 0;
+      W4D_TIM : System_Time.Response_Wait_Timeout_Time := 0.0;
+      ACK_TIM : ACK_RESP_T_ACK_TIM_Field               := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
