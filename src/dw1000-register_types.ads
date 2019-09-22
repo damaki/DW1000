@@ -912,8 +912,8 @@ is
    -- TX_TIME register file
 
    type TX_TIME_Type is record
-      TX_STAMP : Types.Bits_40 := 0;
-      TX_RAWST : Types.Bits_40 := 0;
+      TX_STAMP : System_Time.Fine_System_Time   := 0.0;
+      TX_RAWST : System_Time.Coarse_System_Time := 0.0;
    end record
      with Size => 80,
      Bit_Order => System.Low_Order_First,

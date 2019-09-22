@@ -1131,7 +1131,7 @@ is
 
    begin
       TX_TIME.Read (TX_TIME_Reg);
-      Timestamp := To_Fine_System_Time (TX_TIME_Reg.TX_STAMP);
+      Timestamp := TX_TIME_Reg.TX_STAMP;
    end Read_Tx_Adjusted_Timestamp;
 
 
@@ -1141,7 +1141,7 @@ is
 
    begin
       TX_TIME.Read (TX_TIME_Reg);
-      Timestamp := To_Coarse_System_Time (TX_TIME_Reg.TX_RAWST);
+      Timestamp := TX_TIME_Reg.TX_RAWST;
    end Read_Tx_Raw_Timestamp;
 
 
@@ -1152,8 +1152,8 @@ is
 
    begin
       TX_TIME.Read (TX_TIME_Reg);
-      Adjusted := To_Fine_System_Time (TX_TIME_Reg.TX_STAMP);
-      Raw      := To_Coarse_System_Time (TX_TIME_Reg.TX_RAWST);
+      Adjusted := TX_TIME_Reg.TX_STAMP;
+      Raw      := TX_TIME_Reg.TX_RAWST;
    end Read_Tx_Timestamps;
 
 
