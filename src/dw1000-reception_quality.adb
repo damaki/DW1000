@@ -99,7 +99,7 @@ is
 
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
                                   RXPACC        : in RX_FINFO_RXPACC_Field;
-                                  CIR_PWR       : in Bits_16)
+                                  CIR_PWR       : in RX_FQUAL_CIR_PWR_Field)
                                   return Float
    is
       subtype Numerator_Range is Long_Float
@@ -163,8 +163,8 @@ is
 
    function First_Path_Signal_Power (Use_16MHz_PRF : in Boolean;
                                      F1            : in Bits_16;
-                                     F2            : in Bits_16;
-                                     F3            : in Bits_16;
+                                     F2            : in RX_FQUAL_FP_AMPL2_Field;
+                                     F3            : in RX_FQUAL_FP_AMPL3_Field;
                                      RXPACC        : in RX_FINFO_RXPACC_Field)
                                      return Float
    is

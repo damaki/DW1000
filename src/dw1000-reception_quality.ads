@@ -66,7 +66,8 @@ is
 
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
                                   RXPACC        : in RX_FINFO_RXPACC_Field;
-                                  CIR_PWR       : in Bits_16) return Float
+                                  CIR_PWR       : in RX_FQUAL_CIR_PWR_Field)
+                                  return Float
      with Post => Receive_Signal_Power'Result in -142.81 .. -14.43;
    --  Compute the estimated receive signal power in dBm.
    --
@@ -87,8 +88,8 @@ is
 
    function First_Path_Signal_Power (Use_16MHz_PRF : in Boolean;
                                      F1            : in Bits_16;
-                                     F2            : in Bits_16;
-                                     F3            : in Bits_16;
+                                     F2            : in RX_FQUAL_FP_AMPL2_Field;
+                                     F3            : in RX_FQUAL_FP_AMPL3_Field;
                                      RXPACC        : in RX_FINFO_RXPACC_Field)
                                      return Float
      with Post => First_Path_Signal_Power'Result in -193.99 .. -17.44;

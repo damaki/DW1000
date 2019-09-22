@@ -785,11 +785,27 @@ is
    ----------------------------------------------------------------------------
    -- RX_FQUAL register file
 
+   type RX_FQUAL_STD_NOISE_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  Standard Deviation of Noise.
+
+   type RX_FQUAL_FP_AMPL2_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  First Path Amplitude point 2.
+
+   type RX_FQUAL_FP_AMPL3_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  First Path Amplitude point 3.
+
+   type RX_FQUAL_CIR_PWR_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  Channel Impulse Response Power.
+
    type RX_FQUAL_Type is record
-      STD_NOISE : Types.Bits_16 := 0;
-      FP_AMPL2  : Types.Bits_16 := 0;
-      FP_AMPL3  : Types.Bits_16 := 0;
-      CIR_PWR   : Types.Bits_16 := 0;
+      STD_NOISE : RX_FQUAL_STD_NOISE_Field := 0;
+      FP_AMPL2  : RX_FQUAL_FP_AMPL2_Field  := 0;
+      FP_AMPL3  : RX_FQUAL_FP_AMPL3_Field  := 0;
+      CIR_PWR   : RX_FQUAL_CIR_PWR_Field   := 0;
    end record
      with Size => 64,
      Bit_Order => System.Low_Order_First,
