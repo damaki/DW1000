@@ -939,6 +939,111 @@ is
    end record;
 
    ----------------------------------------------------------------------------
+   --  SYS_STATE register file
+
+   type SYS_STATE_TX_STATE_Field is
+     (Idle,
+      Preamble,
+      SFD,
+      PHR,
+      SDE,
+      DATA,
+      Reserved_0110,
+      Reserved_0111,
+      Reserved_1000,
+      Reserved_1001,
+      Reserved_1010,
+      Reserved_1011,
+      Reserved_1100,
+      Reserved_1101,
+      Reserved_1110,
+      Reserved_1111)
+     with Size => 4;
+   --  Current Transmit State Machine value
+
+   type SYS_STATE_RX_STATE_Field is
+     (Idle,
+      Start_Analog,
+      Reserved_00010,
+      Reserved_00011,
+      Rx_Ready,
+      Preamble_Search,
+      Preamble_Timeout,
+      SFD_Search,
+      Configure_PHR_Rx,
+      PHY_Rx_Start,
+      Data_Rate_Ready,
+      Reserved_01011,
+      Data_Rx_Seq,
+      Configure_Data_Rx,
+      PHR_Not_OK,
+      Last_Symbol,
+      Wait_RSD_Done,
+      RSD_OK,
+      RSD_Not_OK,
+      Reconfigure_110K,
+      Wait_110K_PHR,
+      Reserved_10101,
+      Reserved_10110,
+      Reserved_10111,
+      Reserved_11000,
+      Reserved_11001,
+      Reserved_11010,
+      Reserved_11011,
+      Reserved_11100,
+      Reserved_11101,
+      Reserved_11110,
+      Reserved_11111)
+     with Size => 5;
+   --  Current Receive State Machine value
+
+   type SYS_STATE_PMSC_STATE_Field is
+     (Init,
+      Idle,
+      TX_Wait,
+      RX_Wait,
+      Tx,
+      Rx,
+      Reserved_0110,
+      Reserved_0111,
+      Reserved_1000,
+      Reserved_1001,
+      Reserved_1010,
+      Reserved_1011,
+      Reserved_1100,
+      Reserved_1101,
+      Reserved_1110,
+      Reserved_1111)
+     with Size => 4;
+
+   type SYS_STATE_Type is record
+      TX_STATE   : SYS_STATE_TX_STATE_Field   := Idle;
+      RX_STATE   : SYS_STATE_RX_STATE_Field   := Idle;
+      PMSC_STATE : SYS_STATE_PMSC_STATE_Field := Idle;
+
+      Reserved_1 : Bits_4  := 0;
+      Reserved_2 : Bits_3  := 0;
+      Reserved_3 : Bits_12 := 0;
+   end record
+     with Size => 32,
+     Bit_Order => System.Low_Order_First,
+     Scalar_Storage_Order => System.Low_Order_First;
+
+   for SYS_STATE_Type use record
+      TX_STATE   at 0 range 0 .. 3;
+
+      Reserved_1 at 0 range 4 .. 7;
+
+      RX_STATE   at 0 range 8 .. 12;
+
+      Reserved_2 at 0 range 13 .. 15;
+
+      PMSC_STATE at 0 range 16 .. 19;
+
+      Reserved_3 at 0 range 20 .. 31;
+   end record;
+
+   ----------------------------------------------------------------------------
    -- ACK_RESP_T register file
 
    type ACK_RESP_T_Type is record

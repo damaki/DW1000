@@ -269,6 +269,10 @@ is
      (Register_Type => DW1000.Register_Types.TX_ANTD_Type,
       Register_ID   => TX_ANTD_Reg_ID);
 
+   package SYS_STATE is new DW1000.Generic_RO_Register_Driver
+     (Register_Type => DW1000.Register_Types.SYS_STATUS_Type,
+      Register_ID   => SYS_STATE_Reg_ID);
+
    package ACK_RESP_T is new DW1000.Generic_RW_Register_Driver
      (Register_Type => DW1000.Register_Types.ACK_RESP_T_Type,
       Register_ID   => ACK_RESP_T_Reg_ID);
