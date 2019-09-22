@@ -204,7 +204,7 @@ is
    --  This procedure configures the following registers:
    --    * PMSC_CTRL0
 
-   procedure Read_OTP (Address : in     Bits_11;
+   procedure Read_OTP (Address : in     OTP_ADDR_Field;
                        Word    :    out Bits_32)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => ((DW1000.BSP.Device_State, Word) => (DW1000.BSP.Device_State,

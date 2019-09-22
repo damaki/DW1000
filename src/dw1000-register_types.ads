@@ -2911,7 +2911,10 @@ is
    ----------------------------------------------------------------------------
    -- OTP_IF register file
 
-   -- OTP_WDAT sub-register
+   ----------------------------
+   -- OTP_WDAT sub-register  --
+   ----------------------------
+
    type OTP_WDAT_Type is record
       OTP_WDAT : Types.Bits_32;
    end record
@@ -2923,9 +2926,14 @@ is
       OTP_WDAT at 0 range 0 .. 31;
    end record;
 
-   -- OTP_ADDR sub-register
+   ----------------------------
+   -- OTP_ADDR sub-register  --
+   ----------------------------
+
+   type OTP_ADDR_Field is new Bits_11;
+
    type OTP_ADDR_Type is record
-      OTP_ADDR : Types.Bits_11 := 0;
+      OTP_ADDR : OTP_ADDR_Field;
 
       Reserved : Types.Bits_5  := 0;
    end record
@@ -2939,14 +2947,55 @@ is
       Reserved at 0 range 11 .. 15;
    end record;
 
-   -- OTP_CTRL sub-register
+   ----------------------------
+   -- OTP_CTRL sub-register  --
+   ----------------------------
+
+   type OTP_CTRL_OPTRDEN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit forces the OTP into manual read mode.
+
+   type OTP_CTRL_OTPREAD_Field is
+     (No_Action,
+      Trigger_Read)
+     with Size => 1;
+   --  This bit commands a read operation from the address specified in the
+   --  OTP_ADDR register, the value read will then be available in the OTP_RDAT
+   --  register.
+
+   type OTP_CTRL_OTPMRWR_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  OTP mode register write.
+
+   type OTP_CTRL_PPROG_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  Setting this bit will cause the contents of OTP_WDAT to be written to
+   --  OTP_ADDR.
+
+   type OTP_CTRL_OTPMR_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+
+   type OTP_CTRL_LDELOAD_Field is
+     (No_Action,
+      Load_LDE_Microcode)
+     with Size => 1;
+   --  This bit forces a load of LDE microcode.
+
    type OTP_CTRL_Type is record
-      OTPRDEN : Types.Bits_1 := 0;
-      OTPREAD : Types.Bits_1 := 0;
-      OTPMRWR : Types.Bits_1 := 0;
-      OTPPROG : Types.Bits_1 := 0;
-      OTPMR   : Types.Bits_4 := 0;
-      LDELOAD : Types.Bits_1 := 0;
+      OTPRDEN : OTP_CTRL_OPTRDEN_Field := Disabled;
+      OTPREAD : OTP_CTRL_OTPREAD_Field := No_Action;
+      OTPMRWR : OTP_CTRL_OTPMRWR_Field := Clear;
+      OTPPROG : OTP_CTRL_PPROG_Field   := Clear;
+      OTPMR   : OTP_CTRL_OTPMR_Field   := Clear;
+      LDELOAD : OTP_CTRL_LDELOAD_Field := No_Action;
 
       Reserved_1 : Types.Bits_1 := 0;
       Reserved_2 : Types.Bits_2 := 0;
@@ -2974,7 +3023,10 @@ is
       LDELOAD    at 0 range 15 .. 15;
    end record;
 
-   -- OTP_STAT sub-register
+   ----------------------------
+   -- OTP_STAT sub-register  --
+   ----------------------------
+
    type OTP_STAT_Type is record
       OTPPRGD  : Types.Bits_1 := 0;
       OTPVPOK  : Types.Bits_1 := 0;
@@ -2992,7 +3044,10 @@ is
       Reserved at 0 range 2 .. 15;
    end record;
 
-   -- OTP_RDAT sub-register
+   ----------------------------
+   -- OTP_RDAT sub-register  --
+   ----------------------------
+
    type OTP_RDAT_Type is record
       OTP_RDAT : Types.Bits_32;
    end record
@@ -3004,7 +3059,10 @@ is
       OTP_RDAT at 0 range 0 .. 31;
    end record;
 
-   -- OTP_SRDAT sub-register
+   -----------------------------
+   -- OTP_SRDAT sub-register  --
+   -----------------------------
+
    type OTP_SRDAT_Type is record
       OTP_SRDAT : Types.Bits_32;
    end record
@@ -3016,14 +3074,39 @@ is
       OTP_SRDAT at 0 range 0 .. 31;
    end record;
 
-   -- OTP_SF sub-register
+   --------------------------
+   -- OTP_SF sub-register  --
+   --------------------------
+
+   type OTP_SF_OPS_KICK_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  This bit when set initiates a load of the operating parameter set
+   --  selected by the OPS_SEL configuration below.
+
+   type OTP_SF_LDO_KICK_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  This bit when set initiates the loading of the LDOTUNE_CAL parameter
+   --  from OTP address 0x4 into the LDOTUNE register
+
+   type OTP_SF_OPS_SEL_Field is
+     (Length64,
+      Tight,
+      Default,
+      Reserved)
+     with Size => 2;
+   --  Operating parameter set selection.
+
    type OTP_SF_Type is record
-      OPS_KICK : Types.Bits_1 := 0;
-      LDO_KICK : Types.Bits_1 := 0;
-      OPS_SEL  : Types.Bits_1 := 0;
+      OPS_KICK : OTP_SF_OPS_KICK_Field := Clear;
+      LDO_KICK : OTP_SF_LDO_KICK_Field := Clear;
+      OPS_SEL  : OTP_SF_OPS_SEL_Field  := Length64;
 
       Reserved_1 : Types.Bits_3 := 0;
-      Reserved_2 : Types.Bits_2 := 0;
+      Reserved_2 : Types.Bits_1 := 0;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -3035,9 +3118,9 @@ is
 
       Reserved_1 at 0 range 2 .. 4;
 
-      OPS_SEL    at 0 range 5 .. 5;
+      OPS_SEL    at 0 range 5 .. 6;
 
-      Reserved_2 at 0 range 6 .. 7;
+      Reserved_2 at 0 range 7 .. 7;
    end record;
 
    ----------------------------------------------------------------------------

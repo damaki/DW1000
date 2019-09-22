@@ -188,12 +188,12 @@ is
 
       --  Kick off the NV MEM load
       OTP_CTRL.Write (OTP_CTRL_Type'
-                        (OTPRDEN    => 0,
-                         OTPREAD    => 0,
-                         OTPMRWR    => 0,
-                         OTPPROG    => 0,
-                         OTPMR      => 0,
-                         LDELOAD    => 1,
+                        (OTPRDEN    => Disabled,
+                         OTPREAD    => No_Action,
+                         OTPMRWR    => Clear,
+                         OTPPROG    => Clear,
+                         OTPMR      => Clear,
+                         LDELOAD    => Load_LDE_Microcode,
                          Reserved_1 => 0,
                          Reserved_2 => 0,
                          Reserved_3 => 0));
@@ -285,7 +285,7 @@ is
    end Enable_Clocks;
 
 
-   procedure Read_OTP (Address : in     Bits_11;
+   procedure Read_OTP (Address : in     OTP_ADDR_Field;
                        Word    :    out Bits_32)
    is
       CTRL_Reg : OTP_CTRL_Type;
@@ -298,12 +298,12 @@ is
 
       -- Trigger OTP read
       CTRL_Reg := OTP_CTRL_Type'
-        (OTPRDEN    => 1,
-         OTPREAD    => 1,
-         OTPMRWR    => 0,
-         OTPPROG    => 0,
-         OTPMR      => 0,
-         LDELOAD    => 0,
+        (OTPRDEN    => Enabled,
+         OTPREAD    => Trigger_Read,
+         OTPMRWR    => Clear,
+         OTPPROG    => Clear,
+         OTPMR      => Clear,
+         LDELOAD    => No_Action,
          Reserved_1 => 0,
          Reserved_2 => 0,
          Reserved_3 => 0);
@@ -311,8 +311,8 @@ is
       OTP_CTRL.Write (CTRL_Reg);
 
       -- OTPRDEN is not self-clearing. Also clear OPTREAD
-      CTRL_Reg.OTPRDEN := 0;
-      CTRL_Reg.OTPREAD := 0;
+      CTRL_Reg.OTPRDEN := Disabled;
+      CTRL_Reg.OTPREAD := No_Action;
       OTP_CTRL.Write (CTRL_Reg);
 
       -- Read back the OTP word
@@ -755,7 +755,7 @@ is
                                       PRF      : in     PRF_Type;
                                       Tx_Power :    out TX_POWER_Type)
    is
-      Address : Bits_11;
+      Address : OTP_ADDR_Field;
       Word    : Bits_32;
 
       function Word_To_TX_POWER is new Ada.Unchecked_Conversion
