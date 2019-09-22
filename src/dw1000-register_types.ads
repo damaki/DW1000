@@ -1099,11 +1099,46 @@ is
    ----------------------------------------------------------------------------
    -- TX_POWER register file
 
+   type TX_POWER_COARSE_Field is
+     (Gain_15_dB,
+      Gain_12_5_dB,
+      Gain_10_dB,
+      Gain_7_5_dB,
+      Gain_5_dB,
+      Gain_2_5_dB,
+      Gain_0_dB,
+      Off) --  No output when used
+     with Size => 3;
+   --  Coarse (DA setting) gain in 2.5 dB steps.
+   --
+   --  Unfortunately we can't use a fixed-point type here (like the fine gain)
+   --  due to the reversed HW representation of the coarse gain and the
+   --  need for the special "Off" setting.
+
+   type TX_POWER_FINE_Field is delta 0.5 range 0.0 .. 15.5
+     with Size => 5;
+   --  Fine (Mixer) gain in dB (Decibels) in 0.5 dB steps.
+
+   type TX_POWER_Field is record
+      Fine_Gain   : TX_POWER_FINE_Field   := 0.0;
+      Coarse_Gain : TX_POWER_COARSE_Field := Gain_15_dB;
+   end record
+     with Size => 8;
+
+   for TX_POWER_Field use record
+      Fine_Gain   at 0 range 0 .. 4;
+      Coarse_Gain at 0 range 5 .. 7;
+   end record;
+
    type TX_POWER_Type is record
-      BOOSTNORM : Types.Bits_8 := 16#22#;
-      BOOSTP500 : Types.Bits_8 := 16#02#;
-      BOOSTP250 : Types.Bits_8 := 16#08#;
-      BOOSTP125 : Types.Bits_8 := 16#0E#;
+      BOOSTNORM : TX_POWER_Field := (Fine_Gain   => 1.0,
+                                     Coarse_Gain => Gain_12_5_dB);
+      BOOSTP500 : TX_POWER_Field := (Fine_Gain   => 1.0,
+                                     Coarse_Gain => Gain_15_dB);
+      BOOSTP250 : TX_POWER_Field := (Fine_Gain   => 4.0,
+                                     Coarse_Gain => Gain_15_dB);
+      BOOSTP125 : TX_POWER_Field := (Fine_Gain   => 7.0,
+                                     Coarse_Gain => Gain_15_dB);
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,

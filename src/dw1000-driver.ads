@@ -99,36 +99,18 @@ is
 
    type Rx_Modes is (Normal, Sniff);
 
-   type Coarse_Tx_Power_Number is delta 3.0 range 0.0 .. 18.0
-     with Small => 0.5;
-   --  GNATprove requires a Small which is a negative power of 2 or 10.
-
-   type Fine_Tx_Power_Number is delta 0.5 range 0.0 .. 15.5
-     with Small => 0.5;
-
-   type Tx_Power_Value (Coarse_Gain_Enabled : Boolean := True) is record
-      Fine_Gain : Fine_Tx_Power_Number;
-
-      case Coarse_Gain_Enabled is
-         when True =>
-            Coarse_Gain : Coarse_Tx_Power_Number;
-         when False =>
-            null;
-      end case;
-   end record;
-
    type Tx_Power_Config_Type (Smart_Tx_Power_Enabled : Boolean := True) is
       record
          case Smart_Tx_Power_Enabled is
-         when True =>
-            Boost_Normal : Tx_Power_Value;
-            Boost_500us  : Tx_Power_Value;
-            Boost_250us  : Tx_Power_Value;
-            Boost_125us  : Tx_Power_Value;
+            when True =>
+               Boost_Normal : TX_POWER_Field;
+               Boost_500us  : TX_POWER_Field;
+               Boost_250us  : TX_POWER_Field;
+               Boost_125us  : TX_POWER_Field;
 
-         when False =>
-            Boost_SHR    : Tx_Power_Value;
-            Boost_PHR    : Tx_Power_Value;
+            when False =>
+               Boost_SHR    : TX_POWER_Field;
+               Boost_PHR    : TX_POWER_Field;
          end case;
       end record;
 
@@ -247,52 +229,6 @@ is
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                  Antenna_Delay_16_MHz    => DW1000.BSP.Device_State,
                  Antenna_Delay_64_MHz    => DW1000.BSP.Device_State);
-
-
-   function To_Bits_8 (Config : in Tx_Power_Value) return Bits_8;
-   --  Convert a Tx power configuration to its Bits_8 representation for use
-   --  when writing to the TX_POWER register.
-   --
-   --  The TX_POWER register is composed of four Bits_8 fields, each of which
-   --  contains 3 bits for the coarse gain setting, and 5 bits for the fine
-   --  gain setting. This function converts to this Bits_8 representation.
-
-   function Fine_Gain (Tx_Power_Bits : in Bits_8) return Fine_Tx_Power_Number;
-   --  Get the fine gain setting from one of the fields in the TX_POWER
-   --  register.
-   --
-   --  The TX_POWER register is composed of four Bits_8 fields, each of which
-   --  contains 3 bits for the coarse gain setting, and 5 bits for the fine
-   --  gain setting. This function gets the fine gain parameter.
-
-   function Is_Coarse_Gain_Enabled (Tx_Power_Bits : in Bits_8) return Boolean
-   is ((Tx_Power_Bits and 2#111_00000#) /= 2#111_00000#);
-   --  Check if the coarse gain output is enabled or disabled.
-   --
-   --  The TX_POWER register is composed of four Bits_8 fields, each of which
-   --  contains 3 bits for the coarse gain setting, and 5 bits for the fine
-   --  gain setting. This function gets the coarse gain parameter.
-   --
-   --  Note that the specical value of 2#111# for the coarse gain bits in the
-   --  TX_POWER register's fields means that the coarse gain output is disabled
-   --  (only the fine gain is used). If the coarse gain is disabled, then this
-   --  function always returns False. Otherwise, it returns True.
-
-   function Coarse_Gain (Tx_Power_Bits : in Bits_8)
-                         return Coarse_Tx_Power_Number
-     with Post => (if not Is_Coarse_Gain_Enabled (Tx_Power_Bits)
-                   then Coarse_Gain'Result = 0.0);
-   --  Get the coarse gain setting from one of the fields in the TX_POWER
-   --  register.
-   --
-   --  The TX_POWER register is composed of four Bits_8 fields, each of which
-   --  contains 3 bits for the coarse gain setting, and 5 bits for the fine
-   --  gain setting. This function gets the coarse gain parameter.
-   --
-   --  Note that the specical value of 2#111# for the coarse gain bits in the
-   --  TX_POWER register's fields means that the coarse gain output is disabled
-   --  (only the fine gain is used). If the coarse gain is disabled, then this
-   --  function always returns 0.0.
 
    procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),

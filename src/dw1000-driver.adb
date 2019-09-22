@@ -862,82 +862,6 @@ is
       Antenna_Delay_64_MHz := To_Antenna_Delay_Time (Hi);
    end Read_OTP_Antenna_Delay;
 
-   function To_Bits_8 (Config : in Tx_Power_Value) return Bits_8
-     with SPARK_Mode => Off
-   --  SPARK mode is disabled as a workaround since GNATprove doesn't yet
-   --  support conversions between different fixed-point types.
-   is
-      type Extended_Fine_Tx_Power_Number is
-      delta Fine_Tx_Power_Number'Delta
-      range 0.0 .. Fine_Tx_Power_Number'Last * 2.0
-        with Small => Fine_Tx_Power_Number'Small;
-      --  Need a temporary type with twice the range to hold an intermediate
-      --  calculation.
-
-      Two : constant Extended_Fine_Tx_Power_Number := 2.0;
-      --  GNATprove doesn't support multiplications/divisions between
-      --  fixed point types and universal real. So this constant is used as a
-      --  workaround so that thed multiplication is between two fixed point
-      --  types.
-
-      Temp : Extended_Fine_Tx_Power_Number;
-
-      Coarse_Bits : Bits_3;
-      Fine_Bits   : Bits_5;
-
-   begin
-      if Config.Coarse_Gain_Enabled then
-         Coarse_Bits := 2#110# - Bits_3 (Bits_8 (Config.Coarse_Gain) / 3);
-      else
-         Coarse_Bits := 2#111#;
-      end if;
-
-      Temp := Extended_Fine_Tx_Power_Number (Config.Fine_Gain);
-      Temp := Temp * Two;
-      Fine_Bits := Bits_5 (Temp);
-
-      return (Bits_8 (Coarse_Bits) * 2**5) or Bits_8 (Fine_Bits);
-   end To_Bits_8;
-
-   function Fine_Gain (Tx_Power_Bits : in Bits_8) return Fine_Tx_Power_Number
-     with SPARK_Mode => Off
-   --  SPARK mode is disabled as a workaround since GNATprove doesn't yet
-   --  support conversions between different fixed-point types.
-   is
-      type Extended_Fine_Tx_Power_Number is
-      delta Fine_Tx_Power_Number'Delta
-      range 0.0 .. Fine_Tx_Power_Number'Last * 2.0
-        with Small => Fine_Tx_Power_Number'Small;
-      --  Need a temporary type with twice the range to hold an intermediate
-      --  calculation.
-
-      Two : constant Extended_Fine_Tx_Power_Number := 2.0;
-      --  GNATprove doesn't support multiplications/divisions between
-      --  fixed point types and universal real. So this constant is used as a
-      --  workaround so that thed multiplication is between two fixed point
-      --  types.
-
-      Temp : Extended_Fine_Tx_Power_Number;
-   begin
-      Temp := Extended_Fine_Tx_Power_Number (Tx_Power_Bits and 2#000_11111#);
-      Temp := Temp / Two;
-
-      return Fine_Tx_Power_Number (Temp);
-   end FIne_Gain;
-
-   function Coarse_Gain (Tx_Power_Bits : in Bits_8)
-                         return Coarse_Tx_Power_Number
-   is
-      Temp : Bits_8;
-   begin
-      if Is_Coarse_Gain_Enabled (Tx_Power_Bits) then
-         Temp := Tx_Power_Bits / 2**5;
-         return Coarse_Tx_Power_Number ((2#110# - Temp) * 3);
-      else
-         return 0.0;
-      end if;
-   end Coarse_Gain;
-
    procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
@@ -946,17 +870,17 @@ is
       if Config.Smart_Tx_Power_Enabled then
          TX_POWER.Write
            (TX_POWER_Type'
-              (BOOSTNORM => To_Bits_8 (Config.Boost_Normal),
-               BOOSTP500 => To_Bits_8 (Config.Boost_500us),
-               BOOSTP250 => To_Bits_8 (Config.Boost_250us),
-               BOOSTP125 => To_Bits_8 (Config.Boost_125us)));
+              (BOOSTNORM => Config.Boost_Normal,
+               BOOSTP500 => Config.Boost_500us,
+               BOOSTP250 => Config.Boost_250us,
+               BOOSTP125 => Config.Boost_125us));
       else
          TX_POWER.Write
            (TX_POWER_Type'
-              (BOOSTNORM => 16#22#,
-               BOOSTP500 => To_Bits_8 (Config.Boost_PHR),
-               BOOSTP250 => To_Bits_8 (Config.Boost_SHR),
-               BOOSTP125 => 16#0E#));
+              (BOOSTNORM => Config.Boost_PHR,
+               BOOSTP500 => Config.Boost_PHR,
+               BOOSTP250 => Config.Boost_SHR,
+               BOOSTP125 => Config.Boost_SHR));
       end if;
 
       SYS_CFG.Read (SYS_CFG_Reg);
