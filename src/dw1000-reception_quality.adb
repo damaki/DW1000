@@ -108,6 +108,8 @@ is
       subtype Denominator_Range is Long_Float
       range 1.0 .. (2.0**12 - 1.0)**2;
 
+      type RXPACC_Sq_Range is range 0 .. RX_FINFO_RXPACC_Field'Last**2;
+
       N   : Numerator_Range;
       D   : Denominator_Range;
       A   : Long_Float;
@@ -140,7 +142,7 @@ is
       pragma Assert_And_Cut (N in Numerator_Range);
 
       if RXPACC /= 0 then
-         D := Long_Float (Bits_24 (RXPACC) * Bits_24 (RXPACC));
+         D := Long_Float (RXPACC_Sq_Range (RXPACC) * RXPACC_Sq_Range (RXPACC));
 
          pragma Assert (D in Denominator_Range);
       else
@@ -188,10 +190,17 @@ is
       subtype Denominator_Range is Long_Float
       range 1.0 .. (2.0**12 - 1.0)**2;
 
-      N   : Numerator_Range;
-      D   : Denominator_Range;
-      R   : Long_Float;
-      A   : Long_Float;
+      type AMPL_Sq_Range is range 0 .. (2**16 - 1)**2;
+
+      type AMPL_Sum_Range is range 0 .. AMPL_Sq_Range'Last * 3;
+
+      type RXPACC_Sq_Range is range 0 .. RX_FINFO_RXPACC_Field'Last**2;
+
+      F_Sum : AMPL_Sum_Range;
+      N     : Numerator_Range;
+      D     : Denominator_Range;
+      R     : Long_Float;
+      A     : Long_Float;
    begin
       --  Calculation from the DW1000 User Manual for the receive signal power
       --  is as follows:
@@ -208,9 +217,11 @@ is
       --    * A is 113.77 for a 16 MHz PRF or 121.74 for a 64 MHz PRF
 
       if F1 /= 0 or F2 /= 0 or F3 /= 0 then
-         N := Numerator_Range (Bits_33 (Bits_32 (F1) * Bits_32 (F1)) +
-                               Bits_33 (Bits_32 (F2) * Bits_32 (F2)) +
-                               Bits_33 (Bits_32 (F3) * Bits_32 (F3)));
+         F_Sum := (AMPL_Sum_Range (AMPL_Sq_Range (F1) * AMPL_Sq_Range (F1))
+                   + AMPL_Sum_Range (AMPL_Sq_Range (F2) * AMPL_Sq_Range (F2))
+                   + AMPL_Sum_Range (AMPL_Sq_Range (F3) * AMPL_Sq_Range (F3)));
+
+         N := Numerator_Range (F_Sum);
 
          pragma Assert (N in Numerator_Range);
       else
@@ -222,7 +233,7 @@ is
       pragma Assert_And_Cut (N in Numerator_Range);
 
       if RXPACC /= 0 then
-         D := Denominator_Range (Bits_24 (RXPACC) * Bits_24 (RXPACC));
+         D := Denominator_Range (RXPACC_Sq_Range (RXPACC) * RXPACC_Sq_Range (RXPACC));
 
          pragma Assert (D in Denominator_Range);
       else
