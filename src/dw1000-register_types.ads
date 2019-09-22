@@ -1354,13 +1354,46 @@ is
    ----------------------------------------------------------------------------
    -- EXT_SYNC register file
 
-   -- EC_CTRL sub-register
+   ---------------------------
+   -- EC_CTRL sub-register  --
+   ---------------------------
+
+   type EC_CTRL_OSTSM_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  External transmit synchronisation mode enable.
+
+   type EC_CTRL_OSRSM_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  External receive synchronisation mode enable.
+
+   type EC_CTRL_PLLLDT_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Clock PLL lock detect tune.
+
+   type EC_CTRL_WAIT_Field is range 0 .. 255
+     with Size => 8;
+   --  Wait counter used for external transmit synchronisation and external
+   --  timebase reset.
+   --
+   --  The wait time is the number of external clock cycles (@ 38.4 MHz).
+
+   type EC_CTRL_OSTRM_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+
    type EC_CTRL_Type is record
-      OSTSM  : Types.Bits_1    := 0;
-      OSRSM  : Types.Bits_1    := 0;
-      PLLLDT : Types.Bits_1    := 0;
-      WAIT   : Types.Bits_8    := 0;
-      OSTRM  : Types.Bits_1    := 0;
+      OSTSM  : EC_CTRL_OSTSM_Field  := Disabled;
+      OSRSM  : EC_CTRL_OSRSM_Field  := Disabled;
+      PLLLDT : EC_CTRL_PLLLDT_Field := Enabled;
+      WAIT   : EC_CTRL_WAIT_Field   := 0;
+      OSTRM  : EC_CTRL_OSTRM_Field  := Disabled;
 
       Reserved : Types.Bits_20 := 0;
    end record
@@ -1378,9 +1411,16 @@ is
       Reserved at 0 range 12 .. 31;
    end record;
 
-   -- EC_RXTC sub-register
+   ---------------------------
+   -- EC_RXTC sub-register  --
+   ---------------------------
+
+   type EC_RCTC_RX_TS_EST_Field is range 0 .. 2**32 - 1
+     with Size => 32;
+   --  External clock synchronisation counter captured on RMARKER.
+
    type EC_RXTC_Type is record
-      RX_TS_EST : Types.Bits_32;
+      RX_TS_EST : EC_RCTC_RX_TS_EST_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1390,9 +1430,15 @@ is
       RX_TS_EST at 0 range 0 .. 31;
    end record;
 
-   -- EC_GOLP sub-register
+   ---------------------------
+   -- EC_GOLP sub-register  --
+   ---------------------------
+
+   type EC_GOLP_OFFSET_EXT_Field is range 0 .. 2**6 - 1
+     with Size => 6;
+
    type EC_GOLP_Type is record
-      OFFSET_EXT : Types.Bits_6  := 0;
+      OFFSET_EXT : EC_GOLP_OFFSET_EXT_Field := 0;
 
       Reserved   : Types.Bits_26 := 0;
    end record
