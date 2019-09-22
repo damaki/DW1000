@@ -35,19 +35,8 @@ is
    Default_SFD_Timeout : constant DW1000.Driver.SFD_Timeout_Number := 16#1041#;
 
    Null_Frame_Info : constant Frame_Info_Type
-     := (RX_TIME_Reg      => (RX_STAMP => 0,
-                              FP_INDEX => 0,
-                              FP_AMPL1 => 0,
-                              RX_RAWST => 0),
-         RX_FINFO_Reg     => (RXFLEN   => 0,
-                              RXFLE    => 0,
-                              RXNSPL   => 0,
-                              RXBR     => 0,
-                              RNG      => 0,
-                              RXPRF    => 0,
-                              RXPSR    => 0,
-                              RXPACC   => 0,
-                              Reserved => 0),
+     := (RX_TIME_Reg      => (others   => <>),
+         RX_FINFO_Reg     => (others   => <>),
          RX_FQUAL_Reg     => (STD_NOISE => 0,
                               FP_AMPL2  => 0,
                               FP_AMPL3  => 0,
@@ -56,7 +45,7 @@ is
          RX_TTCKI_Reg     => (RXTTCKI => 0),
          RX_TTCKO_Reg     => (RXTOFS     => 0,
                               RSMPDEL    => 0,
-                              RCPHASE    => 0,
+                              RCPHASE    => 0.0,
                               Reserved_1 => 0,
                               Reserved_2 => 0),
          SFD_LENGTH       => 64,
@@ -70,7 +59,7 @@ is
                                return Fine_System_Time
    is
    begin
-      return To_Fine_System_Time (Frame_Info.RX_TIME_Reg.RX_STAMP);
+      return Frame_Info.RX_TIME_Reg.RX_STAMP;
    end Receive_Timestamp;
 
    ----------------------------
@@ -80,14 +69,14 @@ is
    function Receive_Signal_Power (Frame_Info : in Frame_Info_Type)
                                   return Float
    is
-      RXBR       : Bits_2;
+      RXBR       : RX_FINFO_RXBR_Field;
       SFD_LENGTH : Bits_8;
-      RXPACC     : Bits_12;
+      RXPACC     : RX_FINFO_RXPACC_Field;
 
    begin
       RXBR := Frame_Info.RX_FINFO_Reg.RXBR;
-      if RXBR = 2#11# then --  Detect reserved value
-         RXBR := 2#10#;    --  default to 6.8 Mbps
+      if RXBR = Reserved then --  Detect reserved value
+         RXBR := Data_Rate_6M8;    --  default to 6.8 Mbps
       end if;
 
       SFD_LENGTH := Frame_Info.SFD_LENGTH;
@@ -103,7 +92,7 @@ is
          Non_Standard_SFD => Frame_Info.Non_Standard_SFD);
 
       return Receive_Signal_Power
-        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = 2#10#,
+        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = PRF_16MHz,
          RXPACC        => RXPACC,
          CIR_PWR       => Frame_Info.RX_FQUAL_Reg.CIR_PWR);
    end Receive_Signal_Power;
@@ -115,13 +104,13 @@ is
    function First_Path_Signal_Power (Frame_Info : in Frame_Info_Type)
                                      return Float
    is
-      RXBR       : Bits_2;
+      RXBR       : RX_FINFO_RXBR_Field;
       SFD_LENGTH : Bits_8;
-      RXPACC     : Bits_12;
+      RXPACC     : RX_FINFO_RXPACC_Field;
    begin
       RXBR := Frame_Info.RX_FINFO_Reg.RXBR;
-      if RXBR = 2#11# then --  Detect reserved value
-         RXBR := 2#10#; --  default to 6.8 Mbps
+      if RXBR = Reserved then --  Detect reserved value
+         RXBR := Data_Rate_6M8; --  default to 6.8 Mbps
       end if;
 
       SFD_LENGTH := Frame_Info.SFD_LENGTH;
@@ -137,7 +126,7 @@ is
          Non_Standard_SFD => Frame_Info.Non_Standard_SFD);
 
       return First_Path_Signal_Power
-        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = 2#10#,
+        (Use_16MHz_PRF => Frame_Info.RX_FINFO_Reg.RXPRF = PRF_16MHz,
          F1            => Frame_Info.RX_TIME_Reg.FP_AMPL1,
          F2            => Frame_Info.RX_FQUAL_Reg.FP_AMPL2,
          F3            => Frame_Info.RX_FQUAL_Reg.FP_AMPL3,
@@ -201,7 +190,7 @@ is
 
          if Load_XTAL_Trim then
             DW1000.Driver.Read_OTP (OTP_ADDR_XTAL_TRIM, Word);
-            XTAL_Trim := Bits_5 (Word and 2#1_1111#);
+            XTAL_Trim := FS_XTALT_Field (Word and 2#1_1111#);
          else
             XTAL_Trim := 2#1_0000#; -- Set to midpoint
          end if;
@@ -212,7 +201,7 @@ is
          else
             -- Should disable LDERUN bit, since the LDE isn't loaded.
             DW1000.Registers.PMSC_CTRL1.Read (PMSC_CTRL1_Reg);
-            PMSC_CTRL1_Reg.LDERUNE := 0;
+            PMSC_CTRL1_Reg.LDERUNE := Disabled;
             DW1000.Registers.PMSC_CTRL1.Write (PMSC_CTRL1_Reg);
          end if;
 
@@ -224,12 +213,12 @@ is
 
          --  Configure IRQs
          DW1000.Registers.SYS_MASK.Read (SYS_MASK_Reg);
-         SYS_MASK_Reg.MRXRFTO  := 1;
-         SYS_MASK_Reg.MRXSFDTO := 1;
-         SYS_MASK_Reg.MRXPHE   := 1;
-         SYS_MASK_Reg.MRXRFSL  := 1;
-         SYS_MASK_Reg.MRXDFR   := 1; --  Always detect frame received
-         SYS_MASK_Reg.MTXFRS   := 1; --  Always detect frame sent
+         SYS_MASK_Reg.MRXRFTO  := Not_Masked;
+         SYS_MASK_Reg.MRXSFDTO := Not_Masked;
+         SYS_MASK_Reg.MRXPHE   := Not_Masked;
+         SYS_MASK_Reg.MRXRFSL  := Not_Masked;
+         SYS_MASK_Reg.MRXDFR   := Not_Masked; --  Always detect frame received
+         SYS_MASK_Reg.MTXFRS   := Not_Masked; --  Always detect frame sent
          DW1000.Registers.SYS_MASK.Write (SYS_MASK_Reg);
 
          Detect_Frame_Timeout := True;
@@ -252,14 +241,15 @@ is
 
          --  110 kbps data rate has special handling
          if Config.Data_Rate = DW1000.Driver.Data_Rate_110k then
-            SYS_CFG_Reg.RXM110K := 1;
+            SYS_CFG_Reg.RXM110K := SFD_110K;
          else
-            SYS_CFG_Reg.RXM110K := 0;
+            SYS_CFG_Reg.RXM110K := SFD_850K_6M8;
          end if;
 
          --  Set physical header mode (standard or extended frames)
          Long_Frames := Config.PHR_Mode = Extended_Frames;
-         SYS_CFG_Reg.PHR_MODE := Bits_2 (Physical_Header_Modes'Pos (Config.PHR_Mode));
+         SYS_CFG_Reg.PHR_MODE := SYS_CFG_PHR_MODE_Field'Val
+           (Physical_Header_Modes'Pos (Config.PHR_Mode));
 
          DW1000.Registers.SYS_CFG.Write (SYS_CFG_Reg);
 
@@ -295,14 +285,22 @@ is
          --  Configure the channel, Rx PRF, non-std SFD, and preamble codes
          DW1000.Registers.CHAN_CTRL.Write
            (DW1000.Register_Types.CHAN_CTRL_Type'
-              (TX_CHAN  => Bits_4 (Config.Channel),
-               RX_CHAN  => Bits_4 (Config.Channel),
-               DWSFD    => (if Config.Use_Nonstandard_SFD then 1 else 0),
-               RXPRF    => (if Config.PRF = PRF_16MHz then 2#01# else 2#10#),
-               TNSSFD   => (if Config.Use_Nonstandard_SFD then 1 else 0),
-               RNSSFD   => (if Config.Use_Nonstandard_SFD then 1 else 0),
-               TX_PCODE => Bits_5 (Config.Tx_Preamble_Code),
-               RX_PCODE => Bits_5 (Config.Rx_Preamble_Code),
+              (TX_CHAN  => CHAN_CTRL_Channel_Field (Config.Channel),
+               RX_CHAN  => CHAN_CTRL_Channel_Field (Config.Channel),
+               DWSFD    => (if Config.Use_Nonstandard_SFD
+                            then Enabled
+                            else Disabled),
+               RXPRF    => (if Config.PRF = PRF_16MHz
+                            then PRF_16MHz
+                            else PRF_64MHz),
+               TNSSFD   => (if Config.Use_Nonstandard_SFD
+                            then Enabled
+                            else Disabled),
+               RNSSFD   => (if Config.Use_Nonstandard_SFD
+                            then Enabled
+                            else Disabled),
+               TX_PCODE => CHAN_CTRL_PCODE_Field (Config.Tx_Preamble_Code),
+               RX_PCODE => CHAN_CTRL_PCODE_Field (Config.Rx_Preamble_Code),
                Reserved => 0));
 
          --  Set the Tx frame control (transmit data rate, PRF, ranging bit)
@@ -311,14 +309,17 @@ is
               (TFLEN    => 0,
                TFLE     => 0,
                R        => 0,
-               TXBR     => Bits_2 (Data_Rates'Pos (Config.Data_Rate)),
-               TR       => 1,
-               TXPRF    => (if Config.PRF = PRF_16MHz then 2#01# else 2#10#),
+               TXBR     => (case Config.Data_Rate is
+                               when Data_Rate_110k => Data_Rate_110K,
+                               when Data_Rate_850k => Data_Rate_850K,
+                               when Data_Rate_6M8 => Data_Rate_6M8),
+               TR       => Enabled,
+               TXPRF    => (if Config.PRF = PRF_16MHz then PRF_16MHz else PRF_64MHz),
                TXPSR    =>
                  (case Config.Tx_Preamble_Length is
-                     when PLEN_64 | PLEN_128 | PLEN_256 | PLEN_512 => 2#01#,
-                     when PLEN_1024 | PLEN_1536 | PLEN_2048        => 2#10#,
-                     when others                                   => 2#11#),
+                     when PLEN_64 | PLEN_128 | PLEN_256 | PLEN_512 => PLEN_64,
+                     when PLEN_1024 | PLEN_1536 | PLEN_2048        => PLEN_1024,
+                     when others                                   => PLEN_4096),
                PE       =>
                  (case Config.Tx_Preamble_Length is
                      when PLEN_64 | PLEN_1024 | PLEN_4096 => 2#00#,
@@ -609,7 +610,7 @@ is
                begin
                   DW1000.Registers.CHAN_CTRL.Read (CHAN_CTRL_Reg);
                   Frame_Queue (Next_Idx).Frame_Info.Non_Standard_SFD
-                    := CHAN_CTRL_Reg.DWSFD = 1;
+                    := CHAN_CTRL_Reg.DWSFD = Enabled;
                end;
             end if;
 

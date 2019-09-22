@@ -20,7 +20,8 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with DW1000.Driver; use DW1000.Driver;
+with DW1000.Driver;         use DW1000.Driver;
+with DW1000.Register_Types; use DW1000.Register_Types;
 
 --  @summary
 --  Reference transmit power gain tables for both smart transmit power and
@@ -51,243 +52,168 @@ package Tx_Power
 with SPARK_Mode => On
 is
 
-   --  Values for the smart tx power mode.
-   Smart_Tx_Power_Table : constant Tx_Power_Config_Table
-       := (1 | 2 =>
-               (PRF_16MHz =>
+   --  Values for the smart tx power mode
+   Smart_Tx_Power_Table : constant Tx_Power_Config_Table :=
+     (1 | 2 => (PRF_16MHz =>
                     (Smart_Tx_Power_Enabled => True,
-                     Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 10.5,
-                                                Coarse_Gain         => 9.0),
-                     Boost_500us            => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 10.5,
-                                                Coarse_Gain         => 12.0),
-                     Boost_250us            => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 10.5,
-                                                Coarse_Gain         => 15.0),
-                     Boost_125us            => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 10.5,
-                                                Coarse_Gain         => 18.0)),
+                     Boost_Normal           => (Fine_Gain   => 10.5,
+                                                Coarse_Gain => Gain_7_5_dB),
+                     Boost_500us            => (Fine_Gain   => 10.5,
+                                                Coarse_Gain => Gain_10_dB),
+                     Boost_250us            => (Fine_Gain   => 10.5,
+                                                Coarse_Gain => Gain_12_5_dB),
+                     Boost_125us            => (Fine_Gain   => 10.5,
+                                                Coarse_Gain => Gain_15_dB)),
+
                 PRF_64MHz =>
                   (Smart_Tx_Power_Enabled => True,
-                   Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                              Fine_Gain           => 3.5,
-                                              Coarse_Gain         => 9.0),
-                   Boost_500us            => (Coarse_Gain_Enabled => True,
-                                              Fine_Gain           => 3.5,
-                                              Coarse_Gain         => 12.0),
-                   Boost_250us            => (Coarse_Gain_Enabled => True,
-                                              Fine_Gain           => 3.5,
-                                              Coarse_Gain         => 15.0),
-                   Boost_125us            => (Coarse_Gain_Enabled => True,
-                                              Fine_Gain           => 3.5,
-                                              Coarse_Gain         => 18.0))),
-           3     =>
-             (PRF_16MHz =>
-                (Smart_Tx_Power_Enabled => True,
-                 Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 7.5,
-                                            Coarse_Gain         => 9.0),
-                 Boost_500us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 7.5,
-                                            Coarse_Gain         => 12.0),
-                 Boost_250us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 7.5,
-                                            Coarse_Gain         => 15.0),
-                 Boost_125us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 7.5,
-                                            Coarse_Gain         => 18.0)),
-              PRF_64MHz =>
-                (Smart_Tx_Power_Enabled => True,
-                 Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 5.5,
-                                            Coarse_Gain         => 6.0),
-                 Boost_500us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 5.5,
-                                            Coarse_Gain         => 9.0),
-                 Boost_250us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 5.5,
-                                            Coarse_Gain         => 12.0),
-                 Boost_125us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 5.5,
-                                            Coarse_Gain         => 15.0))),
-           4     =>
-             (PRF_16MHz =>
-                (Smart_Tx_Power_Enabled => True,
-                 Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 15.5,
-                                            Coarse_Gain         => 12.0),
-                 Boost_500us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 15.5,
-                                            Coarse_Gain         => 15.0),
-                 Boost_250us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 15.5,
-                                            Coarse_Gain         => 18.0),
-                 Boost_125us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 15.5,
-                                            Coarse_Gain         => 18.0)),
-              PRF_64MHz =>
-                (Smart_Tx_Power_Enabled => True,
-                 Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 13.0,
-                                            Coarse_Gain         => 6.0),
-                 Boost_500us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 13.0,
-                                            Coarse_Gain         => 9.0),
-                 Boost_250us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 13.0,
-                                            Coarse_Gain         => 12.0),
-                 Boost_125us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 13.0,
-                                            Coarse_Gain         => 15.0))),
-           5 | 6 =>  --  Ch6 not supported, so the power values doesn't matter
-             (PRF_16MHz =>
-                (Smart_Tx_Power_Enabled => True,
-                 Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 4.0,
-                                            Coarse_Gain         => 12.0),
-                 Boost_500us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 4.0,
-                                            Coarse_Gain         => 15.0),
-                 Boost_250us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 4.0,
-                                            Coarse_Gain         => 18.0),
-                 Boost_125us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 3.0,
-                                            Coarse_Gain         => 18.0)),
-              PRF_64MHz =>
-                (Smart_Tx_Power_Enabled => True,
-                 Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 2.5,
-                                            Coarse_Gain         => 6.0),
-                 Boost_500us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 2.5,
-                                            Coarse_Gain         => 9.0),
-                 Boost_250us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 2.5,
-                                            Coarse_Gain         => 12.0),
-                 Boost_125us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 2.5,
-                                            Coarse_Gain         => 15.0))),
-           7     =>
-             (PRF_16MHz =>
-                (Smart_Tx_Power_Enabled => True,
-                 Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 9.0,
-                                            Coarse_Gain         => 6.0),
-                 Boost_500us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 9.0,
-                                            Coarse_Gain         => 9.0),
-                 Boost_250us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 9.0,
-                                            Coarse_Gain         => 12.0),
-                 Boost_125us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 9.0,
-                                            Coarse_Gain         => 15.0)),
-              PRF_64MHz =>
-                (Smart_Tx_Power_Enabled => True,
-                 Boost_Normal           => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 8.5,
-                                            Coarse_Gain         => 0.0),
-                 Boost_500us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 8.5,
-                                            Coarse_Gain         => 3.0),
-                 Boost_250us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 8.5,
-                                            Coarse_Gain         => 9.0),
-                 Boost_125us            => (Coarse_Gain_Enabled => True,
-                                            Fine_Gain           => 8.5,
-                                            Coarse_Gain         => 12.0)))
-          );
+                   Boost_Normal           => (Fine_Gain   => 3.5,
+                                              Coarse_Gain => Gain_7_5_dB),
+                   Boost_500us            => (Fine_Gain   => 3.5,
+                                              Coarse_Gain => Gain_10_dB),
+                   Boost_250us            => (Fine_Gain   => 3.5,
+                                              Coarse_Gain => Gain_12_5_dB),
+                   Boost_125us            => (Fine_Gain   => 3.5,
+                                              Coarse_Gain => Gain_15_dB))),
 
+      3 => (PRF_16MHz =>
+                (Smart_Tx_Power_Enabled => True,
+                 Boost_Normal           => (Fine_Gain   => 7.5,
+                                            Coarse_Gain => Gain_7_5_dB),
+                 Boost_500us            => (Fine_Gain   => 7.5,
+                                            Coarse_Gain => Gain_10_dB),
+                 Boost_250us            => (Fine_Gain   => 7.5,
+                                            Coarse_Gain => Gain_12_5_dB),
+                 Boost_125us            => (Fine_Gain   => 7.5,
+                                            Coarse_Gain => Gain_15_dB)),
 
-   --  Values for the manual tx power mode.
-   Manual_Tx_Power_Table : constant Tx_Power_Config_Table
-       := (1 | 2  =>
-               (PRF_16MHz =>
-                    (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 10.5,
-                                                Coarse_Gain         => 9.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 10.5,
-                                                Coarse_Gain         => 9.0)),
+            PRF_64MHz =>
+              (Smart_Tx_Power_Enabled => True,
+               Boost_Normal           => (Fine_Gain   => 5.5,
+                                          Coarse_Gain => Gain_5_dB),
+               Boost_500us            => (Fine_Gain   => 5.5,
+                                          Coarse_Gain => Gain_7_5_dB),
+               Boost_250us            => (Fine_Gain   => 5.5,
+                                          Coarse_Gain => Gain_10_dB),
+               Boost_125us            => (Fine_Gain   => 5.5,
+                                          Coarse_Gain => Gain_12_5_dB))),
+
+      4 => (PRF_16MHz =>
+                (Smart_Tx_Power_Enabled => True,
+                 Boost_Normal           => (Fine_Gain   => 15.5,
+                                            Coarse_Gain => Gain_10_dB),
+                 Boost_500us            => (Fine_Gain   => 15.5,
+                                            Coarse_Gain => Gain_12_5_dB),
+                 Boost_250us            => (Fine_Gain   => 15.5,
+                                            Coarse_Gain => Gain_15_dB),
+                 Boost_125us            => (Fine_Gain   => 15.5,
+                                            Coarse_Gain => Gain_15_dB)),
+
+            PRF_64MHz =>
+              (Smart_Tx_Power_Enabled => True,
+               Boost_Normal           => (Fine_Gain   => 13.0,
+                                          Coarse_Gain => Gain_5_dB),
+               Boost_500us            => (Fine_Gain   => 13.0,
+                                          Coarse_Gain => Gain_7_5_dB),
+               Boost_250us            => (Fine_Gain   => 13.0,
+                                          Coarse_Gain => Gain_10_dB),
+               Boost_125us            => (Fine_Gain   => 13.0,
+                                          Coarse_Gain => Gain_12_5_dB))),
+
+      5 | 6 => (PRF_16MHz =>
+                    (Smart_Tx_Power_Enabled => True,
+                     Boost_Normal           => (Fine_Gain   => 4.0,
+                                                Coarse_Gain => Gain_10_dB),
+                     Boost_500us            => (Fine_Gain   => 4.0,
+                                                Coarse_Gain => Gain_12_5_dB),
+                     Boost_250us            => (Fine_Gain   => 4.0,
+                                                Coarse_Gain => Gain_15_dB),
+                     Boost_125us            => (Fine_Gain   => 7.0,
+                                                Coarse_Gain => Gain_15_dB)),
+
                 PRF_64MHz =>
+                  (Smart_Tx_Power_Enabled => True,
+                   Boost_Normal           => (Fine_Gain   => 2.5,
+                                              Coarse_Gain => Gain_5_dB),
+                   Boost_500us            => (Fine_Gain   => 2.5,
+                                              Coarse_Gain => Gain_7_5_dB),
+                   Boost_250us            => (Fine_Gain   => 2.5,
+                                              Coarse_Gain => Gain_10_dB),
+                   Boost_125us            => (Fine_Gain   => 2.5,
+                                              Coarse_Gain => Gain_12_5_dB))),
+
+      7 => (PRF_16MHz =>
+                (Smart_Tx_Power_Enabled => True,
+                 Boost_Normal           => (Fine_Gain   => 9.0,
+                                            Coarse_Gain => Gain_5_dB),
+                 Boost_500us            => (Fine_Gain   => 9.0,
+                                            Coarse_Gain => Gain_7_5_dB),
+                 Boost_250us            => (Fine_Gain   => 9.0,
+                                            Coarse_Gain => Gain_10_dB),
+                 Boost_125us            => (Fine_Gain   => 9.0,
+                                            Coarse_Gain => Gain_12_5_dB)),
+
+            PRF_64MHz =>
+              (Smart_Tx_Power_Enabled => True,
+               Boost_Normal           => (Fine_Gain   => 8.5,
+                                          Coarse_Gain => Gain_0_dB),
+               Boost_500us            => (Fine_Gain   => 8.5,
+                                          Coarse_Gain => Gain_2_5_dB),
+               Boost_250us            => (Fine_Gain   => 8.5,
+                                          Coarse_Gain => Gain_7_5_dB),
+               Boost_125us            => (Fine_Gain   => 8.5,
+                                          Coarse_Gain => Gain_10_dB))));
+
+   --  Values for the manual tx power mode
+   Manual_Tx_Power_Table : constant Tx_Power_Config_Table :=
+     (1 | 2 => (PRF_16MHz =>
                     (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 3.5,
-                                                Coarse_Gain         => 9.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 3.5,
-                                                Coarse_Gain         => 9.0))),
-           3      =>
-             (PRF_16MHz =>
-                    (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 7.5,
-                                                Coarse_Gain         => 9.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 7.5,
-                                                Coarse_Gain         => 9.0)),
+                     Boost_SHR | Boost_PhR  => (Fine_Gain   => 10.5,
+                                                Coarse_Gain => Gain_7_5_dB)),
+
                 PRF_64MHz =>
+                  (Smart_Tx_Power_Enabled => False,
+                   Boost_SHR | Boost_PHR  => (Fine_Gain   => 3.5,
+                                              Coarse_Gain => Gain_7_5_dB))),
+
+      3 => (PRF_16MHz =>
+                (Smart_Tx_Power_Enabled => False,
+                 Boost_SHR | Boost_PHR  => (Fine_Gain   => 7.5,
+                                            Coarse_Gain => Gain_7_5_dB)),
+
+            PRF_64MHz =>
+              (Smart_Tx_Power_Enabled => False,
+               Boost_SHR | Boost_PHR  => (Fine_Gain   => 5.5,
+                                          Coarse_Gain => Gain_5_dB))),
+
+      4 => (PRF_16MHz =>
+                (Smart_Tx_Power_Enabled => False,
+                 Boost_SHR | Boost_PHR  => (Fine_Gain   => 15.5,
+                                            Coarse_Gain => Gain_10_dB)),
+
+            PRF_64MHz =>
+              (Smart_Tx_Power_Enabled => False,
+               Boost_SHR | Boost_PHR  => (Fine_Gain   => 13.0,
+                                          Coarse_Gain => Gain_5_dB))),
+
+      5 | 6 => (PRF_16MHz =>
                     (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 5.5,
-                                                Coarse_Gain         => 6.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 5.5,
-                                                Coarse_Gain         => 6.0))),
-           4      =>
-             (PRF_16MHz =>
-                    (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 15.5,
-                                                Coarse_Gain         => 12.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 15.5,
-                                                Coarse_Gain         => 12.0)),
+                     Boost_SHR | Boost_PHR  => (Fine_Gain   => 4.0,
+                                                Coarse_Gain => Gain_10_dB)),
+
                 PRF_64MHz =>
-                    (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 13.0,
-                                                Coarse_Gain         => 6.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 13.0,
-                                                Coarse_Gain         => 6.0))),
-           5 | 6  =>
-             (PRF_16MHz =>
-                    (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 4.0,
-                                                Coarse_Gain         => 12.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 4.0,
-                                                Coarse_Gain         => 12.0)),
-                PRF_64MHz =>
-                    (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 2.5,
-                                                Coarse_Gain         => 6.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 2.5,
-                                                Coarse_Gain         => 6.0))),
-           7      =>
-             (PRF_16MHz =>
-                    (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 9.0,
-                                                Coarse_Gain         => 6.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 9.0,
-                                                Coarse_Gain         => 6.0)),
-                PRF_64MHz =>
-                    (Smart_Tx_Power_Enabled => False,
-                     Boost_SHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 8.5,
-                                                Coarse_Gain         => 0.0),
-                     Boost_PHR              => (Coarse_Gain_Enabled => True,
-                                                Fine_Gain           => 8.5,
-                                                Coarse_Gain         => 0.0)))
-          );
+                  (Smart_Tx_Power_Enabled => False,
+                   Boost_SHR | Boost_PHR  => (Fine_Gain   => 2.5,
+                                              Coarse_Gain => Gain_5_dB))),
+
+      7 => (PRF_16MHz =>
+                (Smart_Tx_Power_Enabled => False,
+                 Boost_SHR | Boost_PHR  => (Fine_Gain   => 9.0,
+                                            Coarse_Gain => Gain_5_dB)),
+
+            PRF_64MHz =>
+              (Smart_Tx_Power_Enabled => False,
+               Boost_SHR | Boost_PHR  => (Fine_Gain   => 8.5,
+                                          Coarse_Gain => Gain_0_dB))));
 
 end Tx_Power;

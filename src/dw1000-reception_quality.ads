@@ -20,7 +20,8 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with DW1000.Types; use DW1000.Types;
+with DW1000.Register_Types; use DW1000.Register_Types;
+with DW1000.Types;          use DW1000.Types;
 
 --  @summary
 --  Utility functions for measuring the quality of received frames.
@@ -28,12 +29,12 @@ package DW1000.Reception_Quality
 with SPARK_Mode => On
 is
 
-   function Adjust_RXPACC (RXPACC              : in Bits_12;
-                           RXPACC_NOSAT        : in Bits_16;
-                           RXBR                : in Bits_2;
+   function Adjust_RXPACC (RXPACC              : in RX_FINFO_RXPACC_Field;
+                           RXPACC_NOSAT        : in RXPACC_NOSAT_Field;
+                           RXBR                : in RX_FINFO_RXBR_Field;
                            SFD_LENGTH          : in Bits_8;
-                           Non_Standard_SFD    : in Boolean) return Bits_12
-     with Pre => (RXBR /= 2#11#
+                           Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field
+     with Pre => (RXBR /= Reserved
                   and (if Non_Standard_SFD then SFD_LENGTH in 8 | 16));
    --  Apply the correction to the RXPACC value.
    --
@@ -64,9 +65,10 @@ is
 
 
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
-                                  RXPACC        : in Bits_12;
-                                  CIR_PWR       : in Bits_16) return Float
-     with Post => Receive_Signal_Power'Result in -166.90 .. -14.43;
+                                  RXPACC        : in RX_FINFO_RXPACC_Field;
+                                  CIR_PWR       : in RX_FQUAL_CIR_PWR_Field)
+                                  return Float
+     with Post => Receive_Signal_Power'Result in -142.81 .. -14.43;
    --  Compute the estimated receive signal power in dBm.
    --
    --  @param Use_16MHz_PRF Set to True if a 16 MHz PRF is used, otherwise set
@@ -85,11 +87,12 @@ is
 
 
    function First_Path_Signal_Power (Use_16MHz_PRF : in Boolean;
-                                     F1            : in Bits_16;
-                                     F2            : in Bits_16;
-                                     F3            : in Bits_16;
-                                     RXPACC        : in Bits_12) return Float
-     with Post => First_Path_Signal_Power'Result in -218.07 .. -12.66;
+                                     F1            : in RX_TIME_FP_AMPL1_Field;
+                                     F2            : in RX_FQUAL_FP_AMPL2_Field;
+                                     F3            : in RX_FQUAL_FP_AMPL3_Field;
+                                     RXPACC        : in RX_FINFO_RXPACC_Field)
+                                     return Float
+     with Post => First_Path_Signal_Power'Result in -193.99 .. -17.44;
    --  Compute the estimated first path power level in dBm.
    --
    --  @param Use_16MHz_PRF Set to True if a 16 MHz PRF is used, otherwise set
@@ -111,8 +114,9 @@ is
    --     is -218.07 dBm to -12.67 dBm.
 
 
-   function Transmitter_Clock_Offset (RXTOFS  : in Bits_19;
-                                      RXTTCKI : in Bits_32) return Long_Float
+   function Transmitter_Clock_Offset (RXTOFS  : in RX_TTCKO_RXTOFS_Field;
+                                      RXTTCKI : in RX_TTCKI_RXTTCKI_Field)
+                                      return Long_Float
      with Post => Transmitter_Clock_Offset'Result in -1.0 .. 1.0;
    --  Calculate the clock offset between the receiver's and transmitter's
    --  clocks.

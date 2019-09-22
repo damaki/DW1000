@@ -132,11 +132,13 @@ is
    RF_STATUS_Sub_Reg_ID  : constant Types.Bits_15 := 16#2C#;
    LDOTUNE_Sub_Reg_ID    : constant Types.Bits_15 := 16#30#;
 
-   TC_SARC_Sub_Reg_ID    : constant Types.Bits_15 := 16#00#;
-   TC_SARL_Sub_Reg_ID    : constant Types.Bits_15 := 16#03#;
-   TC_SARW_Sub_Reg_ID    : constant Types.Bits_15 := 16#06#;
-   TC_PGDELAY_Sub_Reg_ID : constant Types.Bits_15 := 16#0B#;
-   TC_PGTEST_Sub_Reg_ID  : constant Types.Bits_15 := 16#0C#;
+   TC_SARC_Sub_Reg_ID      : constant Types.Bits_15 := 16#00#;
+   TC_SARL_Sub_Reg_ID      : constant Types.Bits_15 := 16#03#;
+   TC_SARW_Sub_Reg_ID      : constant Types.Bits_15 := 16#06#;
+   TC_PG_CTRL_Sub_Reg_ID   : constant Types.Bits_15 := 16#08#;
+   TC_PG_STATUS_Sub_Reg_ID : constant Types.Bits_15 := 16#09#;
+   TC_PGDELAY_Sub_Reg_ID   : constant Types.Bits_15 := 16#0B#;
+   TC_PGTEST_Sub_Reg_ID    : constant Types.Bits_15 := 16#0C#;
 
    FS_PLLCFG_Sub_Reg_ID  : constant Types.Bits_15 := 16#07#;
    FS_PLLTUNE_Sub_Reg_ID : constant Types.Bits_15 := 16#0B#;
@@ -268,6 +270,10 @@ is
    package TX_ANTD is new DW1000.Generic_RW_Register_Driver
      (Register_Type => DW1000.Register_Types.TX_ANTD_Type,
       Register_ID   => TX_ANTD_Reg_ID);
+
+   package SYS_STATE is new DW1000.Generic_RO_Register_Driver
+     (Register_Type => DW1000.Register_Types.SYS_STATUS_Type,
+      Register_ID   => SYS_STATE_Reg_ID);
 
    package ACK_RESP_T is new DW1000.Generic_RW_Register_Driver
      (Register_Type => DW1000.Register_Types.ACK_RESP_T_Type,
@@ -462,6 +468,16 @@ is
      (Register_Type => DW1000.Register_Types.TC_SARW_Type,
       Register_ID   => TX_CAL_Reg_ID,
       Sub_Register  => TC_SARW_Sub_Reg_ID);
+
+   package TC_PG_CTRL is new DW1000.Generic_RO_Register_Driver
+     (Register_Type => DW1000.Register_Types.TC_PG_CTRL_Type,
+      Register_ID   => TX_CAL_Reg_ID,
+      Sub_Register  => TC_PG_CTRL_Sub_Reg_ID);
+
+   package TC_PG_STATUS is new DW1000.Generic_RW_Register_Driver
+     (Register_Type => DW1000.Register_Types.TC_PG_STATUS_Type,
+      Register_ID   => TX_CAL_Reg_ID,
+      Sub_Register  => TC_PG_STATUS_Sub_Reg_ID);
 
    package TC_PGDELAY is new DW1000.Generic_RW_Register_Driver
      (Register_Type => DW1000.Register_Types.TC_PGDELAY_Type,

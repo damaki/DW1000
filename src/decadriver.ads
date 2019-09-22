@@ -650,15 +650,13 @@ is
 
       Antenna_Delay_PRF_64 : Antenna_Delay_Time := 0.0;
       Antenna_Delay_PRF_16 : Antenna_Delay_Time := 0.0;
-      XTAL_Trim            : Bits_5  := 2#1_0000#;
+      XTAL_Trim            : FS_XTALT_Field     := 2#1_0000#;
 
       Long_Frames : Boolean := False;
 
       SYS_CFG_Reg : SYS_CFG_Type := SYS_CFG_Type'
-        (Reserved_1 => 0,
-         Reserved_2 => 0,
-         PHR_MODE   => 0,
-         others     => 0);
+        (PHR_MODE   => Standard_Frames_Mode,
+         others     => <>);
 
       Use_OTP_XTAL_Trim     : Boolean := False;
       Use_OTP_Antenna_Delay : Boolean := False;

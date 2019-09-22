@@ -20,7 +20,8 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with DW1000.Types; use DW1000.Types;
+with DW1000.System_Time;
+with DW1000.Types;       use DW1000.Types;
 with System;
 
 --  This package defines types for each of the DW1000 registers.
@@ -84,30 +85,172 @@ is
    ----------------------------------------------------------------------------
    -- SYS_CFG register file
 
+   type SYS_CFG_FFEN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Frame Filtering Enable.
+
+   type SYS_CFG_FFBC_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Frame Filtering Behave as a Coordinator.
+
+   type SYS_CFG_FFAB_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow Beacon frame reception.
+
+   type SYS_CFG_FFAD_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow Data frame reception.
+
+   type SYS_CFG_FFAA_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow Acknowledgment frame reception.
+
+   type SYS_CFG_FFAM_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow MAC command frame reception.
+
+   type SYS_CFG_FFAR_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow Reserved frame types.
+
+   type SYS_CFG_FFA4_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow frames with frame type field of 4, (binary 100).
+
+   type SYS_CFG_FFA5_Field is
+     (Not_Allowed,
+      Allowed)
+     with Size => 1;
+   --  Frame Filtering Allow frames with frame type field of 5, (binary 101).
+
+   type SYS_CFG_HIRQ_Pol_Field is
+     (Active_Low,
+      Active_High)
+     with Size => 1;
+   --  Host interrupt polarity.
+
+   type SYS_CFG_SPI_EDGE_Field is
+     (Sampling_Edge,
+      Opposite_Edge)
+     with Size => 1;
+   --  SPI data launch edge.
+
+   type SYS_CFG_DIS_FCE_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable frame check error handling.
+
+   type SYS_CFG_DIS_DRXB_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable Double RX Buffer.
+
+   type SYS_CFG_DIS_PHE_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable receiver abort on PHR error.
+
+   type SYS_CFG_DIS_RSDE_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable Receiver Abort on RSD (Reed-Solomon Decoder) error.
+
+   type SYS_CFG_FCS_INIT2F_Field is
+     (All_Zeroes,
+      All_Ones)
+     with Size => 1;
+   --  This bit allows selection of the initial seed value for the FCS
+   --  generation and checking function that is set at the start of each frame
+   --  transmission and reception.
+
+   type SYS_CFG_PHR_MODE_Field is
+     (Standard_Frames_Mode,
+      Reserved_01,
+      Reserved_10,
+      Long_Frames_Mode)
+     with Size => 2;
+   --  Standard (max. 127 octets) or long (max. 1023 octets) frames.
+
+   type SYS_CFG_DIS_STXP_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+   --  Disable Smart TX Power control.
+
+   type SYS_CFG_RXM110K_Field is
+     (SFD_850K_6M8,
+      SFD_110K)
+     with Size => 1;
+   --  Receiver Mode 110 kbps data rate.
+
+   type SYS_CFG_RXWTOE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Receive Wait Timeout Enable.
+
+   type SYS_CFG_RXAUTR_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Receiver Auto-Re-enable.
+
+   type SYS_CFG_AUTOACK_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Automatic Acknowledgement Enable.
+
+   type SYS_CFG_AACKPEND_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Automatic Acknowledgement Pending bit control.
+
    type SYS_CFG_Type is record
-      FFEN       : Types.Bits_1 := 0;
-      FFBC       : Types.Bits_1 := 0;
-      FFAB       : Types.Bits_1 := 0;
-      FFAD       : Types.Bits_1 := 0;
-      FFAA       : Types.Bits_1 := 0;
-      FFAM       : Types.Bits_1 := 0;
-      FFAR       : Types.Bits_1 := 0;
-      FFA4       : Types.Bits_1 := 0;
-      FFA5       : Types.Bits_1 := 0;
-      HIRQ_POL   : Types.Bits_1 := 1;
-      SPI_EDGE   : Types.Bits_1 := 0;
-      DIS_FCE    : Types.Bits_1 := 0;
-      DIS_DRXB   : Types.Bits_1 := 1;
-      DIS_PHE    : Types.Bits_1 := 0;
-      DIS_RSDE   : Types.Bits_1 := 0;
-      FCS_INT2F  : Types.Bits_1 := 0;
-      PHR_MODE   : Types.Bits_2 := 0;
-      DIS_STXP   : Types.Bits_1 := 0;
-      RXM110K    : Types.Bits_1 := 0;
-      RXWTOE     : Types.Bits_1 := 0;
-      RXAUTR     : Types.Bits_1 := 0;
-      AUTOACK    : Types.Bits_1 := 0;
-      AACKPEND   : Types.Bits_1 := 0;
+      FFEN       : SYS_CFG_FFEN_Field       := Disabled;
+      FFBC       : SYS_CFG_FFBC_Field       := Disabled;
+      FFAB       : SYS_CFG_FFAB_Field       := Not_Allowed;
+      FFAD       : SYS_CFG_FFAD_Field       := Not_Allowed;
+      FFAA       : SYS_CFG_FFAA_Field       := Not_Allowed;
+      FFAM       : SYS_CFG_FFAM_Field       := Not_Allowed;
+      FFAR       : SYS_CFG_FFAR_Field       := Not_Allowed;
+      FFA4       : SYS_CFG_FFA4_Field       := Not_Allowed;
+      FFA5       : SYS_CFG_FFA5_Field       := Not_Allowed;
+      HIRQ_POL   : SYS_CFG_HIRQ_Pol_Field   := Active_High;
+      SPI_EDGE   : SYS_CFG_SPI_EDGE_Field   := Sampling_Edge;
+      DIS_FCE    : SYS_CFG_DIS_FCE_Field    := Not_Disabled;
+      DIS_DRXB   : SYS_CFG_DIS_DRXB_Field   := Disabled;
+      DIS_PHE    : SYS_CFG_DIS_PHE_Field    := Not_Disabled;
+      DIS_RSDE   : SYS_CFG_DIS_RSDE_Field   := Not_Disabled;
+      FCS_INT2F  : SYS_CFG_FCS_INIT2F_Field := All_Zeroes;
+      PHR_MODE   : SYS_CFG_PHR_MODE_Field   := Standard_Frames_Mode;
+      DIS_STXP   : SYS_CFG_DIS_STXP_Field   := Not_Disabled;
+      RXM110K    : SYS_CFG_RXM110K_Field    := SFD_850K_6M8;
+      RXWTOE     : SYS_CFG_RXWTOE_Field     := Disabled;
+      RXAUTR     : SYS_CFG_RXAUTR_Field     := Disabled;
+      AUTOACK    : SYS_CFG_AUTOACK_Field    := Disabled;
+      AACKPEND   : SYS_CFG_AACKPEND_Field   := Disabled;
 
       Reserved_1 : Types.Bits_3 := 0;
       Reserved_2 : Types.Bits_5 := 0;
@@ -152,7 +295,7 @@ is
    -- SYS_TIME register file
 
    type SYS_TIME_Type is record
-      SYS_TIME : Types.Bits_40;
+      SYS_TIME : System_Time.Coarse_System_Time;
    end record
      with Pack, Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -161,17 +304,67 @@ is
    ----------------------------------------------------------------------------
    -- TX_FCTRL register file
 
+   type TX_FCTRL_TFLEN_Field is range 0 .. 127
+     with Size => 7;
+   --  Transmit Frame Length.
+
+   type TX_FCTRL_TFLE_Field is range 0 .. 7
+     with Size => 3;
+   --  Transmit Frame Length Extension.
+
+   type TX_FCTRL_TXBR_Field is
+     (Data_Rate_110K,
+      Data_Rate_850K,
+      Data_Rate_6M8,
+      Reserved)
+     with Size => 2;
+   --  Transmit Bit Rate.
+
+   type TX_FCTRL_TR_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Transmit Ranging enable.
+
+   type TX_FCTRL_TXPRF_Field is
+     (PRF_4MHz,
+      PRF_16MHz,
+      PRF_64MHz,
+      Reserved)
+     with Size => 2;
+   --  Transmit Pulse Repetition Frequency.
+
+   type TX_FCTRL_TXPSR_Field is
+     (PLEN_16,
+      PLEN_64,
+      PLEN_1024,
+      PLEN_4096)
+     with Size => 2;
+   --  Transmit Preamble Symbol Repetitions (PSR).
+
+   type TX_FCTRL_PE_Field is range 0 .. 3
+     with Size => 2;
+   --  Preamble Extension.
+
+   type TX_FCTRL_TXBOFFS_Field is range 0 .. 2**10 - 1
+     with Size => 10;
+   --  Transmit buffer index offset.
+
+   type TX_FCTRL_IFSDELAY_Field is range 0 .. 255
+     with Size => 8;
+   --  Inter-Frame Spacing.
+
    type TX_FCTRL_Type is record
-      TFLEN    : Types.Bits_7  := 12;
-      TFLE     : Types.Bits_3  := 0;
-      R        : Types.Bits_3  := 0;
-      TXBR     : Types.Bits_2  := 0;
-      TR       : Types.Bits_1  := 0;
-      TXPRF    : Types.Bits_2  := 0;
-      TXPSR    : Types.Bits_2  := 0;
-      PE       : Types.Bits_2  := 0;
-      TXBOFFS  : Types.Bits_10 := 0;
-      IFSDELAY : Types.Bits_8  := 0;
+      TFLEN    : TX_FCTRL_TFLEN_Field    := 12;
+      TFLE     : TX_FCTRL_TFLE_Field     := 0;
+      R        : Types.Bits_3            := 0;
+      TXBR     : TX_FCTRL_TXBR_Field     := Data_Rate_6M8;
+      TR       : TX_FCTRL_TR_Field       := Disabled;
+      TXPRF    : TX_FCTRL_TXPRF_Field    := PRF_16MHz;
+      TXPSR    : TX_FCTRL_TXPSR_Field    := PLEN_64;
+      PE       : TX_FCTRL_PE_Field       := 0;
+      TXBOFFS  : TX_FCTRL_TXBOFFS_Field  := 0;
+      IFSDELAY : TX_FCTRL_IFSDELAY_Field := 0;
    end record
      with Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -208,7 +401,7 @@ is
    -- DX_TIME register file
 
    type DX_TIME_Type is record
-      DX_TIME : Types.Bits_40;
+      DX_TIME : System_Time.Coarse_System_Time := 0.0;
    end record
      with Pack, Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -218,7 +411,7 @@ is
    -- RX_FWTO register file
 
    type RX_FWTO_Type is record
-      RXFWTO : Types.Bits_16 := 0;
+      RXFWTO : System_Time.Frame_Wait_Timeout_Time := 0.0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -231,16 +424,70 @@ is
    ----------------------------------------------------------------------------
    -- SYS_CTRL register file
 
+   type SYS_CTRL_SFCST_Field is
+     (Not_Suppressed,
+      Suppressed)
+     with Size => 1;
+   --  Suppress auto-FCS Transmission (on this next frame).
+
+   type SYS_CTRL_TXSTRT_Field is
+     (No_Action,
+      Start_Tx)
+     with Size => 1;
+   --  Transmit Start.
+
+   type SYS_CTRL_TXDLYS_Field is
+     (Not_Delayed,
+      Delayed)
+     with Size => 1;
+   --  Transmitter Delayed Sending.
+
+   type SYS_CTRL_CANSFCS_Field is
+     (Not_Cancelled,
+      Cancelled)
+     with Size => 1;
+   --  Cancel Suppression of auto-FCS transmission (on the current frame).
+
+   type SYS_CTRL_TRXOFF_Field is
+     (No_Action,
+      Transceiver_Off)
+     with Size => 1;
+   --  Transceiver Off.
+
+   type SYS_CTRL_WAIT4RESP_Field is
+     (No_Wait,
+      Wait)
+     with Size => 1;
+   --  Wait for Response.
+
+   type SYS_CTRL_RXENAB_Field is
+     (No_Action,
+      Start_Rx)
+     with Size => 1;
+   --  Enable Receiver.
+
+   type SYS_CTRL_RXDLYE_Field is
+     (Not_Delayed,
+      Delayed)
+     with Size => 1;
+   --  Receiver Delayed Enable.
+
+   type SYS_CTRL_HRBPT_Field is
+     (No_Action,
+      Toggle)
+     with Size => 1;
+   --  Host Side Receive Buffer Pointer Toggle.
+
    type SYS_CTRL_Type is record
-      SFCST     : Types.Bits_1   := 0;
-      TXSTRT    : Types.Bits_1   := 0;
-      TXDLYS    : Types.Bits_1   := 0;
-      CANSFCS   : Types.Bits_1   := 0;
-      TRXOFF    : Types.Bits_1   := 0;
-      WAIT4RESP : Types.Bits_1   := 0;
-      RXENAB    : Types.Bits_1   := 0;
-      RXDLYE    : Types.Bits_1   := 0;
-      HRBPT     : Types.Bits_1   := 0;
+      SFCST     : SYS_CTRL_SFCST_Field     := Not_Suppressed;
+      TXSTRT    : SYS_CTRL_TXSTRT_Field    := No_Action;
+      TXDLYS    : SYS_CTRL_TXDLYS_Field    := Not_Delayed;
+      CANSFCS   : SYS_CTRL_CANSFCS_Field   := Not_Cancelled;
+      TRXOFF    : SYS_CTRL_TRXOFF_Field    := No_Action;
+      WAIT4RESP : SYS_CTRL_WAIT4RESP_Field := No_Wait;
+      RXENAB    : SYS_CTRL_RXENAB_Field    := No_Action;
+      RXDLYE    : SYS_CTRL_RXDLYE_Field    := Not_Delayed;
+      HRBPT     : SYS_CTRL_HRBPT_Field     := No_Action;
 
       Reserved_1 : Types.Bits_2  := 0;
       Reserved_2 : Types.Bits_14 := 0;
@@ -273,35 +520,41 @@ is
    ----------------------------------------------------------------------------
    -- SYS_MASK register file
 
+   type SYS_MASK_Mask_Field is
+     (Masked,
+      Not_Masked)
+     with Size => 1;
+   --  Mask event.
+
    type SYS_MASK_Type is record
-      MCPLOCK   : Types.Bits_1  := 0;
-      MESYNCR   : Types.Bits_1  := 0;
-      MAAT      : Types.Bits_1  := 0;
-      MTXFRB    : Types.Bits_1  := 0;
-      MTXPRS    : Types.Bits_1  := 0;
-      MTXPHS    : Types.Bits_1  := 0;
-      MTXFRS    : Types.Bits_1  := 0;
-      MRXPRD    : Types.Bits_1  := 0;
-      MRXSFDD   : Types.Bits_1  := 0;
-      MLDEDONE  : Types.Bits_1  := 0;
-      MRXPHD    : Types.Bits_1  := 0;
-      MRXPHE    : Types.Bits_1  := 0;
-      MRXDFR    : Types.Bits_1  := 0;
-      MRXFCG    : Types.Bits_1  := 0;
-      MRXFCE    : Types.Bits_1  := 0;
-      MRXRFSL   : Types.Bits_1  := 0;
-      MRXRFTO   : Types.Bits_1  := 0;
-      MLDEERR   : Types.Bits_1  := 0;
-      MRXOVRR   : Types.Bits_1  := 0;
-      MRXPTO    : Types.Bits_1  := 0;
-      MGPIOIRQ  : Types.Bits_1  := 0;
-      MSLP2INIT : Types.Bits_1  := 0;
-      MRFPLLLL  : Types.Bits_1  := 0;
-      MCPLLLL   : Types.Bits_1  := 0;
-      MRXSFDTO  : Types.Bits_1  := 0;
-      MHPDWARN  : Types.Bits_1  := 0;
-      MTXBERR   : Types.Bits_1  := 0;
-      MAFFREJ   : Types.Bits_1  := 0;
+      MCPLOCK   : SYS_MASK_Mask_Field := Masked;
+      MESYNCR   : SYS_MASK_Mask_Field := Masked;
+      MAAT      : SYS_MASK_Mask_Field := Masked;
+      MTXFRB    : SYS_MASK_Mask_Field := Masked;
+      MTXPRS    : SYS_MASK_Mask_Field := Masked;
+      MTXPHS    : SYS_MASK_Mask_Field := Masked;
+      MTXFRS    : SYS_MASK_Mask_Field := Masked;
+      MRXPRD    : SYS_MASK_Mask_Field := Masked;
+      MRXSFDD   : SYS_MASK_Mask_Field := Masked;
+      MLDEDONE  : SYS_MASK_Mask_Field := Masked;
+      MRXPHD    : SYS_MASK_Mask_Field := Masked;
+      MRXPHE    : SYS_MASK_Mask_Field := Masked;
+      MRXDFR    : SYS_MASK_Mask_Field := Masked;
+      MRXFCG    : SYS_MASK_Mask_Field := Masked;
+      MRXFCE    : SYS_MASK_Mask_Field := Masked;
+      MRXRFSL   : SYS_MASK_Mask_Field := Masked;
+      MRXRFTO   : SYS_MASK_Mask_Field := Masked;
+      MLDEERR   : SYS_MASK_Mask_Field := Masked;
+      MRXOVRR   : SYS_MASK_Mask_Field := Masked;
+      MRXPTO    : SYS_MASK_Mask_Field := Masked;
+      MGPIOIRQ  : SYS_MASK_Mask_Field := Masked;
+      MSLP2INIT : SYS_MASK_Mask_Field := Masked;
+      MRFPLLLL  : SYS_MASK_Mask_Field := Masked;
+      MCPLLLL   : SYS_MASK_Mask_Field := Masked;
+      MRXSFDTO  : SYS_MASK_Mask_Field := Masked;
+      MHPDWARN  : SYS_MASK_Mask_Field := Masked;
+      MTXBERR   : SYS_MASK_Mask_Field := Masked;
+      MAFFREJ   : SYS_MASK_Mask_Field := Masked;
 
       Reserved_1 : Types.Bits_1 := 0;
       Reserved_2 : Types.Bits_1 := 0;
@@ -440,15 +693,60 @@ is
    ----------------------------------------------------------------------------
    -- RX_FINFO register file
 
+   type RX_FINFO_RXFLEN_Field is range 0 .. 127
+     with Size => 7;
+   --  Receive Frame Length.
+
+   type RX_FINFO_RXFLE_Field is range 0 .. 7
+     with Size => 3;
+   --  Receive Frame Length Extension.
+
+   type RX_FINFO_RXNSPL_Field is range 0 .. 3
+     with Size => 2;
+   --  Receive non-standard preamble length.
+
+   type RX_FINFO_RXBR_Field is
+     (Data_Rate_110K,
+      Data_Rate_850K,
+      Data_Rate_6M8,
+      Reserved)
+     with Size => 2;
+   --  Receive Bit Rate report.
+
+   type RX_FINFO_RNG_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Receiver Ranging.
+
+   type RX_FINFO_RXPRFR_Field is
+     (Reserved_00,
+      PRF_16MHz,
+      PRF_64MHz,
+      Reserved_11)
+     with Size => 2;
+   --  RX Pulse Repetition Rate report.
+
+   type RX_FINFO_RXPSR_Field is
+     (PLEN_16,
+      PLEN_64,
+      PLEN_1024,
+      PLEN_4096)
+     with Size => 2;
+   --  RX Preamble Repetition.
+
+   type RX_FINFO_RXPACC_Field is range 0 .. 2**12 - 1
+     with Size => 12;
+
    type RX_FINFO_Type is record
-      RXFLEN : Types.Bits_7   := 0;
-      RXFLE  : Types.Bits_3   := 0;
-      RXNSPL : Types.Bits_2   := 0;
-      RXBR   : Types.Bits_2   := 0;
-      RNG    : Types.Bits_1   := 0;
-      RXPRF  : Types.Bits_2   := 0;
-      RXPSR  : Types.Bits_2   := 0;
-      RXPACC : Types.Bits_12  := 0;
+      RXFLEN : RX_FINFO_RXFLEN_Field := 0;
+      RXFLE  : RX_FINFO_RXFLE_Field  := 0;
+      RXNSPL : RX_FINFO_RXNSPL_Field := 0;
+      RXBR   : RX_FINFO_RXBR_Field   := Data_Rate_110K;
+      RNG    : RX_FINFO_RNG_Field    := Disabled;
+      RXPRF  : RX_FINFO_RXPRFR_Field := Reserved_00;
+      RXPSR  : RX_FINFO_RXPSR_Field  := PLEN_16;
+      RXPACC : RX_FINFO_RXPACC_Field := 0;
 
       Reserved : Types.Bits_1 := 0;
    end record
@@ -487,11 +785,27 @@ is
    ----------------------------------------------------------------------------
    -- RX_FQUAL register file
 
+   type RX_FQUAL_STD_NOISE_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  Standard Deviation of Noise.
+
+   type RX_FQUAL_FP_AMPL2_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  First Path Amplitude point 2.
+
+   type RX_FQUAL_FP_AMPL3_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  First Path Amplitude point 3.
+
+   type RX_FQUAL_CIR_PWR_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  Channel Impulse Response Power.
+
    type RX_FQUAL_Type is record
-      STD_NOISE : Types.Bits_16 := 0;
-      FP_AMPL2  : Types.Bits_16 := 0;
-      FP_AMPL3  : Types.Bits_16 := 0;
-      CIR_PWR   : Types.Bits_16 := 0;
+      STD_NOISE : RX_FQUAL_STD_NOISE_Field := 0;
+      FP_AMPL2  : RX_FQUAL_FP_AMPL2_Field  := 0;
+      FP_AMPL3  : RX_FQUAL_FP_AMPL3_Field  := 0;
+      CIR_PWR   : RX_FQUAL_CIR_PWR_Field   := 0;
    end record
      with Size => 64,
      Bit_Order => System.Low_Order_First,
@@ -507,8 +821,12 @@ is
    ----------------------------------------------------------------------------
    -- RX_TTCKI register file
 
+   type RX_TTCKI_RXTTCKI_Field is range 0 .. 2**32 - 1
+     with Size => 32;
+   --  RX time tracking interval.
+
    type RX_TTCKI_Type is record
-      RXTTCKI : Types.Bits_32 := 0;
+      RXTTCKI : RX_TTCKI_RXTTCKI_Field := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -521,10 +839,28 @@ is
    ----------------------------------------------------------------------------
    -- RX_TTCKO register file
 
+   type RX_TTCKO_RXTOFS_Field is range -2**18 .. 2**18 - 1
+     with Size => 19;
+   --  RX time tracking offset.
+
+   type RX_TTCKO_RSMPDEL_Field is range 0 .. 255
+     with Size => 8;
+   --  This 8-bit field reports an internal re-sampler delay value.
+
+   type RX_TTCKO_RCPHASE_Field is
+   delta 360.0 / 127.0
+   range 0.0 .. 360.0
+     with Small => 360.0 / 127.0,
+       Size => 7;
+   --  This 7-bit field reports the receive carrier phase adjustment at time
+   --  the ranging timestamp is made. This gives the phase (7 bits = 360 degrees)
+   --  of the internal carrier tracking loop at the time that the RX timestamp
+   --  is received.
+
    type RX_TTCKO_Type is record
-      RXTOFS  : Types.Bits_19   := 0;
-      RSMPDEL : Types.Bits_8    := 0;
-      RCPHASE : Types.Bits_7    := 0;
+      RXTOFS  : RX_TTCKO_RXTOFS_Field  := 0;
+      RSMPDEL : RX_TTCKO_RSMPDEL_Field := 0;
+      RCPHASE : RX_TTCKO_RCPHASE_Field := RX_TTCKO_RCPHASE_Field'First;
 
       Reserved_1 : Types.Bits_5 := 0;
       Reserved_2 : Types.Bits_1 := 0;
@@ -539,19 +875,27 @@ is
       Reserved_1 at 0 range 19 .. 23;
 
       RSMPDEL    at 0 range 24 .. 31;
-      RCPHASE    at 4 range  0 ..  6;
+      RCPHASE    at 0 range 32 .. 38;
 
-      Reserved_2 at 4 range  7 ..  7;
+      Reserved_2 at 0 range 39 .. 39;
    end record;
 
    ----------------------------------------------------------------------------
    -- RX_TIME register file
 
+   type RX_TIME_FP_INDEX_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  First path index.
+
+   type RX_TIME_FP_AMPL1_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  First Path Amplitude point 1.
+
    type RX_TIME_Type is record
-      RX_STAMP : Types.Bits_40 := 0;
-      FP_INDEX : Types.Bits_16 := 0;
-      FP_AMPL1 : Types.Bits_16 := 0;
-      RX_RAWST : Types.Bits_40 := 0;
+      RX_STAMP : System_Time.Fine_System_Time   := 0.0;
+      FP_INDEX : RX_TIME_FP_INDEX_Field         := 0;
+      FP_AMPL1 : RX_TIME_FP_AMPL1_Field         := 0;
+      RX_RAWST : System_Time.Coarse_System_Time := 0.0;
    end record
      with Size => 8*14,
      Bit_Order => System.Low_Order_First,
@@ -568,8 +912,8 @@ is
    -- TX_TIME register file
 
    type TX_TIME_Type is record
-      TX_STAMP : Types.Bits_40 := 0;
-      TX_RAWST : Types.Bits_40 := 0;
+      TX_STAMP : System_Time.Fine_System_Time   := 0.0;
+      TX_RAWST : System_Time.Coarse_System_Time := 0.0;
    end record
      with Size => 80,
      Bit_Order => System.Low_Order_First,
@@ -584,7 +928,7 @@ is
    -- TX_ANTD register file
 
    type TX_ANTD_Type is record
-      TX_ANTD : Types.Bits_16;
+      TX_ANTD : System_Time.Antenna_Delay_Time := 0.0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -595,11 +939,120 @@ is
    end record;
 
    ----------------------------------------------------------------------------
+   --  SYS_STATE register file
+
+   type SYS_STATE_TX_STATE_Field is
+     (Idle,
+      Preamble,
+      SFD,
+      PHR,
+      SDE,
+      DATA,
+      Reserved_0110,
+      Reserved_0111,
+      Reserved_1000,
+      Reserved_1001,
+      Reserved_1010,
+      Reserved_1011,
+      Reserved_1100,
+      Reserved_1101,
+      Reserved_1110,
+      Reserved_1111)
+     with Size => 4;
+   --  Current Transmit State Machine value
+
+   type SYS_STATE_RX_STATE_Field is
+     (Idle,
+      Start_Analog,
+      Reserved_00010,
+      Reserved_00011,
+      Rx_Ready,
+      Preamble_Search,
+      Preamble_Timeout,
+      SFD_Search,
+      Configure_PHR_Rx,
+      PHY_Rx_Start,
+      Data_Rate_Ready,
+      Reserved_01011,
+      Data_Rx_Seq,
+      Configure_Data_Rx,
+      PHR_Not_OK,
+      Last_Symbol,
+      Wait_RSD_Done,
+      RSD_OK,
+      RSD_Not_OK,
+      Reconfigure_110K,
+      Wait_110K_PHR,
+      Reserved_10101,
+      Reserved_10110,
+      Reserved_10111,
+      Reserved_11000,
+      Reserved_11001,
+      Reserved_11010,
+      Reserved_11011,
+      Reserved_11100,
+      Reserved_11101,
+      Reserved_11110,
+      Reserved_11111)
+     with Size => 5;
+   --  Current Receive State Machine value
+
+   type SYS_STATE_PMSC_STATE_Field is
+     (Init,
+      Idle,
+      TX_Wait,
+      RX_Wait,
+      Tx,
+      Rx,
+      Reserved_0110,
+      Reserved_0111,
+      Reserved_1000,
+      Reserved_1001,
+      Reserved_1010,
+      Reserved_1011,
+      Reserved_1100,
+      Reserved_1101,
+      Reserved_1110,
+      Reserved_1111)
+     with Size => 4;
+
+   type SYS_STATE_Type is record
+      TX_STATE   : SYS_STATE_TX_STATE_Field   := Idle;
+      RX_STATE   : SYS_STATE_RX_STATE_Field   := Idle;
+      PMSC_STATE : SYS_STATE_PMSC_STATE_Field := Idle;
+
+      Reserved_1 : Bits_4  := 0;
+      Reserved_2 : Bits_3  := 0;
+      Reserved_3 : Bits_12 := 0;
+   end record
+     with Size => 32,
+     Bit_Order => System.Low_Order_First,
+     Scalar_Storage_Order => System.Low_Order_First;
+
+   for SYS_STATE_Type use record
+      TX_STATE   at 0 range 0 .. 3;
+
+      Reserved_1 at 0 range 4 .. 7;
+
+      RX_STATE   at 0 range 8 .. 12;
+
+      Reserved_2 at 0 range 13 .. 15;
+
+      PMSC_STATE at 0 range 16 .. 19;
+
+      Reserved_3 at 0 range 20 .. 31;
+   end record;
+
+   ----------------------------------------------------------------------------
    -- ACK_RESP_T register file
 
+   type ACK_RESP_T_ACK_TIM_Field is range 0 .. 255
+     with Size => 8;
+   --  Auto-Acknowledgement turn-around Time (in number of preamble symbols).
+
    type ACK_RESP_T_Type is record
-      W4D_TIM : Types.Bits_20 := 0;
-      ACK_TIM : Types.Bits_8  := 0;
+      W4D_TIM : System_Time.Response_Wait_Timeout_Time := 0.0;
+      ACK_TIM : ACK_RESP_T_ACK_TIM_Field               := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -618,9 +1071,13 @@ is
    ----------------------------------------------------------------------------
    -- RX_SNIFF register file
 
+   type RX_SNIFF_SNIFF_ONT_Field is range 0 .. 15
+     with Size => 4;
+   --  SNIFF Mode ON time. This parameter is specified in units of PAC.
+
    type RX_SNIFF_Type is record
-      SNIFF_ONT  : Types.Bits_4  := 0;
-      SNIFF_OFFT : Types.Bits_8  := 0;
+      SNIFF_ONT  : RX_SNIFF_SNIFF_ONT_Field   := 0;
+      SNIFF_OFFT : System_Time.Sniff_Off_Time := 0.0;
 
       Reserved_1 : Types.Bits_4  := 0;
       Reserved_2 : Types.Bits_16 := 0;
@@ -642,11 +1099,46 @@ is
    ----------------------------------------------------------------------------
    -- TX_POWER register file
 
+   type TX_POWER_COARSE_Field is
+     (Gain_15_dB,
+      Gain_12_5_dB,
+      Gain_10_dB,
+      Gain_7_5_dB,
+      Gain_5_dB,
+      Gain_2_5_dB,
+      Gain_0_dB,
+      Off) --  No output when used
+     with Size => 3;
+   --  Coarse (DA setting) gain in 2.5 dB steps.
+   --
+   --  Unfortunately we can't use a fixed-point type here (like the fine gain)
+   --  due to the reversed HW representation of the coarse gain and the
+   --  need for the special "Off" setting.
+
+   type TX_POWER_FINE_Field is delta 0.5 range 0.0 .. 15.5
+     with Size => 5;
+   --  Fine (Mixer) gain in dB (Decibels) in 0.5 dB steps.
+
+   type TX_POWER_Field is record
+      Fine_Gain   : TX_POWER_FINE_Field   := 0.0;
+      Coarse_Gain : TX_POWER_COARSE_Field := Gain_15_dB;
+   end record
+     with Size => 8;
+
+   for TX_POWER_Field use record
+      Fine_Gain   at 0 range 0 .. 4;
+      Coarse_Gain at 0 range 5 .. 7;
+   end record;
+
    type TX_POWER_Type is record
-      BOOSTNORM : Types.Bits_8 := 16#22#;
-      BOOSTP500 : Types.Bits_8 := 16#02#;
-      BOOSTP250 : Types.Bits_8 := 16#08#;
-      BOOSTP125 : Types.Bits_8 := 16#0E#;
+      BOOSTNORM : TX_POWER_Field := (Fine_Gain   => 1.0,
+                                     Coarse_Gain => Gain_12_5_dB);
+      BOOSTP500 : TX_POWER_Field := (Fine_Gain   => 1.0,
+                                     Coarse_Gain => Gain_15_dB);
+      BOOSTP250 : TX_POWER_Field := (Fine_Gain   => 4.0,
+                                     Coarse_Gain => Gain_15_dB);
+      BOOSTP125 : TX_POWER_Field := (Fine_Gain   => 7.0,
+                                     Coarse_Gain => Gain_15_dB);
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -662,15 +1154,51 @@ is
    ----------------------------------------------------------------------------
    -- CHAN_CTRL register file
 
+   type CHAN_CTRL_Channel_Field is range 0 .. 15
+     with Size => 4;
+   --  This selects the transmit/receive channel.
+
+   type CHAN_CTRL_DWSFD_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables a non-standard Decawave proprietary SFD sequence.
+
+   type CHAN_CTRL_RXPRF_Field is
+     (Reserved_00,
+      PRF_16MHz,
+      PRF_64MHz,
+      Reserved_11)
+     with Size => 2;
+   --  This two bit field selects the PRF used in the receiver.
+
+   type CHAN_CTRL_TNSSFD_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables the use of a user specified (non-standard) SFD in the
+   --  transmitter.
+
+   type CHAN_CTRL_RNSSFD_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables the use of a user specified (non-standard) SFD in the
+   --  receiver.
+
+   type CHAN_CTRL_PCODE_Field is range 0 .. 31
+     with Size => 5;
+   --  This field selects the preamble code used in the transmitter/receiver.
+
    type CHAN_CTRL_Type is record
-      TX_CHAN  : Types.Bits_4 := 5;
-      RX_CHAN  : Types.Bits_4 := 5;
-      DWSFD    : Types.Bits_1 := 0;
-      RXPRF    : Types.Bits_2 := 0;
-      TNSSFD   : Types.Bits_1 := 0;
-      RNSSFD   : Types.Bits_1 := 0;
-      TX_PCODE : Types.Bits_5 := 0;
-      RX_PCODE : Types.Bits_5 := 0;
+      TX_CHAN  : CHAN_CTRL_Channel_Field := 5;
+      RX_CHAN  : CHAN_CTRL_Channel_Field := 5;
+      DWSFD    : CHAN_CTRL_DWSFD_Field   := Disabled;
+      RXPRF    : CHAN_CTRL_RXPRF_Field   := Reserved_00;
+      TNSSFD   : CHAN_CTRL_TNSSFD_Field  := Disabled;
+      RNSSFD   : CHAN_CTRL_RNSSFD_Field  := Disabled;
+      TX_PCODE : CHAN_CTRL_PCODE_Field   := 0;
+      RX_PCODE : CHAN_CTRL_PCODE_Field   := 0;
 
       Reserved : Types.Bits_9 := 0;
    end record
@@ -709,9 +1237,17 @@ is
    ----------------------------------------------------------------------------
    -- AGC_CTRL register file
 
-   -- AGC_CTRL1 sub-register
+   ------------------------------
+   --  AGC_CTRL1 sub-register  --
+   ------------------------------
+
+   type AGC_CTRL1_DIS_AM_Field is
+     (Not_Disabled,
+      Disabled)
+     with Size => 1;
+
    type AGC_CTRL1_Type is record
-      DIS_AM : Types.Bits_1    := 1;
+      DIS_AM : AGC_CTRL1_DIS_AM_Field := Disabled;
 
       Reserved : Types.Bits_15 := 0;
    end record
@@ -725,9 +1261,17 @@ is
       Reserved at 0 range 1 .. 15;
    end record;
 
-   -- AGC_TUNE1 sub-register
+   ------------------------------
+   --  AGC_TUNE1 sub-register  --
+   ------------------------------
+
+   type AGC_TUNE1_Field is new Bits_16;
+
+   AGC_TUNE1_PRF_16MHz : constant AGC_TUNE1_Field := 16#8870#;
+   AGC_TUNE1_PRF_64MHz : constant AGC_TUNE1_Field := 16#889B#;
+
    type AGC_TUNE1_Type is record
-      AGC_TUNE1 : Types.Bits_16;
+      AGC_TUNE1 : AGC_TUNE1_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -737,9 +1281,16 @@ is
       AGC_TUNE1 at 0 range 0 .. 15;
    end record;
 
-   -- AGC_TUNE2 sub-register
+   ------------------------------
+   --  AGC_TUNE2 sub-register  --
+   ------------------------------
+
+   type AGC_TUNE2_Field is new Bits_32;
+
+   AGC_TUNE2_Value : constant AGC_TUNE2_Field := 16#2502A907#;
+
    type AGC_TUNE2_Type is record
-      AGC_TUNE2 : Types.Bits_32;
+      AGC_TUNE2 : AGC_TUNE2_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -749,9 +1300,16 @@ is
       AGC_TUNE2 at 0 range 0 .. 31;
    end record;
 
-   -- AGC_TUNE3 sub-register
+   ------------------------------
+   --  AGC_TUNE3 sub-register  --
+   ------------------------------
+
+   type AGC_TUNE3_Field is new Bits_16;
+
+   AGC_TUNE3_Value : constant AGC_TUNE3_Field := 16#0035#;
+
    type AGC_TUNE3_Type is record
-      AGC_TUNE3 : Types.Bits_16;
+      AGC_TUNE3 : AGC_TUNE3_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -761,10 +1319,21 @@ is
       AGC_TUNE3 at 0 range 0 .. 15;
    end record;
 
-   -- AGC_STAT1 sub-register
+   ------------------------------
+   --  AGC_STAT1 sub-register  --
+   ------------------------------
+
+   type AGC_STAT1_EDG1_Field is range 0 .. 2**5 - 1
+     with Size => 5;
+   --  This 5-bit gain value relates to input noise power measurement.
+
+   type AGC_STAT1_EDV2_Field is range 0 .. 2**9 - 1
+     with Size => 9;
+   --  This 9-bit value relates to the input noise power measurement.
+
    type AGC_STAT1_Type is record
-      EDG1 : Types.Bits_5;
-      EDV2 : Types.Bits_9;
+      EDG1 : AGC_STAT1_EDG1_Field;
+      EDV2 : AGC_STAT1_EDV2_Field;
 
       Reserved_1 : Types.Bits_6;
       Reserved_2 : Types.Bits_4;
@@ -785,13 +1354,46 @@ is
    ----------------------------------------------------------------------------
    -- EXT_SYNC register file
 
-   -- EC_CTRL sub-register
+   ---------------------------
+   -- EC_CTRL sub-register  --
+   ---------------------------
+
+   type EC_CTRL_OSTSM_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  External transmit synchronisation mode enable.
+
+   type EC_CTRL_OSRSM_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  External receive synchronisation mode enable.
+
+   type EC_CTRL_PLLLDT_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Clock PLL lock detect tune.
+
+   type EC_CTRL_WAIT_Field is range 0 .. 255
+     with Size => 8;
+   --  Wait counter used for external transmit synchronisation and external
+   --  timebase reset.
+   --
+   --  The wait time is the number of external clock cycles (@ 38.4 MHz).
+
+   type EC_CTRL_OSTRM_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+
    type EC_CTRL_Type is record
-      OSTSM  : Types.Bits_1    := 0;
-      OSRSM  : Types.Bits_1    := 0;
-      PLLLDT : Types.Bits_1    := 0;
-      WAIT   : Types.Bits_8    := 0;
-      OSTRM  : Types.Bits_1    := 0;
+      OSTSM  : EC_CTRL_OSTSM_Field  := Disabled;
+      OSRSM  : EC_CTRL_OSRSM_Field  := Disabled;
+      PLLLDT : EC_CTRL_PLLLDT_Field := Enabled;
+      WAIT   : EC_CTRL_WAIT_Field   := 0;
+      OSTRM  : EC_CTRL_OSTRM_Field  := Disabled;
 
       Reserved : Types.Bits_20 := 0;
    end record
@@ -809,9 +1411,16 @@ is
       Reserved at 0 range 12 .. 31;
    end record;
 
-   -- EC_RXTC sub-register
+   ---------------------------
+   -- EC_RXTC sub-register  --
+   ---------------------------
+
+   type EC_RCTC_RX_TS_EST_Field is range 0 .. 2**32 - 1
+     with Size => 32;
+   --  External clock synchronisation counter captured on RMARKER.
+
    type EC_RXTC_Type is record
-      RX_TS_EST : Types.Bits_32;
+      RX_TS_EST : EC_RCTC_RX_TS_EST_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -821,9 +1430,15 @@ is
       RX_TS_EST at 0 range 0 .. 31;
    end record;
 
-   -- EC_GOLP sub-register
+   ---------------------------
+   -- EC_GOLP sub-register  --
+   ---------------------------
+
+   type EC_GOLP_OFFSET_EXT_Field is range 0 .. 2**6 - 1
+     with Size => 6;
+
    type EC_GOLP_Type is record
-      OFFSET_EXT : Types.Bits_6  := 0;
+      OFFSET_EXT : EC_GOLP_OFFSET_EXT_Field := 0;
 
       Reserved   : Types.Bits_26 := 0;
    end record
@@ -856,10 +1471,10 @@ is
       Imag at 2 range 0 .. 15;
    end record;
 
-   type ACC_MEM_CIR_Array is array(0 .. 1015) of ACC_MEM_Sample_Type;
+   type ACC_MEM_CIR_Array is array(Types.Index range <>) of ACC_MEM_Sample_Type;
 
    type ACC_MEM_Type is record
-      CIR : ACC_MEM_CIR_Array;
+      CIR : ACC_MEM_CIR_Array (0 .. 1015);
    end record
      with Size => 4064*8,
      Bit_Order => System.Low_Order_First,
@@ -872,17 +1487,92 @@ is
    ----------------------------------------------------------------------------
    -- GPIO_CTRL register file
 
-   -- GPIO_MODE sub-register
+   -----------------------------
+   -- GPIO_MODE sub-register  --
+   -----------------------------
+
+   type GPIO_MODE_MSGP0_Field is
+     (GPIO0,
+      RXOKLED,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO0/RXOKLED.
+
+   type GPIO_MODE_MSGP1_Field is
+     (GPIO1,
+      SFDLED,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO1/SFDLED.
+
+   type GPIO_MODE_MSGP2_Field is
+     (GPIO2,
+      RXLED,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO2/RXLED
+
+   type GPIO_MODE_MSGP3_Field is
+     (GPIO3,
+      TXLED,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO3/TXLED
+
+   type GPIO_MODE_MSGP4_Field is
+     (GPIO4,
+      EXTPA,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO4/EXTPA
+
+   type GPIO_MODE_MSGP5_Field is
+     (GPIO5,
+      EXTTXE,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO5/EXTTXE
+
+   type GPIO_MODE_MSGP6_Field is
+     (GPIO6,
+      EXTRXE,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO6/EXTRXE
+
+   type GPIO_MODE_MSGP7_Field is
+     (SYNC,
+      GPIO7,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for SYNC/GPIO7
+
+   type GPIO_MODE_MSGP8_Field is
+     (IRQ,
+      GPIO8,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for IRQ/GPIO8
+
    type GPIO_MODE_Type is record
-      MSGP0 : Types.Bits_2      := 0;
-      MSGP1 : Types.Bits_2      := 0;
-      MSGP2 : Types.Bits_2      := 0;
-      MSGP3 : Types.Bits_2      := 0;
-      MSGP4 : Types.Bits_2      := 0;
-      MSGP5 : Types.Bits_2      := 0;
-      MSGP6 : Types.Bits_2      := 0;
-      MSGP7 : Types.Bits_2      := 0;
-      MSGP8 : Types.Bits_2      := 0;
+      MSGP0 : GPIO_MODE_MSGP0_Field := GPIO0;
+      MSGP1 : GPIO_MODE_MSGP1_Field := GPIO1;
+      MSGP2 : GPIO_MODE_MSGP2_Field := GPIO2;
+      MSGP3 : GPIO_MODE_MSGP3_Field := GPIO3;
+      MSGP4 : GPIO_MODE_MSGP4_Field := GPIO4;
+      MSGP5 : GPIO_MODE_MSGP5_Field := GPIO5;
+      MSGP6 : GPIO_MODE_MSGP6_Field := GPIO6;
+      MSGP7 : GPIO_MODE_MSGP7_Field := SYNC;
+      MSGP8 : GPIO_MODE_MSGP8_Field := IRQ;
 
       Reserved_1 : Types.Bits_6 := 0;
       Reserved_2 : Types.Bits_8 := 0;
@@ -907,26 +1597,45 @@ is
       Reserved_2 at 0 range 24 .. 31;
    end record;
 
-   -- GPIO_DIR sub-register
+   ----------------------------
+   -- GPIO_DIR sub-register  --
+   ----------------------------
+
+   type GPIO_DIR_GDP_Field is
+     (Output,
+      Input)
+     with Size => 1;
+   --  Direction Selection for GPIOx
+
+   type GPIO_DIR_GDM_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  Mask for setting the direction of GPIOx.
+   --
+   --  When writing to GDP0 so select the I/O direction of GPIOx, the value of
+   --  GDPx is only changed if this GDMx mask bit is Set for the write
+   --  operation. GDMx will always read as 0.
+
    type GPIO_DIR_Type is record
-      GDP0 : Types.Bits_1 := 1;
-      GDP1 : Types.Bits_1 := 1;
-      GDP2 : Types.Bits_1 := 1;
-      GDP3 : Types.Bits_1 := 1;
-      GDM0 : Types.Bits_1 := 0;
-      GDM1 : Types.Bits_1 := 0;
-      GDM2 : Types.Bits_1 := 0;
-      GDM3 : Types.Bits_1 := 0;
-      GDP4 : Types.Bits_1 := 1;
-      GDP5 : Types.Bits_1 := 1;
-      GDP6 : Types.Bits_1 := 1;
-      GDP7 : Types.Bits_1 := 1;
-      GDM4 : Types.Bits_1 := 0;
-      GDM5 : Types.Bits_1 := 0;
-      GDM6 : Types.Bits_1 := 0;
-      GDM7 : Types.Bits_1 := 0;
-      GDP8 : Types.Bits_1 := 1;
-      GDM8 : Types.Bits_1 := 0;
+      GDP0 : GPIO_DIR_GDP_Field := Input;
+      GDP1 : GPIO_DIR_GDP_Field := Input;
+      GDP2 : GPIO_DIR_GDP_Field := Input;
+      GDP3 : GPIO_DIR_GDP_Field := Input;
+      GDM0 : GPIO_DIR_GDM_Field := Clear;
+      GDM1 : GPIO_DIR_GDM_Field := Clear;
+      GDM2 : GPIO_DIR_GDM_Field := Clear;
+      GDM3 : GPIO_DIR_GDM_Field := Clear;
+      GDP4 : GPIO_DIR_GDP_Field := Input;
+      GDP5 : GPIO_DIR_GDP_Field := Input;
+      GDP6 : GPIO_DIR_GDP_Field := Input;
+      GDP7 : GPIO_DIR_GDP_Field := Input;
+      GDM4 : GPIO_DIR_GDM_Field := Clear;
+      GDM5 : GPIO_DIR_GDM_Field := Clear;
+      GDM6 : GPIO_DIR_GDM_Field := Clear;
+      GDM7 : GPIO_DIR_GDM_Field := Clear;
+      GDP8 : GPIO_DIR_GDP_Field := Input;
+      GDM8 : GPIO_DIR_GDM_Field := Clear;
 
       Reserved_1 : Types.Bits_3  := 0;
       Reserved_2 : Types.Bits_11 := 0;
@@ -961,26 +1670,34 @@ is
       Reserved_2 at 0 range 21 .. 31;
    end record;
 
-   -- GPIO_DOUT sub-register
+   -----------------------------
+   -- GPIO_DOUT sub-register  --
+   -----------------------------
+
+   type GPIO_DOUT_GOM_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+
    type GPIO_DOUT_Type is record
-      GOP0 : Types.Bits_1 := 0;
-      GOP1 : Types.Bits_1 := 0;
-      GOP2 : Types.Bits_1 := 0;
-      GOP3 : Types.Bits_1 := 0;
-      GOM0 : Types.Bits_1 := 0;
-      GOM1 : Types.Bits_1 := 0;
-      GOM2 : Types.Bits_1 := 0;
-      GOM3 : Types.Bits_1 := 0;
-      GOP4 : Types.Bits_1 := 0;
-      GOP5 : Types.Bits_1 := 0;
-      GOP6 : Types.Bits_1 := 0;
-      GOP7 : Types.Bits_1 := 0;
-      GOM4 : Types.Bits_1 := 0;
-      GOM5 : Types.Bits_1 := 0;
-      GOM6 : Types.Bits_1 := 0;
-      GOM7 : Types.Bits_1 := 0;
-      GOP8 : Types.Bits_1 := 0;
-      GOM8 : Types.Bits_1 := 0;
+      GOP0 : Types.Bits_1        := 0;
+      GOP1 : Types.Bits_1        := 0;
+      GOP2 : Types.Bits_1        := 0;
+      GOP3 : Types.Bits_1        := 0;
+      GOM0 : GPIO_DOUT_GOM_Field := Clear;
+      GOM1 : GPIO_DOUT_GOM_Field := Clear;
+      GOM2 : GPIO_DOUT_GOM_Field := Clear;
+      GOM3 : GPIO_DOUT_GOM_Field := Clear;
+      GOP4 : Types.Bits_1        := 0;
+      GOP5 : Types.Bits_1        := 0;
+      GOP6 : Types.Bits_1        := 0;
+      GOP7 : Types.Bits_1        := 0;
+      GOM4 : GPIO_DOUT_GOM_Field := Clear;
+      GOM5 : GPIO_DOUT_GOM_Field := Clear;
+      GOM6 : GPIO_DOUT_GOM_Field := Clear;
+      GOM7 : GPIO_DOUT_GOM_Field := Clear;
+      GOP8 : Types.Bits_1        := 0;
+      GOM8 : GPIO_DOUT_GOM_Field := Clear;
 
       Reserved_1 : Types.Bits_3  := 0;
       Reserved_2 : Types.Bits_11 := 0;
@@ -1015,17 +1732,26 @@ is
       Reserved_2 at 0 range 21 .. 31;
    end record;
 
-   -- GPIO_IRQE sub-register
+   -----------------------------
+   -- GPIO_IRQE sub-register  --
+   -----------------------------
+
+   type GPIO_IREQ_GIRQE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO IRQ Enable for GPIOx input.
+
    type GPIO_IRQE_Type is record
-      GIRQE0 : Types.Bits_1 := 0;
-      GIRQE1 : Types.Bits_1 := 0;
-      GIRQE2 : Types.Bits_1 := 0;
-      GIRQE3 : Types.Bits_1 := 0;
-      GIRQE4 : Types.Bits_1 := 0;
-      GIRQE5 : Types.Bits_1 := 0;
-      GIRQE6 : Types.Bits_1 := 0;
-      GIRQE7 : Types.Bits_1 := 0;
-      GIRQE8 : Types.Bits_1 := 0;
+      GIRQE0 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE1 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE2 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE3 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE4 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE5 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE6 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE7 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE8 : GPIO_IREQ_GIRQE_Field := Disabled;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1047,17 +1773,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_ISEN sub-register
+   -----------------------------
+   -- GPIO_ISEN sub-register  --
+   -----------------------------
+
+   type GPIO_ISEN_GISEN_Field is
+     (Active_High,
+      Active_Low)
+     with Size => 1;
+   --  GPIO IRQ Sense selection GPIO0 input.
+
    type GPIO_ISEN_Type is record
-      GISEN0 : Types.Bits_1 := 0;
-      GISEN1 : Types.Bits_1 := 0;
-      GISEN2 : Types.Bits_1 := 0;
-      GISEN3 : Types.Bits_1 := 0;
-      GISEN4 : Types.Bits_1 := 0;
-      GISEN5 : Types.Bits_1 := 0;
-      GISEN6 : Types.Bits_1 := 0;
-      GISEN7 : Types.Bits_1 := 0;
-      GISEN8 : Types.Bits_1 := 0;
+      GISEN0 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN1 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN2 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN3 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN4 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN5 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN6 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN7 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN8 : GPIO_ISEN_GISEN_Field := Active_High;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1079,17 +1814,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_IMODE sub-register
+   ------------------------------
+   -- GPIO_IMODE sub-register  --
+   ------------------------------
+
+   type GPIO_IMODE_GIMOD_Field is
+     (Level,
+      Edge)
+     with Size => 1;
+   --  GPIO IRQ Mode selection for GPIOx input.
+
    type GPIO_IMODE_Type is record
-      GIMOD0 : Types.Bits_1 := 0;
-      GIMOD1 : Types.Bits_1 := 0;
-      GIMOD2 : Types.Bits_1 := 0;
-      GIMOD3 : Types.Bits_1 := 0;
-      GIMOD4 : Types.Bits_1 := 0;
-      GIMOD5 : Types.Bits_1 := 0;
-      GIMOD6 : Types.Bits_1 := 0;
-      GIMOD7 : Types.Bits_1 := 0;
-      GIMOD8 : Types.Bits_1 := 0;
+      GIMOD0 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD1 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD2 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD3 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD4 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD5 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD6 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD7 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD8 : GPIO_IMODE_GIMOD_Field := Level;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1111,17 +1855,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_IBES sub-register
+   -----------------------------
+   -- GPIO_IBES sub-register  --
+   -----------------------------
+
+   type GPIO_IBES_GIBES_Field is
+     (Use_GPIO_IMODE,
+      Both_Edges)
+     with Size => 1;
+   --  GPIO IRQ "Both Edge" selection for GPIOx input.
+
    type GPIO_IBES_Type is record
-      GIBES0 : Types.Bits_1 := 0;
-      GIBES1 : Types.Bits_1 := 0;
-      GIBES2 : Types.Bits_1 := 0;
-      GIBES3 : Types.Bits_1 := 0;
-      GIBES4 : Types.Bits_1 := 0;
-      GIBES5 : Types.Bits_1 := 0;
-      GIBES6 : Types.Bits_1 := 0;
-      GIBES7 : Types.Bits_1 := 0;
-      GIBES8 : Types.Bits_1 := 0;
+      GIBES0 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES1 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES2 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES3 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES4 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES5 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES6 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES7 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES8 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1143,17 +1896,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_ICLR sub-register
+   -----------------------------
+   -- GPIO_ICLR sub-register  --
+   -----------------------------
+
+   type GPIO_ICLR_GICLR_Field is
+     (No_Action,
+      Clear_IRQ_Latch)
+     with Size => 1;
+   --  GPIO IRQ latch clear for GPIOx input.
+
    type GPIO_ICLR_Type is record
-      GICLR0 : Types.Bits_1 := 0;
-      GICLR1 : Types.Bits_1 := 0;
-      GICLR2 : Types.Bits_1 := 0;
-      GICLR3 : Types.Bits_1 := 0;
-      GICLR4 : Types.Bits_1 := 0;
-      GICLR5 : Types.Bits_1 := 0;
-      GICLR6 : Types.Bits_1 := 0;
-      GICLR7 : Types.Bits_1 := 0;
-      GICLR8 : Types.Bits_1 := 0;
+      GICLR0 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR1 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR2 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR3 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR4 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR5 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR6 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR7 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR8 : GPIO_ICLR_GICLR_Field := No_Action;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1175,17 +1937,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_IDBE sub-register
+   -----------------------------
+   -- GPIO_IDBE sub-register  --
+   -----------------------------
+
+   type GPIO_IDBE_GIDBE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO IRQ de-bounce enable for GPIOx.
+
    type GPIO_IDBE_Type is record
-      GIDBE0 : Types.Bits_1 := 0;
-      GIDBE1 : Types.Bits_1 := 0;
-      GIDBE2 : Types.Bits_1 := 0;
-      GIDBE3 : Types.Bits_1 := 0;
-      GIDBE4 : Types.Bits_1 := 0;
-      GIDBE5 : Types.Bits_1 := 0;
-      GIDBE6 : Types.Bits_1 := 0;
-      GIDBE7 : Types.Bits_1 := 0;
-      GIDBE8 : Types.Bits_1 := 0;
+      GIDBE0 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE1 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE2 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE3 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE4 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE5 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE6 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE7 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE8 : GPIO_IDBE_GIDBE_Field := Disabled;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1207,7 +1978,10 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_RAW sub-register
+   ----------------------------
+   -- GPIO_RAW sub-register  --
+   ----------------------------
+
    type GPIO_RAW_Type is record
       GRAWP0 : Types.Bits_1 := 0;
       GRAWP1 : Types.Bits_1 := 0;
@@ -1242,9 +2016,21 @@ is
    ----------------------------------------------------------------------------
    -- DRX_CONF register file
 
-   -- DRX_TUNE0b sub-register
+   ------------------------------
+   -- DRX_TUNE0b sub-register  --
+   ------------------------------
+
+   type DRX_TUNE0b_Field is new Bits_16;
+
+   DRX_TUNE0b_110K_STD     : constant DRX_TUNE0b_Field := 16#000A#;
+   DRX_TUNE0b_110K_Non_STD : constant DRX_TUNE0b_Field := 16#0016#;
+   DRX_TUNE0b_850K_STD     : constant DRX_TUNE0b_Field := 16#0001#;
+   DRX_TUNE0b_850K_Non_STD : constant DRX_TUNE0b_Field := 16#0006#;
+   DRX_TUNE0b_6M8_STD      : constant DRX_TUNE0b_Field := 16#0001#;
+   DRX_TUNE0b_6M8_Non_STD  : constant DRX_TUNE0b_Field := 16#0002#;
+
    type DRX_TUNE0b_Type is record
-      DRX_TUNE0b : Types.Bits_16;
+      DRX_TUNE0b : DRX_TUNE0b_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1254,9 +2040,17 @@ is
       DRX_TUNE0b at 0 range 0 .. 15;
    end record;
 
-   -- DRX_TUNE1a sub-register
+   ------------------------------
+   -- DRX_TUNE1a sub-register  --
+   ------------------------------
+
+   type DRX_TUNE1a_Field is new Bits_16;
+
+   DRX_TUNE1a_16MHz : constant DRX_TUNE1a_Field := 16#0087#;
+   DRX_TUNE1a_64MHz : constant DRX_TUNE1a_Field := 16#008D#;
+
    type DRX_TUNE1a_Type is record
-      DRX_TUNE1a : Types.Bits_16;
+      DRX_TUNE1a : DRX_TUNE1a_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1266,9 +2060,23 @@ is
       DRX_TUNE1a at 0 range 0 .. 15;
    end record;
 
-   -- DRX_TUNE1b sub-register
+   ------------------------------
+   -- DRX_TUNE1b sub-register  --
+   ------------------------------
+
+   type DRX_TUNE1b_Field is new Bits_16;
+
+   DRX_TUNE1b_110K     : constant DRX_TUNE1b_Field := 16#0064#;
+   --  Preamble lengths > 1024 symbols, for 110 kbps operation
+
+   DRX_TUNE1b_850K_6M8 : constant DRX_TUNE1b_Field := 16#0020#;
+   -- Preamble lengths 128 to 1024 symbols, for 850 kbps and 6.8 Mbps operation
+
+   DRX_TUNE1b_6M8      : constant DRX_TUNE1b_Field := 16#0010#;
+   --  Preamble length = 64 symbols, for 6.8 Mbps operation
+
    type DRX_TUNE1b_Type is record
-      DRX_TUNE1b : Types.Bits_16;
+      DRX_TUNE1b : DRX_TUNE1b_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1278,9 +2086,23 @@ is
       DRX_TUNE1b at 0 range 0 .. 15;
    end record;
 
-   -- DRX_TUNE2 sub-register
+   ------------------------------
+   -- DRX_TUNE2 sub-register  --
+   ------------------------------
+
+   type DRX_TUNE2_Field is new Bits_32;
+
+   DRX_TUNE2_PAC8_16MHz  : constant DRX_TUNE2_Field := 16#311A002D#;
+   DRX_TUNE2_PAC8_64MHz  : constant DRX_TUNE2_Field := 16#313B006B#;
+   DRX_TUNE2_PAC16_16MHz : constant DRX_TUNE2_Field := 16#331A0052#;
+   DRX_TUNE2_PAC16_64MHz : constant DRX_TUNE2_Field := 16#333B00BE#;
+   DRX_TUNE2_PAC32_16MHz : constant DRX_TUNE2_Field := 16#351A009A#;
+   DRX_TUNE2_PAC32_64MHz : constant DRX_TUNE2_Field := 16#353B015E#;
+   DRX_TUNE2_PAC64_16MHz : constant DRX_TUNE2_Field := 16#371A011D#;
+   DRX_TUNE2_PAC64_64MHz : constant DRX_TUNE2_Field := 16#373B0296#;
+
    type DRX_TUNE2_Type is record
-      DRX_TUNE2 : Types.Bits_32;
+      DRX_TUNE2 : DRX_TUNE2_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1290,9 +2112,16 @@ is
       DRX_TUNE2 at 0 range 0 .. 31;
    end record;
 
-   -- DRX_SFDTOC sub-register
+   ------------------------------
+   -- DRX_SFDTOC sub-register  --
+   ------------------------------
+
+   type DRX_SFDTOC_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  SFD detection timeout count (in units of preamble symbols)
+
    type DRX_SFDTOC_Type is record
-      DRX_SFDTOC : Types.Bits_16;
+      DRX_SFDTOC : DRX_SFDTOC_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1302,9 +2131,16 @@ is
       DRX_SFDTOC at 0 range 0 .. 15;
    end record;
 
-   -- DRX_PRETOC sub-register
+   ------------------------------
+   -- DRX_PRETOC sub-register  --
+   ------------------------------
+
+   type DRX_PRETOC_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  Preamble detection timeout count (in units of PAC size symbols)
+
    type DRX_PRETOC_Type is record
-      DRX_PRETOC : Types.Bits_16;
+      DRX_PRETOC : DRX_PRETOC_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1314,9 +2150,17 @@ is
       DRX_PRETOC at 0 range 0 .. 15;
    end record;
 
-   -- DRX_TUNE4H sub-register
+   ------------------------------
+   -- DRX_TUNE4H sub-register  --
+   ------------------------------
+
+   type DRX_TUNE4H_Field is new Bits_16;
+
+   DRX_TUNE4H_Preamble_64 : constant DRX_TUNE4H_Field := 16#0010#; --  64
+   DRX_TUNE4H_Others      : constant DRX_TUNE4H_Field := 16#0028#; --  128 or greater
+
    type DRX_TUNE4H_Type is record
-      DRX_TUNE4H : Types.Bits_16;
+      DRX_TUNE4H : DRX_TUNE4H_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1326,9 +2170,15 @@ is
       DRX_TUNE4H at 0 range 0 .. 15;
    end record;
 
-   -- RXPACC_NOSAT sub-register
+   --------------------------------
+   -- RXPACC_NOSAT sub-register  --
+   --------------------------------
+
+   type RXPACC_NOSAT_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+
    type RXPACC_NOSAT_Type is record
-      RXPACC_NOSAT : Types.Bits_16;
+      RXPACC_NOSAT : RXPACC_NOSAT_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1341,12 +2191,35 @@ is
    ----------------------------------------------------------------------------
    -- RF_CONF register file
 
-   -- RF_CONF sub-register
+   ---------------------------
+   -- RF_CONF sub-register  --
+   ---------------------------
+
+   type RF_CONF_TXFEN_Field is new Bits_5;
+   --  Transmit block force enable.
+
+   RF_CONF_TXFEN_Force_Enable : constant RF_CONF_TXFEN_Field := 16#1F#;
+
+   type RF_CONF_PLLFEN_Field is new Bits_3;
+   --  PLL block force enables.
+
+   RF_CONF_PLLFEN_Force_Enable : constant RF_CONF_PLLFEN_Field := 16#5#;
+
+   type RF_CONF_LDOFEN_Field is new Bits_5;
+   --  Write 0x1F to force the enable to all LDOs.
+
+   RF_CONF_LDOFEN_Force_Enable : constant RF_CONF_LDOFEN_Field := 16#1F#;
+
+   type RF_CONF_TXRXSW_Field is new Bits_2;
+
+   RF_CONF_TXRXSW_Force_Tx : constant RF_CONF_TXRXSW_Field := 16#2#;
+   RF_CONF_TXRXSW_Force_Rx : constant RF_CONF_TXRXSW_Field := 16#1#;
+
    type RF_CONF_Type is record
-      TXFEN  : Types.Bits_5 := 0;
-      PLLFEN : Types.Bits_3 := 0;
-      LDOFEN : Types.Bits_5 := 0;
-      TXRXSW : Types.Bits_2 := 0;
+      TXFEN  : RF_CONF_TXFEN_Field  := 0;
+      PLLFEN : RF_CONF_PLLFEN_Field := 0;
+      LDOFEN : RF_CONF_LDOFEN_Field := 0;
+      TXRXSW : RF_CONF_TXRXSW_Field := 0;
 
       Reserved_1 : Types.Bits_8 := 0;
       Reserved_2 : Types.Bits_9 := 0;
@@ -1366,9 +2239,17 @@ is
       Reserved_2 at 0 range 23 .. 31;
    end record;
 
-   -- RF_RXCTRLH sub-register
+   ------------------------------
+   -- RF_RXCTRLH sub-register  --
+   ------------------------------
+
+   type RF_RXCTRLH_Field is new Bits_8;
+
+   RF_RXCTRLH_500MHz : constant RF_RXCTRLH_Field := 16#D8#; --  Channels 1,2,3,5
+   RF_RXCTRLH_900MHz : constant RF_RXCTRLH_Field := 16#BC#; --  Channels 4,7
+
    type RF_RXCTRLH_Type is record
-      RF_RXCTRLH : Types.Bits_8;
+      RF_RXCTRLH : RF_RXCTRLH_Field;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1378,9 +2259,21 @@ is
       RF_RXCTRLH at 0 range 0 .. 7;
    end record;
 
-   -- RF_TXCTRL sub-register
+   -----------------------------
+   -- RF_TXCTRL sub-register  --
+   -----------------------------
+
+   type RF_TXCTRL_Field is new Bits_32;
+
+   RF_TXCTRL_Channel_1 : constant RF_TXCTRL_Field := 16#00005C40#;
+   RF_TXCTRL_Channel_2 : constant RF_TXCTRL_Field := 16#00045CA0#;
+   RF_TXCTRL_Channel_3 : constant RF_TXCTRL_Field := 16#00086CC0#;
+   RF_TXCTRL_Channel_4 : constant RF_TXCTRL_Field := 16#00045C80#;
+   RF_TXCTRL_Channel_5 : constant RF_TXCTRL_Field := 16#001E3FE3#;
+   RF_TXCTRL_Channel_7 : constant RF_TXCTRL_Field := 16#001E7DE0#;
+
    type RF_TXCTRL_Type is record
-      RF_TXCTRL : Types.Bits_32 := 16#001E_3DE0#;
+      RF_TXCTRL : RF_TXCTRL_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1390,12 +2283,39 @@ is
       RF_TXCTRL at 0 range 0 .. 31;
    end record;
 
-   -- RF_STATUS sub-register
+   -----------------------------
+   -- RF_STATUS sub-register  --
+   -----------------------------
+
+   type RF_STATUS_CPLLLOCK_Field is
+     (Not_Locked,
+      Locked)
+     with Size => 1;
+   --  Clock PLL Lock status.
+
+   type RF_STATUS_CPLLLOW_Field is
+     (Not_Low,
+      Low)
+     with Size => 1;
+   --  Clock PLL Low flag status.
+
+   type RF_STATUS_CPLLHIGH_Field is
+     (Not_High,
+      High)
+     with Size => 1;
+   --  Clock PLL High flag status.
+
+   type RF_STATUS_RFPLLLOCK_Field is
+     (Not_Locked,
+      Locked)
+     with Size => 1;
+   --  RF PLL Lock status.
+
    type RF_STATUS_Type is record
-      CPLLLOCK  : Types.Bits_1 := 0;
-      CPLLLOW   : Types.Bits_1 := 0;
-      CPLLHIGH  : Types.Bits_1 := 0;
-      RFPLLLOCK : Types.Bits_1 := 0;
+      CPLLLOCK  : RF_STATUS_CPLLLOCK_Field  := Not_Locked;
+      CPLLLOW   : RF_STATUS_CPLLLOW_Field   := Not_Low;
+      CPLLHIGH  : RF_STATUS_CPLLHIGH_Field  := Not_High;
+      RFPLLLOCK : RF_STATUS_RFPLLLOCK_Field := Not_Locked;
 
       Reserved  : Types.Bits_4 := 0;
    end record
@@ -1412,9 +2332,14 @@ is
       Reserved  at 0 range 4 .. 7;
    end record;
 
-   -- LDOTUNE sub-register
+   ---------------------------
+   -- LDOTUNE sub-register  --
+   ---------------------------
+
+   type LDOTUNE_Field is new Bits_40;
+
    type LDOTUNE_Type is Record
-      LDOTUNE : Types.Bits_40 := 16#88_8888_8888#;
+      LDOTUNE : LDOTUNE_Field := 16#88_8888_8888#;
    end record
      with Size => 40,
      Bit_Order => System.Low_Order_First,
@@ -1427,9 +2352,18 @@ is
    ----------------------------------------------------------------------------
    -- TX_CAL register file
 
-   -- TC_SARC sub-register
+   ---------------------------
+   -- TC_SARC sub-register  --
+   ---------------------------
+
+   type TC_SARC_SAR_CTRL_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Enable or disable the SAR
+
    type TC_SARC_Type is record
-      SAR_CTRL : Types.Bits_1 := 0;
+      SAR_CTRL : TC_SARC_SAR_CTRL_Field := Disabled;
 
       Reserved : Types.Bits_15 := 0;
    end record
@@ -1443,10 +2377,21 @@ is
       Reserved at 0 range 1 .. 15;
    end record;
 
-   -- TC_SARL sub-register
+   ---------------------------
+   -- TC_SARL sub-register  --
+   ---------------------------
+
+   type TC_SARL_SAR_LVBAT_Field is range 0 .. 255
+     with Size => 8;
+   --  Latest SAR reading for Voltage level.
+
+   type TC_SARL_SAR_LTEMP_Field is range 0 .. 255
+     with Size => 8;
+   --  Latest SAR reading for Temperature level.
+
    type TC_SARL_Type is record
-      SAR_LVBAT : Types.Bits_8 := 0;
-      SAR_LTEMP : Types.Bits_8 := 0;
+      SAR_LVBAT : TC_SARL_SAR_LVBAT_Field := 0;
+      SAR_LTEMP : TC_SARL_SAR_LTEMP_Field := 0;
 
       Reserved  : Types.Bits_8 := 0;
    end record
@@ -1461,10 +2406,21 @@ is
       Reserved  at 0 range 16 .. 23;
    end record;
 
-   -- TC_SARW sub-register
+   ---------------------------
+   -- TC_SARW sub-register  --
+   ---------------------------
+
+   type TC_SARW_WVBAT_Field is range 0 .. 255
+     with Size => 8;
+   --  SAR reading of Voltage level taken at last wakeup event.
+
+   type TC_SARW_WTEMP_Field is range 0 .. 255
+     with Size => 8;
+   --  SAR reading of temperature level taken at last wakeup event.
+
    type TC_SARW_Type is record
-      SAR_WVBAT : Types.Bits_8 := 0;
-      SAR_WTEMP : Types.Bits_8 := 0;
+      SAR_WVBAT : TC_SARW_WVBAT_Field := 0;
+      SAR_WTEMP : TC_SARW_WTEMP_Field := 0;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1475,9 +2431,80 @@ is
       SAR_WTEMP at 0 range 8 .. 15;
    end record;
 
-   -- TC_PGDELAY sub-register
+   -------------------------------
+   --  TC_PG_CTRL sub-register  --
+   -------------------------------
+
+   type TC_PG_CTRL_PG_START_Field is
+     (No_Action,
+      Start)
+     with Size => 1;
+   --  Start the pulse generator calibration.
+
+   type TC_PG_CTRL_PG_TMEAS_Field is range 0 .. 15
+     with Size => 4;
+   --  Number of clock cycles over which to run the pulse generator cal counter.
+
+   type TC_PG_CTRL_Type is record
+      PG_START : TC_PG_CTRL_PG_START_Field := No_Action;
+      PG_TMEAS : TC_PG_CTRL_PG_TMEAS_Field := 0;
+
+      Reserved_1 : Bits_1;
+      Reserved_2 : Bits_2;
+   end record
+     with Size => 8,
+     Bit_Order => System.Low_Order_First,
+     Scalar_Storage_Order => System.Low_Order_First;
+
+   for TC_PG_CTRL_Type use record
+      PG_START   at 0 range 0 .. 0;
+
+      Reserved_1 at 0 range 1 .. 1;
+
+      PG_TMEAS   at 0 range 2 .. 5;
+
+      Reserved_2 at 0 range 6 .. 7;
+   end record;
+
+   ---------------------------------
+   --  TC_PG_STATUS sub-register  --
+   ---------------------------------
+
+   type TC_PG_STATUS_DELAY_CNT_Field is range 0 .. 2**12 - 1
+     with Size => 12;
+   --  Reference value required for temperature bandwidth compensation
+
+   type TC_PG_STATUS_Type is record
+      DELAY_CNT : TC_PG_STATUS_DELAY_CNT_Field := 0;
+
+      Reserved : Bits_4;
+   end record
+     with Size => 16,
+     Bit_Order => System.Low_Order_First,
+     Scalar_Storage_Order => System.Low_Order_First;
+
+   for TC_PG_STATUS_Type use record
+      DELAY_CNT at 0 range 0 .. 11;
+
+      Reserved  at 0 range 12 .. 15;
+   end record;
+
+   ------------------------------
+   -- TC_PGDELAY sub-register  --
+   ------------------------------
+
+   type TC_PGDELAY_Field is new Bits_8;
+   --  8-bit configuration register for setting the Pulse Generator Delay value.
+
+   TC_PGDELAY_Channel_1 : constant TC_PGDELAY_Field := 16#C9#;
+   TC_PGDELAY_Channel_2 : constant TC_PGDELAY_Field := 16#C2#;
+   TC_PGDELAY_Channel_3 : constant TC_PGDELAY_Field := 16#C5#;
+   TC_PGDELAY_Channel_4 : constant TC_PGDELAY_Field := 16#95#;
+   TC_PGDELAY_Channel_5 : constant TC_PGDELAY_Field := 16#B5#;
+   TC_PGDELAY_Channel_7 : constant TC_PGDELAY_Field := 16#93#;
+
    type TC_PGDELAY_Type is record
-      TC_PGDELAY : Types.Bits_8;
+      TC_PGDELAY : TC_PGDELAY_Field;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1487,9 +2514,19 @@ is
       TC_PGDELAY at 0 range 0 .. 7;
    end record;
 
-   -- TC_PGTEST sub-register
+   -----------------------------
+   -- TC_PGTEST sub-register  --
+   -----------------------------
+
+   type TC_PGTEST_Field is new Bits_8;
+   --  8-bit configuration register for use in setting the transmitter into
+   --  continuous wave (CW) mode.
+
+   TC_PGTEST_Normal_Operation : constant TC_PGTEST_Field := 16#00#;
+   TC_PGTEST_Continuous_Wave  : constant TC_PGTEST_Field := 16#13#;
+
    type TC_PGTEST_Type is record
-      TC_PGTEST : Types.Bits_8;
+      TC_PGTEST : TC_PGTEST_Field := TC_PGTEST_Normal_Operation;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1502,9 +2539,21 @@ is
    ----------------------------------------------------------------------------
    -- FS_CTRL register file
 
-   -- FS_PLLCFG sub-register
+   -----------------------------
+   -- FS_PLLCFG sub-register  --
+   -----------------------------
+
+   type FS_PLLCFG_Field is new Bits_32;
+
+   FS_PLLCFG_Channel_1 : constant FS_PLLCFG_Field := 16#09000407#;
+   FS_PLLCFG_Channel_2 : constant FS_PLLCFG_Field := 16#08400508#;
+   FS_PLLCFG_Channel_3 : constant FS_PLLCFG_Field := 16#08401009#;
+   FS_PLLCFG_Channel_4 : constant FS_PLLCFG_Field := 16#08400508#;
+   FS_PLLCFG_Channel_5 : constant FS_PLLCFG_Field := 16#0800041D#;
+   FS_PLLCFG_Channel_7 : constant FS_PLLCFG_Field := 16#0800041D#;
+
    type FS_PLLCFG_Type is record
-      FS_PLLCFG : Types.Bits_32;
+      FS_PLLCFG : FS_PLLCFG_Field;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1514,9 +2563,21 @@ is
       FS_PLLCFG at 0 range 0 .. 31;
    end record;
 
-   -- FS_PLLTUNE sub-register
+   ------------------------------
+   -- FS_PLLTUNE sub-register  --
+   ------------------------------
+
+   type FS_PLLTUNE_Field is new Bits_8;
+
+   FS_PLLTUNE_Channel_1 : constant FS_PLLTUNE_Field := 16#1E#;
+   FS_PLLTUNE_Channel_2 : constant FS_PLLTUNE_Field := 16#26#;
+   FS_PLLTUNE_Channel_3 : constant FS_PLLTUNE_Field := 16#56#;
+   FS_PLLTUNE_Channel_4 : constant FS_PLLTUNE_Field := 16#26#;
+   FS_PLLTUNE_Channel_5 : constant FS_PLLTUNE_Field := 16#BE#;
+   FS_PLLTUNE_Channel_7 : constant FS_PLLTUNE_Field := 16#BE#;
+
    type FS_PLLTUNE_Type is record
-      FS_PLLTUNE : Types.Bits_8;
+      FS_PLLTUNE : FS_PLLTUNE_Field;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1526,9 +2587,16 @@ is
       FS_PLLTUNE at 0 range 0 .. 7;
    end record;
 
-   -- FS_XTALT sub-register
+   ----------------------------
+   -- FS_XTALT sub-register  --
+   ----------------------------
+
+   type FS_XTALT_Field is range 0 .. 2**5 - 1
+     with Size => 5;
+   --  Crystal Trim.
+
    type FS_XTALT_Type is record
-      XTALT    : Types.Bits_5 := 0;
+      XTALT    : FS_XTALT_Field := 0;
 
       Reserved : Types.Bits_3 := 2#011#;
    end record
@@ -1545,16 +2613,68 @@ is
    ----------------------------------------------------------------------------
    -- AON register file
 
-   -- AON_WCFG sub-register
+   ----------------------------
+   -- AON_WCFG sub-register  --
+   ----------------------------
+
+   type AON_WCFG_ONW_RADC_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up Run the (temperature and voltage) Analog-to-Digital Convertors.
+
+   type AON_WCFG_ONW_RX_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up turn on the Receiver.
+
+   type AON_WCFG_ONW_LEUI_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up load the EUI from OTP memory into the EUI register.
+
+   type AON_WCFG_ONW_LDC_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-upload configurations from the AON memory into the host
+   --  interface register set.
+
+   type AON_WCFG_ONW_L64_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up load the Length64 receiver operating parameter set.
+
+   type AON_WCFG_PRES_SLEEP_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Preserve Sleep.
+
+   type AON_WCFG_ONW_LLDE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up load the LDE microcode.
+
+   type AON_WCFG_ONW_LLD0_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  On Wake-up load the LDOTUNE value from OTP.
+
    type AON_WCFG_Type is record
-      ONW_RAD    : Types.Bits_1 := 0;
-      ONW_RX     : Types.Bits_1 := 0;
-      ONW_LEUI   : Types.Bits_1 := 0;
-      ONW_LDC    : Types.Bits_1 := 0;
-      ONW_L64    : Types.Bits_1 := 0;
-      PRES_SLEE  : Types.Bits_1 := 0;
-      ONW_LLDE   : Types.Bits_1 := 0;
-      ONW_LLD    : Types.Bits_1 := 0;
+      ONW_RADC   : AON_WCFG_ONW_RADC_Field   := Disabled;
+      ONW_RX     : AON_WCFG_ONW_RX_Field     := Disabled;
+      ONW_LEUI   : AON_WCFG_ONW_LEUI_Field   := Disabled;
+      ONW_LDC    : AON_WCFG_ONW_LDC_Field    := Disabled;
+      ONW_L64    : AON_WCFG_ONW_L64_Field    := Disabled;
+      PRES_SLEEP : AON_WCFG_PRES_SLEEP_Field := Disabled;
+      ONW_LLDE   : AON_WCFG_ONW_LLDE_Field   := Disabled;
+      ONW_LLD0   : AON_WCFG_ONW_LLD0_Field   := Disabled;
 
       Reserved_1 : Types.Bits_1 := 0;
       Reserved_2 : Types.Bits_2 := 0;
@@ -1566,7 +2686,7 @@ is
      Scalar_Storage_Order => System.Low_Order_First;
 
    for AON_WCFG_Type use record
-      ONW_RAD    at 0 range  0 ..  0;
+      ONW_RADC   at 0 range  0 ..  0;
       ONW_RX     at 0 range  1 ..  1;
 
       Reserved_1 at 0 range  2 .. 2;
@@ -1577,23 +2697,58 @@ is
 
       ONW_LDC    at 0 range  6 ..  6;
       ONW_L64    at 0 range  7 ..  7;
-      PRES_SLEE  at 0 range  8 ..  8;
+      PRES_SLEEP at 0 range  8 ..  8;
 
       Reserved_3 at 0 range  9 .. 10;
 
       ONW_LLDE   at 0 range 11 .. 11;
-      ONW_LLD    at 0 range 12 .. 12;
+      ONW_LLD0   at 0 range 12 .. 12;
 
       Reserved_4 at 0 range 13 .. 15;
    end record;
 
-   -- AON_CTRL sub-register
+   ----------------------------
+   -- AON_CTRL sub-register  --
+   ----------------------------
+
+   type AON_CTRL_RESTORE_Field is
+     (No_Action,
+      Restore)
+     with Size => 1;
+   --  When this bit is set the DW1000 will copy the user configurations from
+   --  the AON memory to the host interface register set.
+
+   type AON_CTRL_SAVE_Field is
+     (No_Action,
+      Save)
+     with Size => 1;
+   --  When this bit is set the DW1000 will copy the user configurations from
+   --  the host interface register set into the AON memory.
+
+   type AON_CTRL_UPL_CFG_Field is
+     (No_Action,
+      Upload)
+     with Size => 1;
+   --  Upload the AON block configurations to the AON.
+
+   type AON_CTRL_DCA_READ_Field is
+     (No_Action,
+      Trigger_Read)
+     with Size => 1;
+   --  Direct AON memory access read.
+
+   type AON_CTRL_DCA_ENAB_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Direct AON memory access enable bit.
+
    type AON_CTRL_Type is record
-      RESTORE  : Types.Bits_1 := 0;
-      SAVE     : Types.Bits_1 := 0;
-      UPL_CFG  : Types.Bits_1 := 0;
-      DCA_READ : Types.Bits_1 := 0;
-      DCA_ENAB : Types.Bits_1 := 0;
+      RESTORE  : AON_CTRL_RESTORE_Field  := No_Action;
+      SAVE     : AON_CTRL_SAVE_Field     := No_Action;
+      UPL_CFG  : AON_CTRL_UPL_CFG_Field  := No_Action;
+      DCA_READ : AON_CTRL_DCA_READ_Field := No_Action;
+      DCA_ENAB : AON_CTRL_DCA_ENAB_Field := Disabled;
 
       Reserved : Types.Bits_3 := 0;
    end record
@@ -1612,7 +2767,10 @@ is
       DCA_ENAB at 0 range 7 .. 7;
    end record;
 
-   -- AON_RDAT sub-register
+   ----------------------------
+   -- AON_RDAT sub-register  --
+   ----------------------------
+
    type AON_RDAT_Type is record
       AON_RDAT : Types.Bits_8;
    end record
@@ -1624,9 +2782,14 @@ is
       AON_RDAT at 0 range 0 .. 7;
    end record;
 
-   -- AON_ADDR sub-register
+   ----------------------------
+   -- AON_ADDR sub-register  --
+   ----------------------------
+
+   type AON_ADDR_Field is new Bits_8;
+
    type AON_ADDR_Type is record
-      AON_ADDR : Types.Bits_8;
+      AON_ADDR : AON_ADDR_Field;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1636,15 +2799,57 @@ is
       AON_ADDR at 0 range 0 .. 7;
    end record;
 
-   -- AON_CFG0 sub-register
+   ----------------------------
+   -- AON_CFG0 sub-register  --
+   ----------------------------
+
+   type AON_CFG0_SLEEP_EN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This is the sleep enable configuration bit.
+
+   type AON_CFG0_WAKE_PIN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Wake using WAKEUP pin.
+
+   type AON_CFG0_WAKE_SPI_Pin_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Wake using SPI access.
+
+   type AON_CFG0_WAKE_CNT_Pin_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Wake when sleep counter elapses.
+
+   type AON_CFG0_LPDIV_EN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Low power divider enable configuration.
+
+   type AON_CFG0_LPCLKDIVA_Field is range 0 .. 2**11 - 1
+     with Size => 11;
+   --  This field specifies a divider count for dividing the raw DW1000 XTAL
+   --  oscillator frequency to set an LP clock frequency.
+
+   type AON_CFG0_SLEEP_TIM_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+   --  Sleep time.
+
    type AON_CFG0_Type is record
-      SLEEP_EN  : Types.Bits_1  := 0;
-      WAKE_PIN  : Types.Bits_1  := 1;
-      WAKE_SPI  : Types.Bits_1  := 1;
-      WAKE_CNT  : Types.Bits_1  := 1;
-      LPDIV_EN  : Types.Bits_1  := 0;
-      LPCLKDIVA : Types.Bits_11 := 2#000_1111_1111#;
-      SLEEP_TIM : Types.Bits_16 := 2#0101_0000_1111_1111#;
+      SLEEP_EN  : AON_CFG0_SLEEP_EN_Field     := Disabled;
+      WAKE_PIN  : AON_CFG0_WAKE_PIN_Field     := Enabled;
+      WAKE_SPI  : AON_CFG0_WAKE_SPI_Pin_Field := Enabled;
+      WAKE_CNT  : AON_CFG0_WAKE_CNT_Pin_Field := Enabled;
+      LPDIV_EN  : AON_CFG0_LPDIV_EN_Field     := Disabled;
+      LPCLKDIVA : AON_CFG0_LPCLKDIVA_Field    := 255;
+      SLEEP_TIM : AON_CFG0_SLEEP_TIM_Field    := 20735;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
@@ -1660,11 +2865,34 @@ is
       SLEEP_TIM at 0 range 16 .. 31;
    end record;
 
-   -- AON_CFG1 sub-register
+   ----------------------------
+   -- AON_CFG1 sub-register  --
+   ----------------------------
+
+   type AON_CFG1_SLEEP_CE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables the sleep counter.
+
+   type AON_CFG1_SMXX_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  This bit needs to be Cleared for correct operation in the SLEEP state
+   --  within the DW1000. By default this bit is Set.
+
+   type AON_CFG1_LPOSC_C_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit enables the calibration function that measures the period of the
+   --  IC's internal low powered oscillator
+
    type AON_CFG1_Type is record
-      SLEEP_CE : Types.Bits_1 := 1;
-      SMXX     : Types.Bits_1 := 1;
-      LPOSC_C  : Types.Bits_1 := 1;
+      SLEEP_CE : AON_CFG1_SLEEP_CE_Field := Enabled;
+      SMXX     : AON_CFG1_SMXX_Field     := Set;
+      LPOSC_C  : AON_CFG1_LPOSC_C_Field  := Enabled;
 
       Reserved : Types.Bits_13 := 0;
    end record
@@ -1683,7 +2911,10 @@ is
    ----------------------------------------------------------------------------
    -- OTP_IF register file
 
-   -- OTP_WDAT sub-register
+   ----------------------------
+   -- OTP_WDAT sub-register  --
+   ----------------------------
+
    type OTP_WDAT_Type is record
       OTP_WDAT : Types.Bits_32;
    end record
@@ -1695,9 +2926,14 @@ is
       OTP_WDAT at 0 range 0 .. 31;
    end record;
 
-   -- OTP_ADDR sub-register
+   ----------------------------
+   -- OTP_ADDR sub-register  --
+   ----------------------------
+
+   type OTP_ADDR_Field is new Bits_11;
+
    type OTP_ADDR_Type is record
-      OTP_ADDR : Types.Bits_11 := 0;
+      OTP_ADDR : OTP_ADDR_Field;
 
       Reserved : Types.Bits_5  := 0;
    end record
@@ -1711,14 +2947,55 @@ is
       Reserved at 0 range 11 .. 15;
    end record;
 
-   -- OTP_CTRL sub-register
+   ----------------------------
+   -- OTP_CTRL sub-register  --
+   ----------------------------
+
+   type OTP_CTRL_OPTRDEN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  This bit forces the OTP into manual read mode.
+
+   type OTP_CTRL_OTPREAD_Field is
+     (No_Action,
+      Trigger_Read)
+     with Size => 1;
+   --  This bit commands a read operation from the address specified in the
+   --  OTP_ADDR register, the value read will then be available in the OTP_RDAT
+   --  register.
+
+   type OTP_CTRL_OTPMRWR_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  OTP mode register write.
+
+   type OTP_CTRL_PPROG_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  Setting this bit will cause the contents of OTP_WDAT to be written to
+   --  OTP_ADDR.
+
+   type OTP_CTRL_OTPMR_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+
+   type OTP_CTRL_LDELOAD_Field is
+     (No_Action,
+      Load_LDE_Microcode)
+     with Size => 1;
+   --  This bit forces a load of LDE microcode.
+
    type OTP_CTRL_Type is record
-      OTPRDEN : Types.Bits_1 := 0;
-      OTPREAD : Types.Bits_1 := 0;
-      OTPMRWR : Types.Bits_1 := 0;
-      OTPPROG : Types.Bits_1 := 0;
-      OTPMR   : Types.Bits_4 := 0;
-      LDELOAD : Types.Bits_1 := 0;
+      OTPRDEN : OTP_CTRL_OPTRDEN_Field := Disabled;
+      OTPREAD : OTP_CTRL_OTPREAD_Field := No_Action;
+      OTPMRWR : OTP_CTRL_OTPMRWR_Field := Clear;
+      OTPPROG : OTP_CTRL_PPROG_Field   := Clear;
+      OTPMR   : OTP_CTRL_OTPMR_Field   := Clear;
+      LDELOAD : OTP_CTRL_LDELOAD_Field := No_Action;
 
       Reserved_1 : Types.Bits_1 := 0;
       Reserved_2 : Types.Bits_2 := 0;
@@ -1746,7 +3023,10 @@ is
       LDELOAD    at 0 range 15 .. 15;
    end record;
 
-   -- OTP_STAT sub-register
+   ----------------------------
+   -- OTP_STAT sub-register  --
+   ----------------------------
+
    type OTP_STAT_Type is record
       OTPPRGD  : Types.Bits_1 := 0;
       OTPVPOK  : Types.Bits_1 := 0;
@@ -1764,7 +3044,10 @@ is
       Reserved at 0 range 2 .. 15;
    end record;
 
-   -- OTP_RDAT sub-register
+   ----------------------------
+   -- OTP_RDAT sub-register  --
+   ----------------------------
+
    type OTP_RDAT_Type is record
       OTP_RDAT : Types.Bits_32;
    end record
@@ -1776,7 +3059,10 @@ is
       OTP_RDAT at 0 range 0 .. 31;
    end record;
 
-   -- OTP_SRDAT sub-register
+   -----------------------------
+   -- OTP_SRDAT sub-register  --
+   -----------------------------
+
    type OTP_SRDAT_Type is record
       OTP_SRDAT : Types.Bits_32;
    end record
@@ -1788,14 +3074,39 @@ is
       OTP_SRDAT at 0 range 0 .. 31;
    end record;
 
-   -- OTP_SF sub-register
+   --------------------------
+   -- OTP_SF sub-register  --
+   --------------------------
+
+   type OTP_SF_OPS_KICK_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  This bit when set initiates a load of the operating parameter set
+   --  selected by the OPS_SEL configuration below.
+
+   type OTP_SF_LDO_KICK_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  This bit when set initiates the loading of the LDOTUNE_CAL parameter
+   --  from OTP address 0x4 into the LDOTUNE register
+
+   type OTP_SF_OPS_SEL_Field is
+     (Length64,
+      Tight,
+      Default,
+      Reserved)
+     with Size => 2;
+   --  Operating parameter set selection.
+
    type OTP_SF_Type is record
-      OPS_KICK : Types.Bits_1 := 0;
-      LDO_KICK : Types.Bits_1 := 0;
-      OPS_SEL  : Types.Bits_1 := 0;
+      OPS_KICK : OTP_SF_OPS_KICK_Field := Clear;
+      LDO_KICK : OTP_SF_LDO_KICK_Field := Clear;
+      OPS_SEL  : OTP_SF_OPS_SEL_Field  := Length64;
 
       Reserved_1 : Types.Bits_3 := 0;
-      Reserved_2 : Types.Bits_2 := 0;
+      Reserved_2 : Types.Bits_1 := 0;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1807,17 +3118,23 @@ is
 
       Reserved_1 at 0 range 2 .. 4;
 
-      OPS_SEL    at 0 range 5 .. 5;
+      OPS_SEL    at 0 range 5 .. 6;
 
-      Reserved_2 at 0 range 6 .. 7;
+      Reserved_2 at 0 range 7 .. 7;
    end record;
 
    ----------------------------------------------------------------------------
    -- LDE_IF register file
 
-   -- LDE_THRESH sub-register
+   ------------------------------
+   -- LDE_THRESH sub-register  --
+   ------------------------------
+
+   type LDE_THRESH_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+
    type LDE_THRESH_Type is record
-      LDE_THRESH : Types.Bits_16;
+      LDE_THRESH : LDE_THRESH_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1827,10 +3144,21 @@ is
       LDE_THRESH at 0 range 0 .. 15;
    end record;
 
-   -- LDE_CFG1 sub-register
+   ----------------------------
+   -- LDE_CFG1 sub-register  --
+   ----------------------------
+
+   type LDE_CFG1_NTM_Field is range 0 .. 31
+     with Size => 5;
+   --  Noise Threshold Multiplier.
+
+   type LDE_CFG1_PMULT_Field is range 0 .. 7
+     with Size => 3;
+   --  Peak Multiplier.
+
    type LDE_CFG1_Type is record
-      NTM   : Types.Bits_5 := 2#0_1100#;
-      PMULT : Types.Bits_3 := 2#011#;
+      NTM   : LDE_CFG1_NTM_Field   := 12;
+      PMULT : LDE_CFG1_PMULT_Field := 3;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -1841,9 +3169,15 @@ is
       PMULT at 0 range 5 .. 7;
    end record;
 
-   -- LDE_PPINDX sub-register
+   ------------------------------
+   -- LDE_PPINDX sub-register  --
+   ------------------------------
+
+   type LDE_PPINDX_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+
    type LDE_PPINDX_Type is record
-      LDE_PPINDX : Types.Bits_16;
+      LDE_PPINDX : LDE_PPINDX_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1853,9 +3187,15 @@ is
       LDE_PPINDX at 0 range 0 .. 15;
    end record;
 
-   -- LDE_PPAMPL sub-register
+   ------------------------------
+   -- LDE_PPAMPL sub-register  --
+   ------------------------------
+
+   type LDE_PPAMLP_Field is range 0 .. 2**16 - 1
+     with Size => 16;
+
    type LDE_PPAMPL_Type is record
-      LDE_PPAMPL : Types.Bits_16;
+      LDE_PPAMPL : LDE_PPAMLP_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1865,9 +3205,12 @@ is
       LDE_PPAMPL at 0 range 0 .. 15;
    end record;
 
-   -- LDE_RXANTD sub-register
+   ------------------------------
+   -- LDE_RXANTD sub-register  --
+   ------------------------------
+
    type LDE_RXANTD_Type is record
-      LDE_RXANTD : Types.Bits_16;
+      LDE_RXANTD : System_Time.Antenna_Delay_Time;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1877,9 +3220,17 @@ is
       LDE_RXANTD at 0 range 0 .. 15;
    end record;
 
-   -- LDE_CFG2 sub-register
+   ----------------------------
+   -- LDE_CFG2 sub-register  --
+   ----------------------------
+
+   type LDE_CFG2_Field is new Bits_16;
+
+   LDE_CFG2_16MHz : constant LDE_CFG2_Field := 16#1607#;
+   LDE_CFG2_64MHz : constant LDE_CFG2_Field := 16#0607#;
+
    type LDE_CFG2_Type is record
-      LDE_CFG2 : Types.Bits_16;
+      LDE_CFG2 : LDE_CFG2_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1889,9 +3240,39 @@ is
       LDE_CFG2 at 0 range 0 .. 15;
    end record;
 
-   -- LDE_REPC sub-register
+   ----------------------------
+   -- LDE_REPC sub-register  --
+   ----------------------------
+
+   type LDE_REPC_Field is new Bits_16;
+
+   LDE_REPC_PCODE_1  : constant LDE_REPC_Field := 16#5998#;
+   LDE_REPC_PCODE_2  : constant LDE_REPC_Field := 16#5998#;
+   LDE_REPC_PCODE_3  : constant LDE_REPC_Field := 16#51EA#;
+   LDE_REPC_PCODE_4  : constant LDE_REPC_Field := 16#428E#;
+   LDE_REPC_PCODE_5  : constant LDE_REPC_Field := 16#451E#;
+   LDE_REPC_PCODE_6  : constant LDE_REPC_Field := 16#2E14#;
+   LDE_REPC_PCODE_7  : constant LDE_REPC_Field := 16#8000#;
+   LDE_REPC_PCODE_8  : constant LDE_REPC_Field := 16#51EA#;
+   LDE_REPC_PCODE_9  : constant LDE_REPC_Field := 16#28F4#;
+   LDE_REPC_PCODE_10 : constant LDE_REPC_Field := 16#3332#;
+   LDE_REPC_PCODE_11 : constant LDE_REPC_Field := 16#3AE0#;
+   LDE_REPC_PCODE_12 : constant LDE_REPC_Field := 16#3D70#;
+   LDE_REPC_PCODE_13 : constant LDE_REPC_Field := 16#3AE0#;
+   LDE_REPC_PCODE_14 : constant LDE_REPC_Field := 16#35C2#;
+   LDE_REPC_PCODE_15 : constant LDE_REPC_Field := 16#2B84#;
+   LDE_REPC_PCODE_16 : constant LDE_REPC_Field := 16#35C2#;
+   LDE_REPC_PCODE_17 : constant LDE_REPC_Field := 16#3332#;
+   LDE_REPC_PCODE_18 : constant LDE_REPC_Field := 16#35C2#;
+   LDE_REPC_PCODE_19 : constant LDE_REPC_Field := 16#35C2#;
+   LDE_REPC_PCODE_20 : constant LDE_REPC_Field := 16#47AE#;
+   LDE_REPC_PCODE_21 : constant LDE_REPC_Field := 16#3AE0#;
+   LDE_REPC_PCODE_22 : constant LDE_REPC_Field := 16#3850#;
+   LDE_REPC_PCODE_23 : constant LDE_REPC_Field := 16#30A2#;
+   LDE_REPC_PCODE_24 : constant LDE_REPC_Field := 16#3850#;
+
    type LDE_REPC_Type is record
-      LDE_REPC : Types.Bits_16;
+      LDE_REPC : LDE_REPC_Field;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -1904,10 +3285,25 @@ is
    ----------------------------------------------------------------------------
    -- DIG_DIAG register file
 
-   -- EVC_CTRL sub-register
+   ----------------------------
+   -- EVC_CTRL sub-register  --
+   ----------------------------
+
+   type EVC_CTRL_EVC_EN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Event Counters Enable.
+
+   type EVC_CTRL_EVC_CLR_Field is
+     (No_action,
+      Clear_Counters)
+     with Size => 1;
+   --  Event Counters Clear.
+
    type EVC_CTRL_Type is record
-      EVC_EN  : Types.Bits_1   := 0;
-      EVC_CLR : Types.Bits_1   := 0;
+      EVC_EN  : EVC_CTRL_EVC_EN_Field  := Disabled;
+      EVC_CLR : EVC_CTRL_EVC_CLR_Field := No_Action;
 
       Reserved : Types.Bits_30 := 0;
    end record
@@ -1922,9 +3318,16 @@ is
       Reserved at 0 range 2 .. 31;
    end record;
 
-   -- EVC_PHE sub-register
+   ---------------------------
+   -- EVC_PHE sub-register  --
+   ---------------------------
+
+   type EVC_Counter_Field is range 0 .. 2**12 - 1
+     with Size => 12;
+   --  Event counter field
+
    type EVC_PHE_Type is record
-      EVC_PHE : Types.Bits_12 := 0;
+      EVC_PHE : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -1938,9 +3341,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_RSE sub-register
+   ---------------------------
+   -- EVC_RSE sub-register  --
+   ---------------------------
+
    type EVC_RSE_Type is record
-      EVC_RSE : Types.Bits_12 := 0;
+      EVC_RSE : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -1954,9 +3360,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_FCG sub-register
+   ---------------------------
+   -- EVC_FCG sub-register  --
+   ---------------------------
+
    type EVC_FCG_Type is record
-      EVC_FCG : Types.Bits_12 := 0;
+      EVC_FCG : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -1970,9 +3379,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_FCE sub-register
+   ---------------------------
+   -- EVC_FCE sub-register  --
+   ---------------------------
+
    type EVC_FCE_Type is record
-      EVC_FCE : Types.Bits_12 := 0;
+      EVC_FCE : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -1986,9 +3398,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_FFR sub-register
+   ---------------------------
+   -- EVC_FFR sub-register  --
+   ---------------------------
+
    type EVC_FFR_Type is record
-      EVC_FFR : Types.Bits_12 := 0;
+      EVC_FFR : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -2002,9 +3417,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_OVR sub-register
+   ---------------------------
+   -- EVC_OVR sub-register  --
+   ---------------------------
+
    type EVC_OVR_Type is record
-      EVC_OVR : Types.Bits_12 := 0;
+      EVC_OVR : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -2018,9 +3436,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_STO sub-register
+   ---------------------------
+   -- EVC_STO sub-register  --
+   ---------------------------
+
    type EVC_STO_Type is record
-      EVC_STO : Types.Bits_12 := 0;
+      EVC_STO : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -2034,9 +3455,11 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_PTO sub-register
+   ---------------------------
+   -- EVC_PTO sub-register  --
+   ---------------------------
    type EVC_PTO_Type is record
-      EVC_PTO : Types.Bits_12 := 0;
+      EVC_PTO : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -2050,9 +3473,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_FWTO sub-register
+   ----------------------------
+   -- EVC_FWTO sub-register  --
+   ----------------------------
+
    type EVC_FWTO_Type is record
-      EVC_FWTO : Types.Bits_12 := 0;
+      EVC_FWTO : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -2066,9 +3492,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_TXFS sub-register
+   ----------------------------
+   -- EVC_TXFS sub-register  --
+   ----------------------------
+
    type EVC_TXFS_Type is record
-      EVC_TXFS : Types.Bits_12 := 0;
+      EVC_TXFS : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -2082,9 +3511,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_HPW sub-register
+   ---------------------------
+   -- EVC_HPW sub-register  --
+   ---------------------------
+
    type EVC_HPW_Type is record
-      EVC_HPW : Types.Bits_12 := 0;
+      EVC_HPW : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4 := 0;
    end record
@@ -2098,9 +3530,12 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- EVC_TPW sub-register
+   ---------------------------
+   -- EVC_TPW sub-register  --
+   ---------------------------
+
    type EVC_TPW_Type is record
-      EVC_TPW : Types.Bits_12;
+      EVC_TPW : EVC_Counter_Field := 0;
 
       Reserved : Types.Bits_4;
    end record
@@ -2114,9 +3549,18 @@ is
       Reserved at 0 range 12 .. 15;
    end record;
 
-   -- DIAG_TMC sub-register
+   ----------------------------
+   -- DIAG_TMC sub-register  --
+   ----------------------------
+
+   type DIAG_TMC_TX_PSTM_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Transmit Power Spectrum Test Mode.
+
    type DIAG_TMC_Type is record
-      TX_PSTM : Types.Bits_1 := 0;
+      TX_PSTM : DIAG_TMC_TX_PSTM_Field := Disabled;
 
       Reserved_1 : Types.Bits_4  := 0;
       Reserved_2 : Types.Bits_11 := 0;
@@ -2136,67 +3580,202 @@ is
    ----------------------------------------------------------------------------
    -- PMSC register file
 
+   type PMSC_CTRL0_SYSCLKS_Field is
+     (Auto,
+      Force_XTI,
+      Force_PLL,
+      Reserved)
+     with Size => 2;
+   --  System Clock Selection.
+
+   type PMSC_CTRL0_RXCLKS_Field is
+     (Auto,
+      Force_XTI,
+      Force_PLL,
+      Force_Off)
+     with Size => 2;
+   --  Receiver Clock Selection.
+
+   type PMSC_CTRL0_TXCLKS_Field is new PMSC_CTRL0_RXCLKS_Field;
+   --  Transmitter Clock Selection.
+
+   type PMSC_CTRL0_FACE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Force Accumulator Clock Enable.
+
+   type PMSC_CTRL0_ADCCE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  (temperature and voltage) Analog-to-Digital Convertor Clock Enable.
+
+   type PMSC_CTRL0_AMCE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Accumulator Memory Clock Enable.
+
+   type PMSC_CTRL0_GPCE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO clock Enable.
+
+   type PMSC_CTRL0_GPRN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO reset (NOT), active low.
+
+   type PMSC_CTRL0_GPDCE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO De-bounce Clock Enable.
+
+   type PMSC_CTRL0_GPDRN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO de-bounce reset (NOT), active low.
+
+   type PMSC_CTRL0_KHZCLKEN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Kilohertz clock Enable.
+
+   type PMSC_CTRL0_PLL2_SEQ_EN_Field is
+     (Normal,
+      Sniff)
+     with Size => 1;
+
+   type PMSC_CTRL0_SOFTRESET_Field is new Bits_4;
+   --  These four bits reset the IC TX, RX, Host Interface and the PMSC itself,
+   --  essentially allowing a reset of the IC under software control.
+
+   PMSC_CTRL0_SOFTRESET_Reset     : constant PMSC_CTRL0_SOFTRESET_Field := 2#0000#;
+   PMSC_CTRL0_SOFTRESET_Reset_Rx  : constant PMSC_CTRL0_SOFTRESET_Field := 2#0111#;
+   PMSC_CTRL0_SOFTRESET_Set_All   : constant PMSC_CTRL0_SOFTRESET_Field := 2#1111#;
+
    type PMSC_CTRL0_Type is record
-      SYSCLKS   : Types.Bits_2 := 0;
-      RXCLKS    : Types.Bits_2 := 0;
-      TXCLKS    : Types.Bits_2 := 0;
-      FACE      : Types.Bits_1 := 0;
-      ADCCE     : Types.Bits_1 := 0;
-      AMCE      : Types.Bits_1 := 0;
-      GPCE      : Types.Bits_1 := 0;
-      GPRN      : Types.Bits_1 := 0;
-      GPDCE     : Types.Bits_1 := 0;
-      GPDRN     : Types.Bits_1 := 0;
-      KHZCLKEN  : Types.Bits_1 := 0;
-      SOFTRESET : Types.Bits_4 := 2#1111#;
+      SYSCLKS     : PMSC_CTRL0_SYSCLKS_Field     := Auto;
+      RXCLKS      : PMSC_CTRL0_RXCLKS_Field      := Auto;
+      TXCLKS      : PMSC_CTRL0_TXCLKS_Field      := Auto;
+      FACE        : PMSC_CTRL0_FACE_Field        := Disabled;
+      ADCCE       : PMSC_CTRL0_ADCCE_Field       := Disabled;
+      AMCE        : PMSC_CTRL0_AMCE_Field        := Disabled;
+      GPCE        : PMSC_CTRL0_GPCE_Field        := Disabled;
+      GPRN        : PMSC_CTRL0_GPRN_Field        := Disabled;
+      GPDCE       : PMSC_CTRL0_GPDCE_Field       := Disabled;
+      GPDRN       : PMSC_CTRL0_GPDRN_Field       := Disabled;
+      KHZCLKEN    : PMSC_CTRL0_KHZCLKEN_Field    := Disabled;
+      PLL2_SEQ_EN : PMSC_CTRL0_PLL2_SEQ_EN_Field := Normal;
+      SOFTRESET   : PMSC_CTRL0_SOFTRESET_Field   := PMSC_CTRL0_SOFTRESET_Set_All;
 
       Reserved_1 : Types.Bits_3 := 2#100#;
       Reserved_2 : Types.Bits_4 := 0;
       Reserved_3 : Types.Bits_3 := 2#011#;
-      Reserved_4 : Types.Bits_4 := 0;
+      Reserved_4 : Types.Bits_3 := 0;
    end record
      with Size => 32,
      Bit_Order => System.Low_Order_First,
      Scalar_Storage_Order => System.Low_Order_First;
 
    for PMSC_CTRL0_Type use record
-      SYSCLKS    at 0 range  0 ..  1;
-      RXCLKS     at 0 range  2 ..  3;
-      TXCLKS     at 0 range  4 ..  5;
-      FACE       at 0 range  6 ..  6;
+      SYSCLKS     at 0 range  0 ..  1;
+      RXCLKS      at 0 range  2 ..  3;
+      TXCLKS      at 0 range  4 ..  5;
+      FACE        at 0 range  6 ..  6;
 
-      Reserved_1 at 0 range  7 ..  9;
+      Reserved_1  at 0 range  7 ..  9;
 
-      ADCCE      at 0 range 10 .. 10;
+      ADCCE       at 0 range 10 .. 10;
 
-      Reserved_2 at 0 range 11 .. 14;
+      Reserved_2  at 0 range 11 .. 14;
 
-      AMCE       at 0 range 15 .. 15;
-      GPCE       at 0 range 16 .. 16;
-      GPRN       at 0 range 17 .. 17;
-      GPDCE      at 0 range 18 .. 18;
-      GPDRN      at 0 range 19 .. 19;
+      AMCE        at 0 range 15 .. 15;
+      GPCE        at 0 range 16 .. 16;
+      GPRN        at 0 range 17 .. 17;
+      GPDCE       at 0 range 18 .. 18;
+      GPDRN       at 0 range 19 .. 19;
 
-      Reserved_3 at 0 range 20 .. 22;
+      Reserved_3  at 0 range 20 .. 22;
 
-      KHZCLKEN   at 0 range 23 .. 23;
+      KHZCLKEN    at 0 range 23 .. 23;
+      PLL2_SEQ_EN at 0 range 24 .. 24;
 
-      Reserved_4 at 0 range 24 .. 27;
+      Reserved_4  at 0 range 25 .. 27;
 
-      SOFTRESET  at 0 range 28 .. 31;
+      SOFTRESET   at 0 range 28 .. 31;
    end record;
 
-   -- PMSC_CTRL1 sub-register
+   ------------------------------
+   -- PMSC_CTRL1 sub-register  --
+   ------------------------------
+
+   type PMSC_CTRL1_ARX2INIT_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Automatic transition from receive mode into the INIT state.
+
+   type PMSC_CTRL1_PKTSEQ_Field is new Bits_8;
+
+   PMSC_CTRL1_Disabled : constant PMSC_CTRL1_PKTSEQ_Field := 16#00#;
+   PMSC_CTRL1_Enabled  : constant PMSC_CTRL1_PKTSEQ_Field := 16#E7#;
+
+   type PMSC_CTRL1_ATXSLP_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  After TX automatically Sleep.
+
+   type PMSC_CTRL1_ARXSLP_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  After RX automatically Sleep.
+
+   type PMSC_CTRL1_SNOZE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Snooze Enable.
+
+   type PMSC_CTRL1_SNOZR_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Snooze Repeat.
+
+   type PMSC_CTRL1_PLLSYN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   -- This enables a special 1 GHz clock used for some external SYNC modes.
+
+   type PMSC_CTRL1_LDERUNE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  LDE run enable.
+
+   type PMSC_CTRL1_KHZCLKDIV_Field is range 0 .. 2**6 - 1
+     with Size => 6;
+
    type PMSC_CTRL1_Type is record
-      ARX2INIT  : Types.Bits_1 := 0;
-      PKTSEQ    : Types.Bits_8 := 2#1110_0111#;
-      ATXSLP    : Types.Bits_1 := 0;
-      ARXSLP    : Types.Bits_1 := 0;
-      SNOZE     : Types.Bits_1 := 0;
-      SNOZR     : Types.Bits_1 := 0;
-      PLLSYN    : Types.Bits_1 := 0;
-      LDERUNE   : Types.Bits_1 := 1;
-      KHZCLKDIV : Types.Bits_6 := 2#10_0000#;
+      ARX2INIT  : PMSC_CTRL1_ARX2INIT_Field  := Disabled;
+      PKTSEQ    : PMSC_CTRL1_PKTSEQ_Field    := PMSC_CTRL1_Enabled;
+      ATXSLP    : PMSC_CTRL1_ATXSLP_Field    := Disabled;
+      ARXSLP    : PMSC_CTRL1_ARXSLP_Field    := Disabled;
+      SNOZE     : PMSC_CTRL1_SNOZE_Field     := Disabled;
+      SNOZR     : PMSC_CTRL1_SNOZR_Field     := Disabled;
+      PLLSYN    : PMSC_CTRL1_PLLSYN_Field    := Disabled;
+      LDERUNE   : PMSC_CTRL1_LDERUNE_Field   := Enabled;
+      KHZCLKDIV : PMSC_CTRL1_KHZCLKDIV_Field := 32;
 
       Reserved_1 : Types.Bits_1 := 0;
       Reserved_2 : Types.Bits_1 := 0;
@@ -2230,9 +3809,12 @@ is
       KHZCLKDIV  at 0 range 26 .. 31;
    end record;
 
-   -- PMSC_SNOZT sub-register
+   ------------------------------
+   -- PMSC_SNOZT sub-register  --
+   ------------------------------
+
    type PMSC_SNOZT_Type is record
-      SNOZ_TIM : Types.Bits_8 := 2#0100_0000#;
+      SNOZ_TIM : System_Time.Snooze_Time := 0.001_706_667;
    end record
      with Size => 8,
      Bit_Order => System.Low_Order_First,
@@ -2242,9 +3824,14 @@ is
       SNOZ_TIM at 0 range 0 .. 7;
    end record;
 
-   -- PMSC_TXFSEQ sub-register
+   -------------------------------
+   -- PMSC_TXFSEQ sub-register  --
+   -------------------------------
+
+   type PMSC_TXFSEQ_Field is new Bits_16;
+
    type PMSC_TXFSEQ_Type is record
-      TXFINESEQ : Types.Bits_16 := 2#0000_1011_0011_1100#;
+      TXFINESEQ : PMSC_TXFSEQ_Field := 2#0000_1011_0011_1100#;
    end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
@@ -2254,11 +3841,28 @@ is
       TXFINESEQ at 0 range 0 .. 15;
    end record;
 
-   -- PMSC_LEDC sub-register
+   -----------------------------
+   -- PMSC_LEDC sub-register  --
+   -----------------------------
+
+   type PMSC_LEDC_BLINKEN_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  Blink Enable.
+
+   type PMSC_LEDC_BLNKNOW_Field is
+     (No_Action,
+      Blink_Now)
+     with Size => 1;
+
    type PMSC_LEDC_Type is record
-      BLINK_TIM : Types.Bits_8 := 2#0010_0000#;
-      BLNKEN    : Types.Bits_1 := 0;
-      BLNKNOW   : Types.Bits_4 := 0;
+      BLINK_TIM       : System_Time.Blink_Time  := 0.448;
+      BLNKEN          : PMSC_LEDC_BLINKEN_Field := Disabled;
+      BLNKNOW_RXOKLED : PMSC_LEDC_BLNKNOW_Field := No_Action;
+      BLNKNOW_SFDLED  : PMSC_LEDC_BLNKNOW_Field := No_Action;
+      BLNKNOW_RXLED   : PMSC_LEDC_BLNKNOW_Field := No_Action;
+      BLNKNOW_TXLED   : PMSC_LEDC_BLNKNOW_Field := No_Action;
 
       Reserved_1 : Types.Bits_7  := 0;
       Reserved_2 : Types.Bits_12 := 0;
@@ -2268,14 +3872,17 @@ is
      Scalar_Storage_Order => System.Low_Order_First;
 
    for PMSC_LEDC_Type use record
-      BLINK_TIM  at 0 range 0 .. 7;
-      BLNKEN     at 0 range 8 .. 8;
+      BLINK_TIM        at 0 range 0 .. 7;
+      BLNKEN           at 0 range 8 .. 8;
 
-      Reserved_1 at 0 range 9 .. 15;
+      Reserved_1       at 0 range 9 .. 15;
 
-      BLNKNOW    at 0 range 16 .. 19;
+      BLNKNOW_RXOKLED  at 0 range 16 .. 16;
+      BLNKNOW_SFDLED   at 0 range 17 .. 17;
+      BLNKNOW_RXLED    at 0 range 18 .. 18;
+      BLNKNOW_TXLED    at 0 range 19 .. 19;
 
-      Reserved_2 at 0 range 20 .. 31;
+      Reserved_2       at 0 range 20 .. 31;
    end record;
 
 end DW1000.Register_Types;

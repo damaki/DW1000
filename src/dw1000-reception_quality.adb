@@ -21,6 +21,7 @@
 -------------------------------------------------------------------------------
 
 with Ada.Numerics.Generic_Elementary_Functions;
+with DW1000.Register_Types;                     use DW1000.Register_Types;
 with Interfaces;                                use Interfaces;
 
 package body DW1000.Reception_Quality
@@ -28,19 +29,19 @@ with SPARK_Mode => On
 is
 
 
-   function Adjust_RXPACC (RXPACC              : in Bits_12;
-                           RXPACC_NOSAT        : in Bits_16;
-                           RXBR                : in Bits_2;
+   function Adjust_RXPACC (RXPACC              : in RX_FINFO_RXPACC_Field;
+                           RXPACC_NOSAT        : in RXPACC_NOSAT_Field;
+                           RXBR                : in RX_FINFO_RXBR_Field;
                            SFD_LENGTH          : in Bits_8;
-                           Non_Standard_SFD    : in Boolean) return Bits_12
+                           Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field
    is
-      RXPACC_Adjustment : Bits_12;
+      RXPACC_Adjustment : RX_FINFO_RXPACC_Field;
 
    begin
-      if Bits_16 (RXPACC) = RXPACC_NOSAT then
+      if RXPACC_NOSAT_Field (RXPACC) = RXPACC_NOSAT then
          if Non_Standard_SFD then
             --  DecaWave-defined SFD sequence is used
-            if RXBR = 2#00# then
+            if RXBR = Data_Rate_110K then
                --  110 kbps data rate. SFD length is always 64 symbols
                RXPACC_Adjustment := 82;
             else
@@ -50,7 +51,7 @@ is
 
          else
             --  Standard-defined SFD sequence is used
-            if RXBR = 2#00# then
+            if RXBR = Data_Rate_110K then
                -- 110 kbps data rate. SFD length is always 64 symbols
                RXPACC_Adjustment := 64;
             else
@@ -97,15 +98,19 @@ is
 
 
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
-                                  RXPACC        : in Bits_12;
-                                  CIR_PWR       : in Bits_16)
+                                  RXPACC        : in RX_FINFO_RXPACC_Field;
+                                  CIR_PWR       : in RX_FQUAL_CIR_PWR_Field)
                                   return Float
    is
       subtype Numerator_Range is Long_Float
       range 2.0**17 .. (2.0**16 - 1.0) * 2.0**17;
 
       subtype Denominator_Range is Long_Float
-      range 1.0 .. (2.0**16 - 1.0)**2;
+      range 1.0 .. (2.0**12 - 1.0)**2;
+
+      type CIR_PWR_Range is range 0 .. (2**16 - 1) * 2**17;
+
+      type RXPACC_Sq_Range is range 0 .. RX_FINFO_RXPACC_Field'Last**2;
 
       N   : Numerator_Range;
       D   : Denominator_Range;
@@ -125,28 +130,40 @@ is
       --    * A is 113.77 for a 16 MHz PRF or 121.74 for a 64 MHz PRF
 
       if CIR_PWR /= 0 then
-         N := Long_Float (Bits_33 (CIR_PWR) * 2**17);
+         N := Long_Float (CIR_PWR_Range (CIR_PWR) * 2**17);
+
+         pragma Assert (N in Numerator_Range);
       else
          --  Prevent value of 0 for the numerator, otherwise the input
          --  to the Log function would be 0, which is not permitted.
          N := 2.0**17;
+
+         pragma Assert (N in Numerator_Range);
       end if;
 
+      pragma Assert_And_Cut (N in Numerator_Range);
+
       if RXPACC /= 0 then
-         D := Long_Float (Bits_24 (RXPACC) * Bits_24 (RXPACC));
+         D := Long_Float (RXPACC_Sq_Range (RXPACC) * RXPACC_Sq_Range (RXPACC));
+
+         pragma Assert (D in Denominator_Range);
       else
          --  Prevent division by zero.
          --  In theory, this should never happen.
          D := 1.0;
+
+         pragma Assert (D in Denominator_Range);
       end if;
+
+      pragma Assert_And_Cut (N in Numerator_Range and D in Denominator_Range);
 
       R := Log10 (N / D);
 
-      --  The values in this assumption were generated using Wolfram|Alpha
-      --  based on the range of the Division_Result_Range subtype.
+      --  The values in this assumption are based on the mathemtical min/max
+      --  values of Log10 based on the possible range of the input: N / D.
       pragma Assume
-        (R in -4.51543668124281909693514752724080083167976452069664
-         .. 9.9339832300529300264179155790949725984287242376320911,
+        (R in -2.10699788590519423954821296166977269784955865640566952845
+         .. 9.933983230052930026417915579094972598428724237632091142242,
          "The possible output range of log10, for the possible input range");
 
       if Use_16MHz_PRF then
@@ -161,10 +178,11 @@ is
 
 
    function First_Path_Signal_Power (Use_16MHz_PRF : in Boolean;
-                                     F1            : in Bits_16;
-                                     F2            : in Bits_16;
-                                     F3            : in Bits_16;
-                                     RXPACC        : in Bits_12) return Float
+                                     F1            : in RX_TIME_FP_AMPL1_Field;
+                                     F2            : in RX_FQUAL_FP_AMPL2_Field;
+                                     F3            : in RX_FQUAL_FP_AMPL3_Field;
+                                     RXPACC        : in RX_FINFO_RXPACC_Field)
+                                     return Float
    is
       subtype F_Range is Long_Float range 0.0 .. (2.0**16 - 1.0)**2;
 
@@ -172,16 +190,19 @@ is
       range 1.0 .. (F_Range'Last * 3.0);
 
       subtype Denominator_Range is Long_Float
-      range 1.0 .. (2.0**16 - 1.0)**2;
+      range 1.0 .. (2.0**12 - 1.0)**2;
 
-      subtype Division_Result_Range is Long_Float
-      range Numerator_Range'First / Denominator_Range'Last ..
-            Numerator_Range'Last  / Denominator_Range'First;
+      type AMPL_Sq_Range is range 0 .. (2**16 - 1)**2;
 
-      N   : Numerator_Range;
-      D   : Denominator_Range;
-      R   : Long_Float;
-      A   : Long_Float;
+      type AMPL_Sum_Range is range 0 .. AMPL_Sq_Range'Last * 3;
+
+      type RXPACC_Sq_Range is range 0 .. RX_FINFO_RXPACC_Field'Last**2;
+
+      F_Sum : AMPL_Sum_Range;
+      N     : Numerator_Range;
+      D     : Denominator_Range;
+      R     : Long_Float;
+      A     : Long_Float;
    begin
       --  Calculation from the DW1000 User Manual for the receive signal power
       --  is as follows:
@@ -198,28 +219,42 @@ is
       --    * A is 113.77 for a 16 MHz PRF or 121.74 for a 64 MHz PRF
 
       if F1 /= 0 or F2 /= 0 or F3 /= 0 then
-         N := Numerator_Range (Bits_33 (Bits_32 (F1) * Bits_32 (F1)) +
-                               Bits_33 (Bits_32 (F2) * Bits_32 (F2)) +
-                               Bits_33 (Bits_32 (F3) * Bits_32 (F3)));
+         F_Sum := (AMPL_Sum_Range (AMPL_Sq_Range (F1) * AMPL_Sq_Range (F1))
+                   + AMPL_Sum_Range (AMPL_Sq_Range (F2) * AMPL_Sq_Range (F2))
+                   + AMPL_Sum_Range (AMPL_Sq_Range (F3) * AMPL_Sq_Range (F3)));
+
+         N := Numerator_Range (F_Sum);
+
+         pragma Assert (N in Numerator_Range);
       else
          N := 1.0;
+
+         pragma Assert (N in Numerator_Range);
       end if;
 
+      pragma Assert_And_Cut (N in Numerator_Range);
+
       if RXPACC /= 0 then
-         D := Long_Float (Bits_24 (RXPACC) * Bits_24 (RXPACC));
+         D := Denominator_Range (RXPACC_Sq_Range (RXPACC) * RXPACC_Sq_Range (RXPACC));
+
+         pragma Assert (D in Denominator_Range);
       else
          --  Prevent division by zero.
          --  In theory, this should never happen.
          D := 1.0;
+
+         pragma Assert (D in Denominator_Range);
       end if;
+
+      pragma Assert_And_Cut (N in Numerator_Range and D in Denominator_Range);
 
       R := Log10 (N / D);
 
-      --  The values in this assumption were generated using Wolfram|Alpha
-      --  based on the range of the Division_Result_Range subtype.
+      --  The values in this assumption are based on the mathemtical min/max
+      --  values of Log10 based on the possible range of the input: N / D.
       pragma Assume
-        (R in -9.63294660753049941556870873755718228673899250555249187993
-         .. 10.11006786225016185286373664081229759593912136974318774476,
+        (R in -7.22450781219257524826183006241290354369191576604307340090
+         .. 9.632946607530499415568708737557182286738992505552491879931,
          "The possible output range of log10, for the possible input range");
 
       if Use_16MHz_PRF then
@@ -233,18 +268,16 @@ is
    end First_Path_Signal_Power;
 
 
-   function Transmitter_Clock_Offset (RXTOFS  : in Bits_19;
-                                      RXTTCKI : in Bits_32) return Long_Float
+   function Transmitter_Clock_Offset (RXTOFS  : in RX_TTCKO_RXTOFS_Field;
+                                      RXTTCKI : in RX_TTCKI_RXTTCKI_Field)
+                                      return Long_Float
    is
       Offset   : Long_Float;
       Interval : Long_Float;
    begin
-      --  RXTOFS is a 19-bit signed quantity. The MSB is the sign bit.
-      if RXTOFS < 2**18 then
-         --  Positive quantity
+      if RXTOFS > -2**18 then
          Offset := Long_Float (RXTOFS);
-
-      elsif RXTOFS = 2**18 then
+      else
          --  Special case for the most negative number
          --  (closest to negative infinity).
          --  Normally, this value would indicate -2.0**18, however, we must
@@ -254,21 +287,18 @@ is
          --  If Offset is allowed to have the value -2.0**18 then it is not
          --  possible for GNATprove to prove that Offset / Interval >= -1.0
          --  (presumably the rounding may cause the proof to fail for -1.0)
-         Offset := -(2.0**18 - 1.0);
 
-      else
-         --  Negative quantity
-         Offset := -Long_Float ((not RXTOFS) + 1);
-
-         pragma Assert (Offset >= -(2.0**18 - 1.0) and Offset <= -1.0);
+         Offset := -2.0**18 + 1.0;
       end if;
+
+      pragma Assert_And_Cut (Offset in -2.0**18 + 1.0 .. 2.0**18 - 1.0);
 
       --  RXTTCKI takes one of two values (Section 7.2.21 of the User Manual):
       --     16#01F00000# for a 16 MHz PRF
       --     16#01FC0000# for a 64 MHz PRF
       --  Based on this assumption, we can constrain the potential range of
       --  Interval to prove absence of overflow and range errors.
-      Interval := Long_Float (RXTTCKI and 16#01FC0000#);
+      Interval := Long_Float (Bits_32 (RXTTCKI) and 16#01FC0000#);
 
       pragma Assert_And_Cut
         (Offset in -(2.0**18 - 1.0) .. 2.0**18 - 1.0

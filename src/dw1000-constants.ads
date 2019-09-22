@@ -20,7 +20,8 @@
 --  DEALINGS IN THE SOFTWARE.
 -------------------------------------------------------------------------------
 
-with DW1000.Types; use DW1000.Types;
+with DW1000.Types;          use DW1000.Types;
+with DW1000.Register_Types; use DW1000.Register_Types;
 
 package DW1000.Constants
 with SPARK_Mode => On
@@ -28,24 +29,24 @@ is
 
    ----------------------------------------------------------------------------
    --  OTP memory word addresses
-   OTP_ADDR_EUID                : constant Bits_11 := 16#00#;
-   OTP_ADDR_LDOTUNE_CAL         : constant Bits_11 := 16#04#;
-   OTP_ADDR_CHIP_ID             : constant Bits_11 := 16#06#;
-   OTP_ADDR_LOT_ID              : constant Bits_11 := 16#07#;
-   OTP_ADDR_CH1_TX_POWER_PRF_16 : constant Bits_11 := 16#10#;
-   OTP_ADDR_CH1_TX_POWER_PRF_64 : constant Bits_11 := 16#11#;
-   OTP_ADDR_CH2_TX_POWER_PRF_16 : constant Bits_11 := 16#12#;
-   OTP_ADDR_CH2_TX_POWER_PRF_64 : constant Bits_11 := 16#13#;
-   OTP_ADDR_CH3_TX_POWER_PRF_16 : constant Bits_11 := 16#14#;
-   OTP_ADDR_CH3_TX_POWER_PRF_64 : constant Bits_11 := 16#15#;
-   OTP_ADDR_CH4_TX_POWER_PRF_16 : constant Bits_11 := 16#16#;
-   OTP_ADDR_CH4_TX_POWER_PRF_64 : constant Bits_11 := 16#17#;
-   OTP_ADDR_CH5_TX_POWER_PRF_16 : constant Bits_11 := 16#18#;
-   OTP_ADDR_CH5_TX_POWER_PRF_64 : constant Bits_11 := 16#19#;
-   OTP_ADDR_CH7_TX_POWER_PRF_16 : constant Bits_11 := 16#1A#;
-   OTP_ADDR_CH7_TX_POWER_PRF_64 : constant Bits_11 := 16#1B#;
-   OTP_ADDR_ANTENNA_DELAY       : constant Bits_11 := 16#1C#;
-   OTP_ADDR_XTAL_TRIM           : constant Bits_11 := 16#E0#;
+   OTP_ADDR_EUID                : constant OTP_ADDR_Field := 16#00#;
+   OTP_ADDR_LDOTUNE_CAL         : constant OTP_ADDR_Field := 16#04#;
+   OTP_ADDR_CHIP_ID             : constant OTP_ADDR_Field := 16#06#;
+   OTP_ADDR_LOT_ID              : constant OTP_ADDR_Field := 16#07#;
+   OTP_ADDR_CH1_TX_POWER_PRF_16 : constant OTP_ADDR_Field := 16#10#;
+   OTP_ADDR_CH1_TX_POWER_PRF_64 : constant OTP_ADDR_Field := 16#11#;
+   OTP_ADDR_CH2_TX_POWER_PRF_16 : constant OTP_ADDR_Field := 16#12#;
+   OTP_ADDR_CH2_TX_POWER_PRF_64 : constant OTP_ADDR_Field := 16#13#;
+   OTP_ADDR_CH3_TX_POWER_PRF_16 : constant OTP_ADDR_Field := 16#14#;
+   OTP_ADDR_CH3_TX_POWER_PRF_64 : constant OTP_ADDR_Field := 16#15#;
+   OTP_ADDR_CH4_TX_POWER_PRF_16 : constant OTP_ADDR_Field := 16#16#;
+   OTP_ADDR_CH4_TX_POWER_PRF_64 : constant OTP_ADDR_Field := 16#17#;
+   OTP_ADDR_CH5_TX_POWER_PRF_16 : constant OTP_ADDR_Field := 16#18#;
+   OTP_ADDR_CH5_TX_POWER_PRF_64 : constant OTP_ADDR_Field := 16#19#;
+   OTP_ADDR_CH7_TX_POWER_PRF_16 : constant OTP_ADDR_Field := 16#1A#;
+   OTP_ADDR_CH7_TX_POWER_PRF_64 : constant OTP_ADDR_Field := 16#1B#;
+   OTP_ADDR_ANTENNA_DELAY       : constant OTP_ADDR_Field := 16#1C#;
+   OTP_ADDR_XTAL_TRIM           : constant OTP_ADDR_Field := 16#E0#;
 
    ----------------------------------------------------------------------------
    --  Buffer lengths

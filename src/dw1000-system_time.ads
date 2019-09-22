@@ -92,7 +92,8 @@ is
    type Fine_System_Time is
    delta 1.0 / System_Time_Clock_Hz
    range 0.0 .. (2.0**40 - 1.0) / System_Time_Clock_Hz
-     with Small => 1.0 / System_Time_Clock_Hz;
+     with Small => 1.0 / System_Time_Clock_Hz,
+     Size => 40;
    --  Type for representing the DW1000 fine-grained system time in seconds,
    --  with a precision of at least 15.65 picoseconds.
    --
@@ -112,7 +113,8 @@ is
    type Coarse_System_Time is
    delta 512.0 / System_Time_Clock_Hz
    range 0.0 .. (2.0**40 - 1.0) / System_Time_Clock_Hz
-     with Small => 512.0 / System_Time_Clock_Hz;
+     with Small => 1.0 / System_Time_Clock_Hz,
+     Size => 40;
    --  Type for representing the DW1000 coarsely-grained system time in seconds,
    --  with a precision of at least 8.013 nanoseconds.
    --
@@ -132,18 +134,76 @@ is
 
    type System_Time_Span is new Fine_System_Time;
 
-   subtype Antenna_Delay_Time is Fine_System_Time
-   range 0.0 .. Fine_System_Time'Delta * (2**16 - 1);
+   type Antenna_Delay_Time is
+   delta Fine_System_Time'Delta
+   range 0.0 .. Fine_System_Time'Delta * (2**16 - 1)
+     with Small => Fine_System_Time'Small,
+     Size => 16;
    --  Type to represent an antenna delay time.
 
    type Frame_Wait_Timeout_Time is
    delta 512.0 / Chipping_Rate_Hz
    range 0.0 .. ((2.0**16 - 1.0) * 512.0) / Chipping_Rate_Hz
-     with Small => 512.0 / 499_200_000.0;
+     with Small => 512.0 / Chipping_Rate_Hz,
+     Size => 16;
    --  Type to represent the frame wait timeout.
    --
    --  The range of this type is 0.0 .. 0.067215385, i.e. the maximum value
    --  is 67.215385 milliseconds.
+   --
+   --  The resolution of this type is 128 system block cycle
+   --  (about 1 microsecond).
+
+   type Response_Wait_Timeout_Time is
+   delta 512.0 / Chipping_Rate_Hz
+   range 0.0 .. ((2.0**20 - 1.0) * 512.0) / Chipping_Rate_Hz
+     with Small => 512.0 / Chipping_Rate_Hz,
+     Size => 20;
+   --  Type to represent the wait-for-response turnaround time.
+   --
+   --  The range of this type is 0.0 .. 1.0754615 i.e. the maximum value is
+   --  about 1.0754615 seconds.
+   --
+   --  The resolution of this type is 128 system block cycle
+   --  (about 1 microsecond).
+
+   type Sniff_Off_Time is
+   delta 512.0 / Chipping_Rate_Hz
+   range 0.0 .. ((2.0**8 - 1.0) * 512.0) / Chipping_Rate_Hz
+     with Small => 512.0 / Chipping_Rate_Hz,
+     Size => 8;
+   --  Type to represent the SNIFF mode OFF time.
+   --
+   --  The range of this type is 0.0 .. 0.000_262_051 i.e. the maximum value is
+   --  about 0.000_262_051 seconds (about 262 microseconds).
+   --
+   --  The resolution of this type is 128 system block cycle
+   --  (about 1 microsecond).
+
+   type Snooze_Time is
+   delta 1.0 / 37_500.0
+   range 0.0 .. (2.0**8 - 1.0) / 37_500.0
+     with Small => 1.0 / 37_500.0,
+     Size => 8;
+   --  Type to represent the snooze time (in seconds).
+   --
+   --  This represents the upper 8 bits of a 17-bit timer clocked from the
+   --  19.2 MHz XTI internal clock. This means that this snooze time value
+   --  is in units of 37.5 KHz, i.e. about 26.7 microseconds.
+   --
+   --  The maximum value of this type is 0.0068 (6.8 milliseconds).
+
+   type Blink_Time is
+   delta 0.014
+   range 0.0 .. (2.0**8 - 1.0) * 0.014
+     with Small => 0.014,
+     Size => 8;
+   --  Type to represent the LED blink time (in seconds).
+   --
+   --  This is in units of 14 milliseconds, so a value of 0.4 will give a
+   --  blink time of 400 ms followed by an off blink of 400 ms.
+   --
+   --  The maximum value of this type is 3.57 seconds.
 
    function To_Bits_40 (Time : in Fine_System_Time) return Bits_40 is
      (Bits_40 (Time / Fine_System_Time (Fine_System_Time'Delta)));
