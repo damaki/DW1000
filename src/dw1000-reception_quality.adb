@@ -106,7 +106,7 @@ is
       range 2.0**17 .. (2.0**16 - 1.0) * 2.0**17;
 
       subtype Denominator_Range is Long_Float
-      range 1.0 .. (2.0**16 - 1.0)**2;
+      range 1.0 .. (2.0**12 - 1.0)**2;
 
       N   : Numerator_Range;
       D   : Denominator_Range;
@@ -143,11 +143,11 @@ is
 
       R := Log10 (N / D);
 
-      --  The values in this assumption were generated using Wolfram|Alpha
-      --  based on the range of the Division_Result_Range subtype.
+      --  The values in this assumption are based on the mathemtical min/max
+      --  values of Log10 based on the possible range of the input: N / D.
       pragma Assume
-        (R in -4.51543668124281909693514752724080083167976452069664
-         .. 9.9339832300529300264179155790949725984287242376320911,
+        (R in -2.10699788590519423954821296166977269784955865640566952845
+         .. 9.933983230052930026417915579094972598428724237632091142242,
          "The possible output range of log10, for the possible input range");
 
       if Use_16MHz_PRF then
@@ -174,7 +174,7 @@ is
       range 1.0 .. (F_Range'Last * 3.0);
 
       subtype Denominator_Range is Long_Float
-      range 1.0 .. (2.0**16 - 1.0)**2;
+      range 1.0 .. (2.0**12 - 1.0)**2;
 
       subtype Division_Result_Range is Long_Float
       range Numerator_Range'First / Denominator_Range'Last ..
@@ -217,11 +217,11 @@ is
 
       R := Log10 (N / D);
 
-      --  The values in this assumption were generated using Wolfram|Alpha
-      --  based on the range of the Division_Result_Range subtype.
+      --  The values in this assumption are based on the mathemtical min/max
+      --  values of Log10 based on the possible range of the input: N / D.
       pragma Assume
-        (R in -9.63294660753049941556870873755718228673899250555249187993
-         .. 10.11006786225016185286373664081229759593912136974318774476,
+        (R in -7.22450781219257524826183006241290354369191576604307340090
+         .. 9.632946607530499415568708737557182286738992505552491879931,
          "The possible output range of log10, for the possible input range");
 
       if Use_16MHz_PRF then
