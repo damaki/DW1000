@@ -1605,10 +1605,10 @@ is
    begin
       --  Configure LED GPIOs
       GPIO_MODE.Read (GPIO_MODE_Reg);
-      GPIO_MODE_Reg.MSGP0 := (if Rx_OK_LED_Enable then 1 else 0);
-      GPIO_MODE_Reg.MSGP1 := (if SFD_LED_Enable   then 1 else 0);
-      GPIO_MODE_Reg.MSGP2 := (if Rx_LED_Enable    then 1 else 0);
-      GPIO_MODE_Reg.MSGP3 := (if Tx_LED_Enable    then 1 else 0);
+      GPIO_MODE_Reg.MSGP0 := (if Rx_OK_LED_Enable then RXOKLED else GPIO0);
+      GPIO_MODE_Reg.MSGP1 := (if SFD_LED_Enable   then SFDLED  else GPIO1);
+      GPIO_MODE_Reg.MSGP2 := (if Rx_LED_Enable    then RXLED   else GPIO2);
+      GPIO_MODE_Reg.MSGP3 := (if Tx_LED_Enable    then TXLED   else GPIO3);
       GPIO_MODE.Write (GPIO_MODE_Reg);
 
       --  Enable LP oscillator to run from counter, turn on debounce clock

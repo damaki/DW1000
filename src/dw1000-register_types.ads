@@ -1471,10 +1471,10 @@ is
       Imag at 2 range 0 .. 15;
    end record;
 
-   type ACC_MEM_CIR_Array is array(0 .. 1015) of ACC_MEM_Sample_Type;
+   type ACC_MEM_CIR_Array is array(Types.Index range <>) of ACC_MEM_Sample_Type;
 
    type ACC_MEM_Type is record
-      CIR : ACC_MEM_CIR_Array;
+      CIR : ACC_MEM_CIR_Array (0 .. 1015);
    end record
      with Size => 4064*8,
      Bit_Order => System.Low_Order_First,
@@ -1487,17 +1487,92 @@ is
    ----------------------------------------------------------------------------
    -- GPIO_CTRL register file
 
-   -- GPIO_MODE sub-register
+   -----------------------------
+   -- GPIO_MODE sub-register  --
+   -----------------------------
+
+   type GPIO_MODE_MSGP0_Field is
+     (GPIO0,
+      RXOKLED,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO0/RXOKLED.
+
+   type GPIO_MODE_MSGP1_Field is
+     (GPIO1,
+      SFDLED,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO1/SFDLED.
+
+   type GPIO_MODE_MSGP2_Field is
+     (GPIO2,
+      RXLED,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO2/RXLED
+
+   type GPIO_MODE_MSGP3_Field is
+     (GPIO3,
+      TXLED,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO3/TXLED
+
+   type GPIO_MODE_MSGP4_Field is
+     (GPIO4,
+      EXTPA,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO4/EXTPA
+
+   type GPIO_MODE_MSGP5_Field is
+     (GPIO5,
+      EXTTXE,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO5/EXTTXE
+
+   type GPIO_MODE_MSGP6_Field is
+     (GPIO6,
+      EXTRXE,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for GPIO6/EXTRXE
+
+   type GPIO_MODE_MSGP7_Field is
+     (SYNC,
+      GPIO7,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for SYNC/GPIO7
+
+   type GPIO_MODE_MSGP8_Field is
+     (IRQ,
+      GPIO8,
+      Reserved_10,
+      Reserved_11)
+     with Size => 2;
+   --  Mode Selection for IRQ/GPIO8
+
    type GPIO_MODE_Type is record
-      MSGP0 : Types.Bits_2      := 0;
-      MSGP1 : Types.Bits_2      := 0;
-      MSGP2 : Types.Bits_2      := 0;
-      MSGP3 : Types.Bits_2      := 0;
-      MSGP4 : Types.Bits_2      := 0;
-      MSGP5 : Types.Bits_2      := 0;
-      MSGP6 : Types.Bits_2      := 0;
-      MSGP7 : Types.Bits_2      := 0;
-      MSGP8 : Types.Bits_2      := 0;
+      MSGP0 : GPIO_MODE_MSGP0_Field := GPIO0;
+      MSGP1 : GPIO_MODE_MSGP1_Field := GPIO1;
+      MSGP2 : GPIO_MODE_MSGP2_Field := GPIO2;
+      MSGP3 : GPIO_MODE_MSGP3_Field := GPIO3;
+      MSGP4 : GPIO_MODE_MSGP4_Field := GPIO4;
+      MSGP5 : GPIO_MODE_MSGP5_Field := GPIO5;
+      MSGP6 : GPIO_MODE_MSGP6_Field := GPIO6;
+      MSGP7 : GPIO_MODE_MSGP7_Field := SYNC;
+      MSGP8 : GPIO_MODE_MSGP8_Field := IRQ;
 
       Reserved_1 : Types.Bits_6 := 0;
       Reserved_2 : Types.Bits_8 := 0;
@@ -1522,26 +1597,45 @@ is
       Reserved_2 at 0 range 24 .. 31;
    end record;
 
-   -- GPIO_DIR sub-register
+   ----------------------------
+   -- GPIO_DIR sub-register  --
+   ----------------------------
+
+   type GPIO_DIR_GDP_Field is
+     (Output,
+      Input)
+     with Size => 1;
+   --  Direction Selection for GPIOx
+
+   type GPIO_DIR_GDM_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+   --  Mask for setting the direction of GPIOx.
+   --
+   --  When writing to GDP0 so select the I/O direction of GPIOx, the value of
+   --  GDPx is only changed if this GDMx mask bit is Set for the write
+   --  operation. GDMx will always read as 0.
+
    type GPIO_DIR_Type is record
-      GDP0 : Types.Bits_1 := 1;
-      GDP1 : Types.Bits_1 := 1;
-      GDP2 : Types.Bits_1 := 1;
-      GDP3 : Types.Bits_1 := 1;
-      GDM0 : Types.Bits_1 := 0;
-      GDM1 : Types.Bits_1 := 0;
-      GDM2 : Types.Bits_1 := 0;
-      GDM3 : Types.Bits_1 := 0;
-      GDP4 : Types.Bits_1 := 1;
-      GDP5 : Types.Bits_1 := 1;
-      GDP6 : Types.Bits_1 := 1;
-      GDP7 : Types.Bits_1 := 1;
-      GDM4 : Types.Bits_1 := 0;
-      GDM5 : Types.Bits_1 := 0;
-      GDM6 : Types.Bits_1 := 0;
-      GDM7 : Types.Bits_1 := 0;
-      GDP8 : Types.Bits_1 := 1;
-      GDM8 : Types.Bits_1 := 0;
+      GDP0 : GPIO_DIR_GDP_Field := Input;
+      GDP1 : GPIO_DIR_GDP_Field := Input;
+      GDP2 : GPIO_DIR_GDP_Field := Input;
+      GDP3 : GPIO_DIR_GDP_Field := Input;
+      GDM0 : GPIO_DIR_GDM_Field := Clear;
+      GDM1 : GPIO_DIR_GDM_Field := Clear;
+      GDM2 : GPIO_DIR_GDM_Field := Clear;
+      GDM3 : GPIO_DIR_GDM_Field := Clear;
+      GDP4 : GPIO_DIR_GDP_Field := Input;
+      GDP5 : GPIO_DIR_GDP_Field := Input;
+      GDP6 : GPIO_DIR_GDP_Field := Input;
+      GDP7 : GPIO_DIR_GDP_Field := Input;
+      GDM4 : GPIO_DIR_GDM_Field := Clear;
+      GDM5 : GPIO_DIR_GDM_Field := Clear;
+      GDM6 : GPIO_DIR_GDM_Field := Clear;
+      GDM7 : GPIO_DIR_GDM_Field := Clear;
+      GDP8 : GPIO_DIR_GDP_Field := Input;
+      GDM8 : GPIO_DIR_GDM_Field := Clear;
 
       Reserved_1 : Types.Bits_3  := 0;
       Reserved_2 : Types.Bits_11 := 0;
@@ -1576,26 +1670,34 @@ is
       Reserved_2 at 0 range 21 .. 31;
    end record;
 
-   -- GPIO_DOUT sub-register
+   -----------------------------
+   -- GPIO_DOUT sub-register  --
+   -----------------------------
+
+   type GPIO_DOUT_GOM_Field is
+     (Clear,
+      Set)
+     with Size => 1;
+
    type GPIO_DOUT_Type is record
-      GOP0 : Types.Bits_1 := 0;
-      GOP1 : Types.Bits_1 := 0;
-      GOP2 : Types.Bits_1 := 0;
-      GOP3 : Types.Bits_1 := 0;
-      GOM0 : Types.Bits_1 := 0;
-      GOM1 : Types.Bits_1 := 0;
-      GOM2 : Types.Bits_1 := 0;
-      GOM3 : Types.Bits_1 := 0;
-      GOP4 : Types.Bits_1 := 0;
-      GOP5 : Types.Bits_1 := 0;
-      GOP6 : Types.Bits_1 := 0;
-      GOP7 : Types.Bits_1 := 0;
-      GOM4 : Types.Bits_1 := 0;
-      GOM5 : Types.Bits_1 := 0;
-      GOM6 : Types.Bits_1 := 0;
-      GOM7 : Types.Bits_1 := 0;
-      GOP8 : Types.Bits_1 := 0;
-      GOM8 : Types.Bits_1 := 0;
+      GOP0 : Types.Bits_1        := 0;
+      GOP1 : Types.Bits_1        := 0;
+      GOP2 : Types.Bits_1        := 0;
+      GOP3 : Types.Bits_1        := 0;
+      GOM0 : GPIO_DOUT_GOM_Field := Clear;
+      GOM1 : GPIO_DOUT_GOM_Field := Clear;
+      GOM2 : GPIO_DOUT_GOM_Field := Clear;
+      GOM3 : GPIO_DOUT_GOM_Field := Clear;
+      GOP4 : Types.Bits_1        := 0;
+      GOP5 : Types.Bits_1        := 0;
+      GOP6 : Types.Bits_1        := 0;
+      GOP7 : Types.Bits_1        := 0;
+      GOM4 : GPIO_DOUT_GOM_Field := Clear;
+      GOM5 : GPIO_DOUT_GOM_Field := Clear;
+      GOM6 : GPIO_DOUT_GOM_Field := Clear;
+      GOM7 : GPIO_DOUT_GOM_Field := Clear;
+      GOP8 : Types.Bits_1        := 0;
+      GOM8 : GPIO_DOUT_GOM_Field := Clear;
 
       Reserved_1 : Types.Bits_3  := 0;
       Reserved_2 : Types.Bits_11 := 0;
@@ -1630,17 +1732,26 @@ is
       Reserved_2 at 0 range 21 .. 31;
    end record;
 
-   -- GPIO_IRQE sub-register
+   -----------------------------
+   -- GPIO_IRQE sub-register  --
+   -----------------------------
+
+   type GPIO_IREQ_GIRQE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO IRQ Enable for GPIOx input.
+
    type GPIO_IRQE_Type is record
-      GIRQE0 : Types.Bits_1 := 0;
-      GIRQE1 : Types.Bits_1 := 0;
-      GIRQE2 : Types.Bits_1 := 0;
-      GIRQE3 : Types.Bits_1 := 0;
-      GIRQE4 : Types.Bits_1 := 0;
-      GIRQE5 : Types.Bits_1 := 0;
-      GIRQE6 : Types.Bits_1 := 0;
-      GIRQE7 : Types.Bits_1 := 0;
-      GIRQE8 : Types.Bits_1 := 0;
+      GIRQE0 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE1 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE2 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE3 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE4 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE5 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE6 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE7 : GPIO_IREQ_GIRQE_Field := Disabled;
+      GIRQE8 : GPIO_IREQ_GIRQE_Field := Disabled;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1662,17 +1773,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_ISEN sub-register
+   -----------------------------
+   -- GPIO_ISEN sub-register  --
+   -----------------------------
+
+   type GPIO_ISEN_GISEN_Field is
+     (Active_High,
+      Active_Low)
+     with Size => 1;
+   --  GPIO IRQ Sense selection GPIO0 input.
+
    type GPIO_ISEN_Type is record
-      GISEN0 : Types.Bits_1 := 0;
-      GISEN1 : Types.Bits_1 := 0;
-      GISEN2 : Types.Bits_1 := 0;
-      GISEN3 : Types.Bits_1 := 0;
-      GISEN4 : Types.Bits_1 := 0;
-      GISEN5 : Types.Bits_1 := 0;
-      GISEN6 : Types.Bits_1 := 0;
-      GISEN7 : Types.Bits_1 := 0;
-      GISEN8 : Types.Bits_1 := 0;
+      GISEN0 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN1 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN2 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN3 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN4 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN5 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN6 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN7 : GPIO_ISEN_GISEN_Field := Active_High;
+      GISEN8 : GPIO_ISEN_GISEN_Field := Active_High;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1694,17 +1814,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_IMODE sub-register
+   ------------------------------
+   -- GPIO_IMODE sub-register  --
+   ------------------------------
+
+   type GPIO_IMODE_GIMOD_Field is
+     (Level,
+      Edge)
+     with Size => 1;
+   --  GPIO IRQ Mode selection for GPIOx input.
+
    type GPIO_IMODE_Type is record
-      GIMOD0 : Types.Bits_1 := 0;
-      GIMOD1 : Types.Bits_1 := 0;
-      GIMOD2 : Types.Bits_1 := 0;
-      GIMOD3 : Types.Bits_1 := 0;
-      GIMOD4 : Types.Bits_1 := 0;
-      GIMOD5 : Types.Bits_1 := 0;
-      GIMOD6 : Types.Bits_1 := 0;
-      GIMOD7 : Types.Bits_1 := 0;
-      GIMOD8 : Types.Bits_1 := 0;
+      GIMOD0 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD1 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD2 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD3 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD4 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD5 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD6 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD7 : GPIO_IMODE_GIMOD_Field := Level;
+      GIMOD8 : GPIO_IMODE_GIMOD_Field := Level;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1726,17 +1855,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_IBES sub-register
+   -----------------------------
+   -- GPIO_IBES sub-register  --
+   -----------------------------
+
+   type GPIO_IBES_GIBES_Field is
+     (Use_GPIO_IMODE,
+      Both_Edges)
+     with Size => 1;
+   --  GPIO IRQ "Both Edge" selection for GPIOx input.
+
    type GPIO_IBES_Type is record
-      GIBES0 : Types.Bits_1 := 0;
-      GIBES1 : Types.Bits_1 := 0;
-      GIBES2 : Types.Bits_1 := 0;
-      GIBES3 : Types.Bits_1 := 0;
-      GIBES4 : Types.Bits_1 := 0;
-      GIBES5 : Types.Bits_1 := 0;
-      GIBES6 : Types.Bits_1 := 0;
-      GIBES7 : Types.Bits_1 := 0;
-      GIBES8 : Types.Bits_1 := 0;
+      GIBES0 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES1 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES2 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES3 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES4 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES5 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES6 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES7 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
+      GIBES8 : GPIO_IBES_GIBES_Field := Use_GPIO_IMODE;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1758,17 +1896,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_ICLR sub-register
+   -----------------------------
+   -- GPIO_ICLR sub-register  --
+   -----------------------------
+
+   type GPIO_ICLR_GICLR_Field is
+     (No_Action,
+      Clear_IRQ_Latch)
+     with Size => 1;
+   --  GPIO IRQ latch clear for GPIOx input.
+
    type GPIO_ICLR_Type is record
-      GICLR0 : Types.Bits_1 := 0;
-      GICLR1 : Types.Bits_1 := 0;
-      GICLR2 : Types.Bits_1 := 0;
-      GICLR3 : Types.Bits_1 := 0;
-      GICLR4 : Types.Bits_1 := 0;
-      GICLR5 : Types.Bits_1 := 0;
-      GICLR6 : Types.Bits_1 := 0;
-      GICLR7 : Types.Bits_1 := 0;
-      GICLR8 : Types.Bits_1 := 0;
+      GICLR0 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR1 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR2 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR3 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR4 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR5 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR6 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR7 : GPIO_ICLR_GICLR_Field := No_Action;
+      GICLR8 : GPIO_ICLR_GICLR_Field := No_Action;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1790,17 +1937,26 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_IDBE sub-register
+   -----------------------------
+   -- GPIO_IDBE sub-register  --
+   -----------------------------
+
+   type GPIO_IDBE_GIDBE_Field is
+     (Disabled,
+      Enabled)
+     with Size => 1;
+   --  GPIO IRQ de-bounce enable for GPIOx.
+
    type GPIO_IDBE_Type is record
-      GIDBE0 : Types.Bits_1 := 0;
-      GIDBE1 : Types.Bits_1 := 0;
-      GIDBE2 : Types.Bits_1 := 0;
-      GIDBE3 : Types.Bits_1 := 0;
-      GIDBE4 : Types.Bits_1 := 0;
-      GIDBE5 : Types.Bits_1 := 0;
-      GIDBE6 : Types.Bits_1 := 0;
-      GIDBE7 : Types.Bits_1 := 0;
-      GIDBE8 : Types.Bits_1 := 0;
+      GIDBE0 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE1 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE2 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE3 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE4 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE5 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE6 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE7 : GPIO_IDBE_GIDBE_Field := Disabled;
+      GIDBE8 : GPIO_IDBE_GIDBE_Field := Disabled;
 
       Reserved : Types.Bits_23 := 0;
    end record
@@ -1822,7 +1978,10 @@ is
       Reserved at 0 range  9 .. 31;
    end record;
 
-   -- GPIO_RAW sub-register
+   ----------------------------
+   -- GPIO_RAW sub-register  --
+   ----------------------------
+
    type GPIO_RAW_Type is record
       GRAWP0 : Types.Bits_1 := 0;
       GRAWP1 : Types.Bits_1 := 0;
