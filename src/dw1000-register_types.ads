@@ -839,10 +839,28 @@ is
    ----------------------------------------------------------------------------
    -- RX_TTCKO register file
 
+   type RX_TTCKO_RXTOFS_Field is range -2**18 .. 2**18 - 1
+     with Size => 19;
+   --  RX time tracking offset.
+
+   type RX_TTCKO_RSMPDEL_Field is range 0 .. 255
+     with Size => 8;
+   --  This 8-bit field reports an internal re-sampler delay value.
+
+   type RX_TTCKO_RCPHASE_Field is
+   delta 360.0 / 127.0
+   range 0.0 .. 360.0
+     with Small => 360.0 / 127.0,
+       Size => 7;
+   --  This 7-bit field reports the receive carrier phase adjustment at time
+   --  the ranging timestamp is made. This gives the phase (7 bits = 360 degrees)
+   --  of the internal carrier tracking loop at the time that the RX timestamp
+   --  is received.
+
    type RX_TTCKO_Type is record
-      RXTOFS  : Types.Bits_19   := 0;
-      RSMPDEL : Types.Bits_8    := 0;
-      RCPHASE : Types.Bits_7    := 0;
+      RXTOFS  : RX_TTCKO_RXTOFS_Field  := 0;
+      RSMPDEL : RX_TTCKO_RSMPDEL_Field := 0;
+      RCPHASE : RX_TTCKO_RCPHASE_Field := RX_TTCKO_RCPHASE_Field'First;
 
       Reserved_1 : Types.Bits_5 := 0;
       Reserved_2 : Types.Bits_1 := 0;
@@ -857,9 +875,9 @@ is
       Reserved_1 at 0 range 19 .. 23;
 
       RSMPDEL    at 0 range 24 .. 31;
-      RCPHASE    at 4 range  0 ..  6;
+      RCPHASE    at 0 range 32 .. 38;
 
-      Reserved_2 at 4 range  7 ..  7;
+      Reserved_2 at 0 range 39 .. 39;
    end record;
 
    ----------------------------------------------------------------------------

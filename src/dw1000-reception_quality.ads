@@ -114,7 +114,7 @@ is
    --     is -218.07 dBm to -12.67 dBm.
 
 
-   function Transmitter_Clock_Offset (RXTOFS  : in Bits_19;
+   function Transmitter_Clock_Offset (RXTOFS  : in RX_TTCKO_RXTOFS_Field;
                                       RXTTCKI : in RX_TTCKI_RXTTCKI_Field)
                                       return Long_Float
      with Post => Transmitter_Clock_Offset'Result in -1.0 .. 1.0;

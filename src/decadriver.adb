@@ -48,7 +48,7 @@ is
          RX_TTCKI_Reg     => (RXTTCKI => 0),
          RX_TTCKO_Reg     => (RXTOFS     => 0,
                               RSMPDEL    => 0,
-                              RCPHASE    => 0,
+                              RCPHASE    => 0.0,
                               Reserved_1 => 0,
                               Reserved_2 => 0),
          SFD_LENGTH       => 64,

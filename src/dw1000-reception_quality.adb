@@ -255,19 +255,16 @@ is
    end First_Path_Signal_Power;
 
 
-   function Transmitter_Clock_Offset (RXTOFS  : in Bits_19;
+   function Transmitter_Clock_Offset (RXTOFS  : in RX_TTCKO_RXTOFS_Field;
                                       RXTTCKI : in RX_TTCKI_RXTTCKI_Field)
                                       return Long_Float
    is
       Offset   : Long_Float;
       Interval : Long_Float;
    begin
-      --  RXTOFS is a 19-bit signed quantity. The MSB is the sign bit.
-      if RXTOFS < 2**18 then
-         --  Positive quantity
+      if RXTOFS > -2**18 then
          Offset := Long_Float (RXTOFS);
-
-      elsif RXTOFS = 2**18 then
+      else
          --  Special case for the most negative number
          --  (closest to negative infinity).
          --  Normally, this value would indicate -2.0**18, however, we must
@@ -277,14 +274,11 @@ is
          --  If Offset is allowed to have the value -2.0**18 then it is not
          --  possible for GNATprove to prove that Offset / Interval >= -1.0
          --  (presumably the rounding may cause the proof to fail for -1.0)
-         Offset := -(2.0**18 - 1.0);
 
-      else
-         --  Negative quantity
-         Offset := -Long_Float ((not RXTOFS) + 1);
-
-         pragma Assert (Offset >= -(2.0**18 - 1.0) and Offset <= -1.0);
+         Offset := -2.0**18 + 1.0;
       end if;
+
+      pragma Assert_And_Cut (Offset in -2.0**18 + 1.0 .. 2.0**18 - 1.0);
 
       --  RXTTCKI takes one of two values (Section 7.2.21 of the User Manual):
       --     16#01F00000# for a 16 MHz PRF
