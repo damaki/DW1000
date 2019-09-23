@@ -41,9 +41,9 @@ generic
 package DW1000.Generic_WO_Register_Driver
 is
 
-   procedure Write(Reg : in Register_Type)
+   procedure Write (Reg : in Register_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Reg),
+     Depends => (DW1000.BSP.Device_State =>+ Reg),
      SPARK_Mode => On;
 
 end DW1000.Generic_WO_Register_Driver;

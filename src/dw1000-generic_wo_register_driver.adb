@@ -26,24 +26,22 @@ with DW1000.Register_Driver;
 package body DW1000.Generic_WO_Register_Driver
 is
    subtype Register_Byte_Array is
-     DW1000.Types.Byte_Array(1 .. Register_Type'Size / 8);
-
+     DW1000.Types.Byte_Array (1 .. Register_Type'Size / 8);
 
    function Register_To_Bytes is new Ada.Unchecked_Conversion
         (Source => Register_Type,
          Target => Register_Byte_Array);
 
-
-   procedure Write(Reg : in Register_Type)
+   procedure Write (Reg : in Register_Type)
    is
       Reg_Bytes : Register_Byte_Array;
 
    begin
-      Reg_Bytes := Register_To_Bytes(Reg);
+      Reg_Bytes := Register_To_Bytes (Reg);
 
-      DW1000.Register_Driver.Write_Register(Register_ID,
-                                            Sub_Register,
-                                            Reg_Bytes);
+      DW1000.Register_Driver.Write_Register (Register_ID,
+                                             Sub_Register,
+                                             Reg_Bytes);
    end Write;
 
 end DW1000.Generic_WO_Register_Driver;

@@ -26,9 +26,9 @@ package body DW1000.Register_Driver
 with SPARK_Mode => On
 is
 
-   subtype Non_Indexed_Header_Bytes   is Types.Byte_Array(1 .. 1);
-   subtype Short_Indexed_Header_Bytes is Types.Byte_Array(1 .. 2);
-   subtype Long_Indexed_Header_Bytes  is Types.Byte_Array(1 .. 3);
+   subtype Non_Indexed_Header_Bytes   is Types.Byte_Array (1 .. 1);
+   subtype Short_Indexed_Header_Bytes is Types.Byte_Array (1 .. 2);
+   subtype Long_Indexed_Header_Bytes  is Types.Byte_Array (1 .. 3);
 
    function To_Bytes is new Ada.Unchecked_Conversion
      (Source => Non_Indexed_Header,
@@ -42,9 +42,9 @@ is
      (Source => Long_Indexed_Header,
       Target => Long_Indexed_Header_Bytes);
 
-   procedure Read_Register(Register_ID : in     DW1000.Types.Bits_6;
-                           Sub_Address : in     DW1000.Types.Bits_15;
-                           Data        :    out DW1000.Types.Byte_Array)
+   procedure Read_Register (Register_ID : in     DW1000.Types.Bits_6;
+                            Sub_Address : in     DW1000.Types.Bits_15;
+                            Data        :    out DW1000.Types.Byte_Array)
    is
       use type Types.Bits_15;
 
@@ -56,8 +56,8 @@ is
                Sub_Index   => Not_Present,
                Register_ID => Register_ID);
          begin
-            BSP.Read_Transaction(Header => To_Bytes (Header),
-                                 Data   => Data);
+            BSP.Read_Transaction (Header => To_Bytes (Header),
+                                  Data   => Data);
          end;
 
       elsif Sub_Address < 2**7 then
@@ -69,8 +69,8 @@ is
                Extended_Address     => Not_Extended,
                Register_Sub_Address => Types.Bits_7 (Sub_Address));
          begin
-            BSP.Read_Transaction(Header => To_Bytes (Header),
-                                 Data   => Data);
+            BSP.Read_Transaction (Header => To_Bytes (Header),
+                                  Data   => Data);
          end;
 
       else
@@ -84,16 +84,16 @@ is
                  Types.Bits_7 (Sub_Address and 16#7F#),
                Register_Sub_Address_MSB => Types.Bits_8 (Sub_Address / 2**7));
          begin
-            BSP.Read_Transaction(Header => To_Bytes (Header),
-                                 Data   => Data);
+            BSP.Read_Transaction (Header => To_Bytes (Header),
+                                  Data   => Data);
          end;
 
       end if;
    end Read_Register;
 
-   procedure Write_Register(Register_ID : in DW1000.Types.Bits_6;
-                            Sub_Address : in DW1000.Types.Bits_15;
-                            Data        : in DW1000.Types.Byte_Array)
+   procedure Write_Register (Register_ID : in DW1000.Types.Bits_6;
+                             Sub_Address : in DW1000.Types.Bits_15;
+                             Data        : in DW1000.Types.Byte_Array)
    is
       use type Types.Bits_15;
 
@@ -105,8 +105,8 @@ is
                Sub_Index   => Not_Present,
                Register_ID => Register_ID);
          begin
-            BSP.Write_Transaction(Header => To_Bytes (Header),
-                                  Data   => Data);
+            BSP.Write_Transaction (Header => To_Bytes (Header),
+                                   Data   => Data);
          end;
 
       elsif Sub_Address < 2**7 then
@@ -118,8 +118,8 @@ is
                Extended_Address     => Not_Extended,
                Register_Sub_Address => Types.Bits_7 (Sub_Address));
          begin
-            BSP.Write_Transaction(Header => To_Bytes (Header),
-                                  Data   => Data);
+            BSP.Write_Transaction (Header => To_Bytes (Header),
+                                   Data   => Data);
          end;
 
       else
@@ -133,8 +133,8 @@ is
                  Types.Bits_7 (Sub_Address and 16#7F#),
                Register_Sub_Address_MSB => Types.Bits_8 (Sub_Address / 2**7));
          begin
-            BSP.Write_Transaction(Header => To_Bytes (Header),
-                                  Data   => Data);
+            BSP.Write_Transaction (Header => To_Bytes (Header),
+                                   Data   => Data);
          end;
       end if;
    end Write_Register;

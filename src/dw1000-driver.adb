@@ -24,19 +24,17 @@ with Ada.Unchecked_Conversion;
 with DW1000.Constants;       use DW1000.Constants;
 with DW1000.Registers;       use DW1000.Registers;
 with DW1000.Register_Driver;
-with DW1000.Register_Types;  use DW1000.Register_Types;
-
 
 package body DW1000.Driver
 with SPARK_Mode => On
 is
 
-   -- These values for LDE_CFG1 are given by the user manual
+   --  These values for LDE_CFG1 are given by the user manual
    LDE_CFG1_Value  : constant LDE_CFG1_Type
      := (NTM   => 13,
          PMULT => 3);
 
-   -- These values for LDE_CFG2 are given by the user manual
+   --  These values for LDE_CFG2 are given by the user manual
    LDE_CFG2_Values : constant array (PRF_Type) of LDE_CFG2_Field
      := (PRF_16MHz => LDE_CFG2_16MHz,
          PRF_64MHz => LDE_CFG2_64MHz);
@@ -68,7 +66,7 @@ is
            23 => LDE_REPC_Field (0.19 * 2**16),
            24 => LDE_REPC_Field (0.22 * 2**16));
 
-   -- These values for FS_PLLCFG are given by the user manual
+   --  These values for FS_PLLCFG are given by the user manual
    FS_PLLCFG_Values : constant array (Positive range 1 .. 7) of FS_PLLCFG_Field
      := (1 => FS_PLLCFG_Channel_1,
          2 => FS_PLLCFG_Channel_2,
@@ -76,11 +74,11 @@ is
          4 => FS_PLLCFG_Channel_4,
          5 => FS_PLLCFG_Channel_5,
          7 => FS_PLLCFG_Channel_7,
-         -- Note that channel 6 is not a valid channel. However, Channel_Number
-         -- cannot be used as the array index type since it has a predicate.
+         --  Note that channel 6 is not a valid channel. However, Channel_Number
+         --  cannot be used as the array index type since it has a predicate.
          6 => 0);
 
-   -- These values for FS_PLLTUNE are given by the user manual
+   --  These values for FS_PLLTUNE are given by the user manual
    FS_PLLTUNE_Values : constant array (Positive range 1 .. 7) of FS_PLLTUNE_Field
      := (1 => FS_PLLTUNE_Channel_1,
          2 => FS_PLLTUNE_Channel_2,
@@ -88,16 +86,16 @@ is
          4 => FS_PLLTUNE_Channel_4,
          5 => FS_PLLTUNE_Channel_5,
          7 => FS_PLLTUNE_Channel_7,
-         -- Note that channel 6 is not a valid channel. However, Channel_Number
-         -- cannot be used as the array index type since it has a predicate.
+         --  Note that channel 6 is not a valid channel. However, Channel_Number
+         --  cannot be used as the array index type since it has a predicate.
          6 => 0);
 
-   -- These values for FS_PLLCFG are ported from the C decadriver
+   --  These values for FS_PLLCFG are ported from the C decadriver
    FS_XTALT_Value : constant FS_XTALT_Type
      := (XTALT    => 16,
          Reserved => 2#011#);
 
-   -- These values for RF_TXCTRL are given by the user manual
+   --  These values for RF_TXCTRL are given by the user manual
    RF_TXCTRL_Values : constant array (Positive range 1 .. 7) of RF_TXCTRL_Field
      := (1 => RF_TXCTRL_Channel_1,
          2 => RF_TXCTRL_Channel_2,
@@ -105,19 +103,19 @@ is
          4 => RF_TXCTRL_Channel_4,
          5 => RF_TXCTRL_Channel_5,
          7 => RF_TXCTRL_Channel_7,
-         -- Note that channel 6 is not a valid channel. However, Channel_Number
-         -- cannot be used as the array index type since it has a predicate.
+         --  Note that channel 6 is not a valid channel. However, Channel_Number
+         --  cannot be used as the array index type since it has a predicate.
          6 => 0);
 
-   -- These values for RF_RXCTRLH are given by the user manual
+   --  These values for RF_RXCTRLH are given by the user manual
    RF_RXCTRLH_Values : constant array (Positive range 1 .. 7) of RF_RXCTRLH_Field
-     := (1..3|5 => RF_RXCTRLH_500MHz,
-         4|7    => RF_RXCTRLH_900MHz,
-         -- Note that channel 6 is not a valid channel. However, Channel_Number
-         -- cannot be used as the array index type since it has a predicate.
-         6      => 0);
+     := (1 .. 3 | 5 => RF_RXCTRLH_500MHz,
+         4 | 7      => RF_RXCTRLH_900MHz,
+         --  Note that channel 6 is not a valid channel. However, Channel_Number
+         --  cannot be used as the array index type since it has a predicate.
+         6          => 0);
 
-   -- These values for DRX_TUNE0b are given by the user manual
+   --  These values for DRX_TUNE0b are given by the user manual
    DRX_TUNE0b_Values : constant array (Data_Rates, Boolean) of DRX_TUNE0b_Field
      := (Data_Rate_110k => (False => DRX_TUNE0b_110K_STD,
                             True  => DRX_TUNE0b_110K_Non_STD),
@@ -126,12 +124,12 @@ is
          Data_Rate_6M8  => (False => DRX_TUNE0b_6M8_STD,
                             True  => DRX_TUNE0b_6M8_Non_STD));
 
-   -- These values for DRX_TUNE1a are given by the user manual
+   --  These values for DRX_TUNE1a are given by the user manual
    DRX_TUNE1a_Values : constant array (PRF_Type) of DRX_TUNE1a_Field
      := (PRF_16MHz => DRX_TUNE1a_16MHz,
          PRF_64MHz => DRX_TUNE1a_64MHz);
 
-   -- These values for DRX_TUNE2 are given by the user manual
+   --  These values for DRX_TUNE2 are given by the user manual
    DRX_TUNE2_Values : constant array (Preamble_Acq_Chunk_Length,
                                       PRF_Type) of DRX_TUNE2_Field
      := (PAC_8  => (PRF_16MHz => DRX_TUNE2_PAC8_16MHz,
@@ -143,12 +141,12 @@ is
          PAC_64 => (PRF_16MHz => DRX_TUNE2_PAC64_16MHz,
                     PRF_64MHz => DRX_TUNE2_PAC64_64MHz));
 
-   -- These values for AGC_TUNE1 are given by the user manual
+   --  These values for AGC_TUNE1 are given by the user manual
    AGC_TUNE1_Values : constant array (PRF_Type) of AGC_TUNE1_Field
      := (PRF_16MHz => AGC_TUNE1_PRF_16MHz,
          PRF_64MHz => AGC_TUNE1_PRF_64MHz);
 
-   -- These values for TC_PGDELAY are given by the user manual
+   --  These values for TC_PGDELAY are given by the user manual
    TC_PGDELAY_Values : constant array (Positive range 1 .. 7) of TC_PGDELAY_Field
      := (1 => TC_PGDELAY_Channel_1,
          2 => TC_PGDELAY_Channel_2,
@@ -158,11 +156,15 @@ is
          6 => 0,      --  Channel 6 not in Channel_Number
          7 => TC_PGDELAY_Channel_7);
 
-   -- This value for non-standard SFD lengths are given by the user manual
+   --  This value for non-standard SFD lengths are given by the user manual
    Non_Standard_SFD_Lengths : constant array (Data_Rates) of Types.Bits_8
      := (Data_Rate_110k => 64,
          Data_Rate_850k => 16,
          Data_Rate_6M8  => 8);
+
+   -------------------------
+   --  Load_LDE_From_ROM  --
+   -------------------------
 
    procedure Load_LDE_From_ROM
    is
@@ -223,6 +225,10 @@ is
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
    end Load_LDE_From_ROM;
 
+   ---------------------
+   --  Enable_Clocks  --
+   ---------------------
+
    procedure Enable_Clocks (Clock : in Clocks)
    is
       PMSC_CTRL0_Reg : PMSC_CTRL0_Type;
@@ -238,7 +244,7 @@ is
             PMSC_CTRL0_Reg.TXCLKS  := Auto;
             PMSC_CTRL0_Reg.FACE    := Disabled;
 
-            -- Need to write the above changes before setting GPCE
+            --  Need to write the above changes before setting GPCE
             PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
             PMSC_CTRL0_Reg.Reserved_1 := PMSC_CTRL0_Reg.Reserved_1 and 2#100#;
@@ -255,7 +261,7 @@ is
             PMSC_CTRL0_Reg.RXCLKS    := Force_PLL;
             PMSC_CTRL0_Reg.FACE      := Enabled;
 
-            -- Need to write the above changes before setting SOFTRESET
+            --  Need to write the above changes before setting SOFTRESET
             PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
             PMSC_CTRL0_Reg.SOFTRESET := PMSC_CTRL0_Reg.SOFTRESET or 2#1000#;
@@ -264,7 +270,7 @@ is
             PMSC_CTRL0_Reg.RXCLKS    := Auto;
             PMSC_CTRL0_Reg.FACE      := Disabled;
 
-            -- Need to write the above changes before clearing SOFTRESET
+            --  Need to write the above changes before clearing SOFTRESET
             PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
             PMSC_CTRL0_Reg.SOFTRESET := PMSC_CTRL0_Reg.SOFTRESET and 2#0111#;
@@ -284,6 +290,9 @@ is
 
    end Enable_Clocks;
 
+   ----------------
+   --  Read_OTP  --
+   ----------------
 
    procedure Read_OTP (Address : in     OTP_ADDR_Field;
                        Word    :    out Bits_32)
@@ -292,11 +301,11 @@ is
       RDAT_Reg : OTP_RDAT_Type;
 
    begin
-      -- Set OTP address to read
+      --  Set OTP address to read
       OTP_ADDR.Write (OTP_ADDR_Type'(OTP_ADDR => Address,
                                      Reserved => 0));
 
-      -- Trigger OTP read
+      --  Trigger OTP read
       CTRL_Reg := OTP_CTRL_Type'
         (OTPRDEN    => Enabled,
          OTPREAD    => Trigger_Read,
@@ -310,17 +319,20 @@ is
 
       OTP_CTRL.Write (CTRL_Reg);
 
-      -- OTPRDEN is not self-clearing. Also clear OPTREAD
+      --  OTPRDEN is not self-clearing. Also clear OPTREAD
       CTRL_Reg.OTPRDEN := Disabled;
       CTRL_Reg.OTPREAD := No_Action;
       OTP_CTRL.Write (CTRL_Reg);
 
-      -- Read back the OTP word
+      --  Read back the OTP word
       OTP_RDAT.Read (RDAT_Reg);
       Word := RDAT_Reg.OTP_RDAT;
 
    end Read_OTP;
 
+   -----------------
+   --  Read_EUID  --
+   -----------------
 
    procedure Read_EUID (EUID : out Bits_64)
    is
@@ -332,11 +344,19 @@ is
       EUID := EUI_Reg.EUI;
    end Read_EUID;
 
+   ------------------
+   --  Write_EUID  --
+   ------------------
+
    procedure Write_EUID (EUID : in Bits_64)
    is
    begin
-      EUI.Write ( (EUI => EUID) );
+      EUI.Write ((EUI => EUID));
    end Write_EUID;
+
+   -------------------
+   --  Read_PAN_ID  --
+   -------------------
 
    procedure Read_PAN_ID (PAN_ID : out Bits_16)
    is
@@ -346,6 +366,10 @@ is
       PANADR.Read (PANADR_Reg);
       PAN_ID := PANADR_Reg.PAN_ID;
    end Read_PAN_ID;
+
+   --------------------
+   --  Write_PAN_ID  --
+   --------------------
 
    procedure Write_PAN_ID (PAN_ID : in Bits_16)
    is
@@ -357,6 +381,10 @@ is
       PANADR.Write (PANADR_Reg);
    end Write_PAN_ID;
 
+   --------------------------
+   --  Read_Short_Address  --
+   --------------------------
+
    procedure Read_Short_Address (Short_Address : out Bits_16)
    is
       PANADR_Reg : PANADR_Type;
@@ -365,6 +393,10 @@ is
       PANADR.Read (PANADR_Reg);
       Short_Address := PANADR_Reg.SHORT_ADDR;
    end Read_Short_Address;
+
+   ---------------------------
+   --  Write_Short_Address  --
+   ---------------------------
 
    procedure Write_Short_Address (Short_Address : in Bits_16)
    is
@@ -375,6 +407,10 @@ is
       PANADR_Reg.SHORT_ADDR := Short_Address;
       PANADR.Write (PANADR_Reg);
    end Write_Short_Address;
+
+   -------------------------------------
+   --  Read_PAN_ID_And_Short_Address  --
+   -------------------------------------
 
    procedure Read_PAN_ID_And_Short_Address (PAN_ID        : out Bits_16;
                                             Short_Address : out Bits_16)
@@ -387,13 +423,21 @@ is
       Short_Address := PANADR_Reg.SHORT_ADDR;
    end Read_PAN_ID_And_Short_Address;
 
+   --------------------------------------
+   --  Write_PAN_ID_And_Short_Address  --
+   --------------------------------------
+
    procedure Write_PAN_ID_And_Short_Address (PAN_ID        : in Bits_16;
                                              Short_Address : in Bits_16)
    is
    begin
-      PANADR.Write ( (PAN_ID     => PAN_ID,
-                      SHORT_ADDR => Short_Address) );
+      PANADR.Write ((PAN_ID     => PAN_ID,
+                     SHORT_ADDR => Short_Address));
    end Write_PAN_ID_And_Short_Address;
+
+   -----------------------------
+   --  Read_Tx_Antenna_Delay  --
+   -----------------------------
 
    procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
    is
@@ -405,15 +449,19 @@ is
       Antenna_Delay := TX_ANTD_Reg.TX_ANTD;
    end Read_Tx_Antenna_Delay;
 
-
+   ------------------------------
+   --  Write_Tx_Antenna_Delay  --
+   ------------------------------
 
    procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
    is
    begin
-      TX_ANTD.Write ( (TX_ANTD => Antenna_Delay) );
+      TX_ANTD.Write ((TX_ANTD => Antenna_Delay));
    end Write_Tx_Antenna_Delay;
 
-
+   -----------------------------
+   --  Read_Rx_Antenna_Delay  --
+   -----------------------------
 
    procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
    is
@@ -425,14 +473,19 @@ is
       Antenna_Delay := LDE_RXANTD_Reg.LDE_RXANTD;
    end Read_Rx_Antenna_Delay;
 
-
+   ------------------------------
+   --  Write_Rx_Antenna_Delay  --
+   ------------------------------
 
    procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
    is
    begin
-      LDE_RXANTD.Write ( (LDE_RXANTD => Antenna_Delay) );
+      LDE_RXANTD.Write ((LDE_RXANTD => Antenna_Delay));
    end Write_Rx_Antenna_Delay;
 
+   ---------------------
+   --  Configure_LDE  --
+   ---------------------
 
    procedure Configure_LDE (PRF              : in PRF_Type;
                             Rx_Preamble_Code : in Preamble_Code_Number;
@@ -448,29 +501,41 @@ is
 
       if Data_Rate = Data_Rate_110k then
          --  110 k data rate has special handling
-         LDE_REPC.Write ( (LDE_REPC => REPC_Coeff / 8) );
+         LDE_REPC.Write ((LDE_REPC => REPC_Coeff / 8));
 
       else
-         LDE_REPC.Write ( (LDE_REPC => REPC_Coeff) );
+         LDE_REPC.Write ((LDE_REPC => REPC_Coeff));
       end if;
 
    end Configure_LDE;
 
+   ---------------------
+   --  Configure_PLL  --
+   ---------------------
+
    procedure Configure_PLL (Channel : in Channel_Number)
    is
    begin
-      FS_PLLCFG.Write  ( (FS_PLLCFG  => FS_PLLCFG_Values  (Positive (Channel))) );
-      FS_PLLTUNE.Write ( (FS_PLLTUNE => FS_PLLTUNE_Values (Positive (Channel))) );
-      FS_XTALT.Write (FS_XTALT_Value);
+      FS_PLLCFG.Write  ((FS_PLLCFG  => FS_PLLCFG_Values  (Positive (Channel))));
+      FS_PLLTUNE.Write ((FS_PLLTUNE => FS_PLLTUNE_Values (Positive (Channel))));
+      FS_XTALT.Write   (FS_XTALT_Value);
    end Configure_PLL;
+
+   --------------------
+   --  Configure_RF  --
+   --------------------
 
    procedure Configure_RF (Channel : in Channel_Number)
    is
    begin
-      RF_RXCTRLH.Write ( (RF_RXCTRLH => RF_RXCTRLH_Values (Positive (Channel))) );
-      RF_TXCTRL.Write  ( (RF_TXCTRL  => RF_TXCTRL_Values (Positive (Channel))) );
+      RF_RXCTRLH.Write ((RF_RXCTRLH => RF_RXCTRLH_Values (Positive (Channel))));
+      RF_TXCTRL.Write  ((RF_TXCTRL  => RF_TXCTRL_Values (Positive (Channel))));
 
    end Configure_RF;
+
+   ---------------------
+   --  Configure_DRX  --
+   ---------------------
 
    procedure Configure_DRX (PRF                : in PRF_Type;
                             Data_Rate          : in Data_Rates;
@@ -480,35 +545,42 @@ is
                             Nonstandard_SFD    : in Boolean)
    is
    begin
-      DRX_TUNE0b.Write ( (DRX_TUNE0b => DRX_TUNE0b_Values (Data_Rate,
-                                                           Nonstandard_SFD)) );
-      DRX_TUNE1a.Write ( (DRX_TUNE1a => DRX_TUNE1a_Values (PRF)) );
+      DRX_TUNE0b.Write ((DRX_TUNE0b => DRX_TUNE0b_Values (Data_Rate,
+                                                          Nonstandard_SFD)));
+      DRX_TUNE1a.Write ((DRX_TUNE1a => DRX_TUNE1a_Values (PRF)));
 
       if Data_Rate = Data_Rate_110k then
-         DRX_TUNE1b.Write ( (DRX_TUNE1b => DRX_TUNE1b_110K) );
+         DRX_TUNE1b.Write ((DRX_TUNE1b => DRX_TUNE1b_110K));
 
       elsif Tx_Preamble_Length = PLEN_64 then
-         DRX_TUNE1b.Write ( (DRX_TUNE1b => DRX_TUNE1b_6M8) );
-         DRX_TUNE4H.Write ( (DRX_TUNE4H => DRX_TUNE4H_Preamble_64) );
+         DRX_TUNE1b.Write ((DRX_TUNE1b => DRX_TUNE1b_6M8));
+         DRX_TUNE4H.Write ((DRX_TUNE4H => DRX_TUNE4H_Preamble_64));
       else
-         DRX_TUNE1b.Write ( (DRX_TUNE1b => DRX_TUNE1b_850K_6M8) );
-         DRX_TUNE4H.Write ( (DRX_TUNE4H => DRX_TUNE4H_Others) );
+         DRX_TUNE1b.Write ((DRX_TUNE1b => DRX_TUNE1b_850K_6M8));
+         DRX_TUNE4H.Write ((DRX_TUNE4H => DRX_TUNE4H_Others));
       end if;
 
-      DRX_TUNE2.Write  ( (DRX_TUNE2  => DRX_TUNE2_Values (PAC, PRF)) );
-      DRX_SFDTOC.Write ( (DRX_SFDTOC => DRX_SFDTOC_Field (SFD_Timeout)) );
+      DRX_TUNE2.Write  ((DRX_TUNE2  => DRX_TUNE2_Values (PAC, PRF)));
+      DRX_SFDTOC.Write ((DRX_SFDTOC => DRX_SFDTOC_Field (SFD_Timeout)));
    end Configure_DRX;
 
+   ---------------------
+   --  Configure_AGC  --
+   ---------------------
 
    procedure Configure_AGC (PRF : in PRF_Type)
    is
    begin
 
-      AGC_TUNE2.Write ( (AGC_TUNE2 => AGC_TUNE2_Value) );
-      AGC_TUNE1.Write ( (AGC_TUNE1 => AGC_TUNE1_Values (PRF)) );
-      AGC_TUNE3.Write ( (AGC_TUNE3 => AGC_TUNE3_Value) );
+      AGC_TUNE2.Write ((AGC_TUNE2 => AGC_TUNE2_Value));
+      AGC_TUNE1.Write ((AGC_TUNE1 => AGC_TUNE1_Values (PRF)));
+      AGC_TUNE3.Write ((AGC_TUNE3 => AGC_TUNE3_Value));
 
    end Configure_AGC;
+
+   --------------------
+   --  Configure_TC  --
+   --------------------
 
    procedure Configure_TC (Channel : in Channel_Number)
    is
@@ -516,6 +588,10 @@ is
       TC_PGDELAY.Write
         ((TC_PGDELAY => TC_PGDELAY_Values (Positive (Channel))));
    end Configure_TC;
+
+   --------------------------
+   --  Configure_TX_FCTRL  --
+   --------------------------
 
    procedure Configure_TX_FCTRL (Frame_Length        : in Natural;
                                  Tx_Data_Rate        : in Data_Rates;
@@ -552,6 +628,10 @@ is
           IFSDELAY => TX_FCTRL_IFSDELAY_Field (Inter_Frame_Spacing)));
    end Configure_TX_FCTRL;
 
+   ---------------------------
+   --  Configure_CHAN_CTRL  --
+   ---------------------------
+
    procedure Configure_CHAN_CTRL
      (Tx_Channel              : in Channel_Number;
       Rx_Channel              : in Channel_Number;
@@ -581,6 +661,10 @@ is
                         Reserved => 0));
    end Configure_CHAN_CTRL;
 
+   ----------------------------------------
+   --  Configure_Nonstandard_SFD_Length  --
+   ----------------------------------------
+
    procedure Configure_Nonstandard_SFD_Length (Data_Rate : in Data_Rates)
    is
       USR_SFD_Reg : Register_Types.USR_SFD_Type;
@@ -591,6 +675,10 @@ is
       USR_SFD.Write (USR_SFD_Reg);
    end Configure_Nonstandard_SFD_Length;
 
+   ----------------------------------
+   --  Configure_Non_Standard_SFD  --
+   ----------------------------------
+
    procedure Configure_Non_Standard_SFD (Rx_SFD : in String;
                                          Tx_SFD : in String)
    is
@@ -600,7 +688,18 @@ is
       function Magnitude (SFD : in String) return Types.Bits_8
         with Pre =>
           (SFD'Length in 1 .. 8
-           and (for all I in SFD'Range => SFD (I) in '+' | '-' | '0'))
+           and (for all I in SFD'Range => SFD (I) in '+' | '-' | '0'));
+
+      function Polarity (SFD : in String) return Types.Bits_8
+        with Pre =>
+          (SFD'Length in 1 .. 8
+           and (for all I in SFD'Range => SFD (I) in '+' | '-' | '0'));
+
+      -----------------
+      --  Magnitude  --
+      -----------------
+
+      function Magnitude (SFD : in String) return Types.Bits_8
       is
          Result : Bits_8 := 0;
 
@@ -614,10 +713,11 @@ is
          return Result;
       end Magnitude;
 
+      ----------------
+      --  Polarity  --
+      ----------------
+
       function Polarity (SFD : in String) return Types.Bits_8
-        with Pre =>
-          (SFD'Length in 1 .. 8
-           and (for all I in SFD'Range => SFD (I) in '+' | '-' | '0'))
       is
          Result : Bits_8 := 0;
 
@@ -647,13 +747,13 @@ is
          USR_SFD_Reg.Sub_Registers :=
            (0 => Bits_8 (Tx_SFD'Length),
             1 => Magnitude (Tx_SFD (Tx_SFD'First     .. Tx_SFD'First + 7)),
-            2 => Magnitude (Tx_SFD (Tx_SFD'First + 8 .. Tx_SFD'Last     )),
+            2 => Magnitude (Tx_SFD (Tx_SFD'First + 8 .. Tx_SFD'Last)),
             3 => Polarity  (Tx_SFD (Tx_SFD'First     .. Tx_SFD'First + 7)),
-            4 => Polarity  (Tx_SFD (Tx_SFD'First + 8 .. Tx_SFD'Last     )),
+            4 => Polarity  (Tx_SFD (Tx_SFD'First + 8 .. Tx_SFD'Last)),
             5 => Magnitude (Rx_SFD (Rx_SFD'First     .. Rx_SFD'First + 7)),
-            6 => Magnitude (Rx_SFD (Rx_SFD'First + 8 .. Rx_SFD'Last     )),
+            6 => Magnitude (Rx_SFD (Rx_SFD'First + 8 .. Rx_SFD'Last)),
             7 => Polarity  (Rx_SFD (Rx_SFD'First     .. Rx_SFD'First + 7)),
-            8 => Polarity  (Rx_SFD (Rx_SFD'First + 8 .. Rx_SFD'Last     )),
+            8 => Polarity  (Rx_SFD (Rx_SFD'First + 8 .. Rx_SFD'Last)),
             others => 0);
 
       else
@@ -698,25 +798,35 @@ is
 
    end Configure_Non_Standard_SFD;
 
-   procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
+   -----------------------------------
+   --  Set_Frame_Filtering_Enabled  --
+   -----------------------------------
+
+   procedure Set_Frame_Filtering_Enabled (Enable : in Boolean)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.FFEN := (if Enabled
-                           then Register_Types.Enabled
-                           else Register_Types.Disabled);
+      SYS_CFG_Reg.FFEN := (if Enable then Enabled else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Frame_Filtering_Enabled;
 
-   procedure Set_FCS_Check_Enabled (Enabled : in Boolean)
+   -----------------------------
+   --  Set_FCS_Check_Enabled  --
+   -----------------------------
+
+   procedure Set_FCS_Check_Enabled (Enable : in Boolean)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.DIS_FCE := (if Enabled then Not_Disabled else Disabled);
+      SYS_CFG_Reg.DIS_FCE := (if Enable then Not_Disabled else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_FCS_Check_Enabled;
+
+   ---------------------------------
+   --  Configure_Frame_Filtering  --
+   ---------------------------------
 
    procedure Configure_Frame_Filtering (Behave_As_Coordinator   : in Boolean;
                                         Allow_Beacon_Frame      : in Boolean;
@@ -741,19 +851,27 @@ is
       SYS_CFG.Write (SYS_CFG_Reg);
    end Configure_Frame_Filtering;
 
-   procedure Set_Smart_Tx_Power (Enabled : in Boolean)
+   --------------------------
+   --  Set_Smart_Tx_Power  --
+   --------------------------
+
+   procedure Set_Smart_Tx_Power (Enable : in Boolean)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.DIS_STXP := (if Enabled then Not_Disabled else Disabled);
+      SYS_CFG_Reg.DIS_STXP := (if Enable then Not_Disabled else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Smart_Tx_Power;
 
-   procedure Read_OTP_Tx_Power_Level (Channel  : in     Channel_Number;
-                                      PRF      : in     PRF_Type;
-                                      Tx_Power :    out TX_POWER_Type)
+   -------------------------------
+   --  Read_OTP_Tx_Power_Level  --
+   -------------------------------
+
+   procedure Read_OTP_Tx_Power_Level (Channel     : in     Channel_Number;
+                                      PRF         : in     PRF_Type;
+                                      Power_Level :    out TX_POWER_Type)
    is
       Address : OTP_ADDR_Field;
       Word    : Bits_32;
@@ -779,8 +897,12 @@ is
       Read_OTP (Address => Address,
                 Word    => Word);
 
-      Tx_Power := Word_To_TX_POWER (Word);
+      Power_Level := Word_To_TX_POWER (Word);
    end Read_OTP_Tx_Power_Level;
+
+   ------------------------------
+   --  Read_OTP_Antenna_Delay  --
+   ------------------------------
 
    procedure Read_OTP_Antenna_Delay
      (Antenna_Delay_16_MHz : out Antenna_Delay_Time;
@@ -800,6 +922,10 @@ is
       Antenna_Delay_16_MHz := To_Antenna_Delay_Time (Lo);
       Antenna_Delay_64_MHz := To_Antenna_Delay_Time (Hi);
    end Read_OTP_Antenna_Delay;
+
+   --------------------------
+   --  Configure_Tx_Power  --
+   --------------------------
 
    procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
    is
@@ -829,6 +955,10 @@ is
       SYS_CFG.Write (SYS_CFG_Reg);
    end Configure_Tx_Power;
 
+   -------------------
+   --  Set_Tx_Data  --
+   -------------------
+
    procedure Set_Tx_Data (Data   : in Types.Byte_Array;
                           Offset : in Natural)
    is
@@ -840,6 +970,10 @@ is
             Data        => Data);
       end if;
    end Set_Tx_Data;
+
+   ---------------------------
+   --  Set_Tx_Frame_Length  --
+   ---------------------------
 
    procedure Set_Tx_Frame_Length (Length : in Natural;
                                   Offset : in Natural)
@@ -854,6 +988,10 @@ is
       TX_FCTRL.Write (TX_FCTRL_Reg);
 
    end Set_Tx_Frame_Length;
+
+   --------------------------
+   --  Start_Tx_Immediate  --
+   --------------------------
 
    procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
                                  Auto_Append_FCS : in Boolean)
@@ -877,6 +1015,10 @@ is
 
       SYS_CTRL.Write (SYS_CTRL_Reg);
    end Start_Tx_Immediate;
+
+   ------------------------
+   --  Start_Tx_Delayed  --
+   ------------------------
 
    procedure Start_Tx_Delayed (Rx_After_Tx : in     Boolean;
                                Result      :    out Result_Type)
@@ -907,7 +1049,7 @@ is
          Result := Success;
 
       else
-         -- Cancel the transmit
+         --  Cancel the transmit
          SYS_CTRL_Reg := SYS_CTRL_Type'(SFCST      => Not_Suppressed,
                                         TXSTRT     => No_Action,
                                         TXDLYS     => Not_Delayed,
@@ -922,12 +1064,16 @@ is
                                         Reserved_3 => 0);
          SYS_CTRL.Write (SYS_CTRL_Reg);
 
-         Set_Sleep_After_Tx (Enabled => False);
+         Set_Sleep_After_Tx (Enable => False);
 
          Result := Error;
       end if;
 
    end Start_Tx_Delayed;
+
+   --------------------
+   --  Read_Rx_Data  --
+   --------------------
 
    procedure Read_Rx_Data (Data   :    out Types.Byte_Array;
                            Offset : in     Natural)
@@ -939,23 +1085,33 @@ is
          Data        => Data);
    end Read_Rx_Data;
 
+   ------------------------------
+   --  Set_Delayed_Tx_Rx_Time  --
+   ------------------------------
+
    procedure Set_Delayed_Tx_Rx_Time (Delay_Time : in Coarse_System_Time)
    is
    begin
       DX_TIME.Write (DX_TIME_Type'(DX_TIME => Delay_Time));
    end Set_Delayed_Tx_Rx_Time;
 
-   procedure Set_Sleep_After_Tx (Enabled : in Boolean)
+   --------------------------
+   --  Set_Sleep_After_Tx  --
+   --------------------------
+
+   procedure Set_Sleep_After_Tx (Enable : in Boolean)
    is
       PMSC_CTRL1_Reg : PMSC_CTRL1_Type;
 
    begin
       PMSC_CTRL1.Read (PMSC_CTRL1_Reg);
-      PMSC_CTRL1_Reg.ATXSLP := (if Enabled
-                                then Register_Types.Enabled
-                                else Register_Types.Disabled);
+      PMSC_CTRL1_Reg.ATXSLP := (if Enable then Enabled else Disabled);
       PMSC_CTRL1.Write (PMSC_CTRL1_Reg);
    end Set_Sleep_After_Tx;
+
+   ----------------------------------
+   --  Read_Rx_Adjusted_Timestamp  --
+   ----------------------------------
 
    procedure Read_Rx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
    is
@@ -966,21 +1122,27 @@ is
       Timestamp := RX_TIME_Reg.RX_STAMP;
    end Read_Rx_Adjusted_Timestamp;
 
+   -----------------------------
+   --  Read_Rx_Raw_Timestamp  --
+   -----------------------------
 
    procedure Read_Rx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
    is
-      RX_Time_Reg : RX_Time_Type;
+      RX_TIME_Reg : RX_TIME_Type;
 
    begin
       RX_TIME.Read (RX_TIME_Reg);
       Timestamp := RX_TIME_Reg.RX_RAWST;
    end Read_Rx_Raw_Timestamp;
 
+   --------------------------
+   --  Read_Rx_Timestamps  --
+   --------------------------
 
    procedure Read_Rx_Timestamps (Adjusted : out Fine_System_Time;
                                  Raw      : out Coarse_System_Time)
    is
-      RX_Time_Reg : RX_Time_Type;
+      RX_TIME_Reg : RX_TIME_Type;
 
    begin
       RX_TIME.Read (RX_TIME_Reg);
@@ -988,6 +1150,9 @@ is
       Raw      := RX_TIME_Reg.RX_RAWST;
    end Read_Rx_Timestamps;
 
+   ----------------------------------
+   --  Read_Tx_Adjusted_Timestamp  --
+   ----------------------------------
 
    procedure Read_Tx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
    is
@@ -998,21 +1163,27 @@ is
       Timestamp := TX_TIME_Reg.TX_STAMP;
    end Read_Tx_Adjusted_Timestamp;
 
+   -----------------------------
+   --  Read_Tx_Raw_Timestamp  --
+   -----------------------------
 
    procedure Read_Tx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
    is
-      TX_Time_Reg : TX_Time_Type;
+      TX_TIME_Reg : TX_TIME_Type;
 
    begin
       TX_TIME.Read (TX_TIME_Reg);
       Timestamp := TX_TIME_Reg.TX_RAWST;
    end Read_Tx_Raw_Timestamp;
 
+   --------------------------
+   --  Read_Tx_Timestamps  --
+   --------------------------
 
    procedure Read_Tx_Timestamps (Adjusted : out Fine_System_Time;
                                  Raw      : out Coarse_System_Time)
    is
-      TX_Time_Reg : TX_Time_Type;
+      TX_TIME_Reg : TX_TIME_Type;
 
    begin
       TX_TIME.Read (TX_TIME_Reg);
@@ -1020,6 +1191,9 @@ is
       Raw      := TX_TIME_Reg.TX_RAWST;
    end Read_Tx_Timestamps;
 
+   -----------------------------
+   --  Read_System_Timestamp  --
+   -----------------------------
 
    procedure Read_System_Timestamp (Timestamp : out Coarse_System_Time)
    is
@@ -1030,6 +1204,10 @@ is
       Timestamp := SYS_TIME_Reg.SYS_TIME;
    end Read_System_Timestamp;
 
+   ---------------------
+   --  Check_Overrun  --
+   ---------------------
+
    procedure Check_Overrun (Overrun : out Boolean)
    is
       SYS_STATUS_Reg : SYS_STATUS_Type;
@@ -1039,20 +1217,24 @@ is
       Overrun := SYS_STATUS_Reg.RXOVRR = 1;
    end Check_Overrun;
 
+   -----------------------
+   --  Force_Tx_Rx_Off  --
+   -----------------------
+
    procedure Force_Tx_Rx_Off
    is
       SYS_MASK_Reg : SYS_MASK_Type;
 
    begin
-      -- Temporarily disable all interrupts
+      --  Temporarily disable all interrupts
       SYS_MASK.Read (SYS_MASK_Reg);
       SYS_MASK.Write (SYS_MASK_Type'(others => <>));
 
-      -- Disable Tx/Rx
+      --  Force transceiver off;
       SYS_CTRL.Write (SYS_CTRL_Type'(TRXOFF => Transceiver_Off,
                                      others => <>));
 
-      -- Force transceiver off; don't want to see any new events.
+      --  Clear any pending events.
       SYS_STATUS.Write (SYS_STATUS_Type'(AAT        => 1,
                                          TXFRB      => 1,
                                          TXPRS      => 1,
@@ -1078,10 +1260,14 @@ is
 
       Sync_Rx_Buffer_Pointers;
 
-      -- Restore previous interrupt settings.
+      --  Restore previous interrupt settings.
       SYS_MASK.Write (SYS_MASK_Reg);
 
    end Force_Tx_Rx_Off;
+
+   ----------------
+   --  Reset_Rx  --
+   ----------------
 
    procedure Reset_Rx
    is
@@ -1101,6 +1287,10 @@ is
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
    end Reset_Rx;
 
+   ------------------------------------------
+   --  Toggle_Host_Side_Rx_Buffer_Pointer  --
+   ------------------------------------------
+
    procedure Toggle_Host_Side_Rx_Buffer_Pointer
    is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
@@ -1110,6 +1300,10 @@ is
       SYS_CTRL.Write (SYS_CTRL_Reg);
    end Toggle_Host_Side_Rx_Buffer_Pointer;
 
+   -------------------------------
+   --  Sync_Rx_Buffer_Pointers  --
+   -------------------------------
+
    procedure Sync_Rx_Buffer_Pointers
    is
       SYS_STATUS_Reg : SYS_STATUS_Type;
@@ -1117,14 +1311,17 @@ is
    begin
       SYS_STATUS.Read (SYS_STATUS_Reg);
 
-      -- Check if the IC side receive buffer pointer is the same
-      -- as the host side receive buffer pointer.
+      --  Check if the IC side receive buffer pointer is the same
+      --  as the host side receive buffer pointer.
       if SYS_STATUS_Reg.ICRBP /= SYS_STATUS_Reg.HSRBP then
          Toggle_Host_Side_Rx_Buffer_Pointer;
       end if;
 
    end Sync_Rx_Buffer_Pointers;
 
+   --------------------------
+   --  Start_Rx_Immediate  --
+   --------------------------
 
    procedure Start_Rx_Immediate
    is
@@ -1151,6 +1348,9 @@ is
 
    end Start_Rx_Immediate;
 
+   ------------------------
+   --  Start_Rx_Delayed  --
+   ------------------------
 
    procedure Start_Rx_Delayed (Result  : out Result_Type)
    is
@@ -1176,13 +1376,13 @@ is
 
       SYS_CTRL.Write (SYS_CTRL_Reg);
 
-      -- Check for errors
+      --  Check for errors
       SYS_STATUS.Read (SYS_STATUS_Reg);
 
       if SYS_STATUS_Reg.HPDWARN = 1 then
          Force_Tx_Rx_Off;
 
-         -- Clear the delay bit
+         --  Clear the delay bit
          SYS_CTRL_Reg.RXDLYE := Not_Delayed;
          SYS_CTRL.Write (SYS_CTRL_Reg);
 
@@ -1193,6 +1393,10 @@ is
       end if;
 
    end Start_Rx_Delayed;
+
+   -------------------
+   --  Set_Rx_Mode  --
+   -------------------
 
    procedure Set_Rx_Mode (Mode        : in Rx_Modes;
                           Rx_On_Time  : in RX_SNIFF_SNIFF_ONT_Field;
@@ -1216,27 +1420,37 @@ is
 
    end Set_Rx_Mode;
 
-   procedure Set_Auto_Rx_Reenable (Enabled : in Boolean)
+   ----------------------------
+   --  Set_Auto_Rx_Reenable  --
+   ----------------------------
+
+   procedure Set_Auto_Rx_Reenable (Enable : in Boolean)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.RXAUTR := (if Enabled
-                             then Register_Types.Enabled
-                             else Register_Types.Disabled);
+      SYS_CFG_Reg.RXAUTR := (if Enable then Enabled else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Auto_Rx_Reenable;
 
-   procedure Set_Rx_Double_Buffer (Enabled : in Boolean)
+   ----------------------------
+   --  Set_Rx_Double_Buffer  --
+   ----------------------------
+
+   procedure Set_Rx_Double_Buffer (Enable : in Boolean)
    is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
-      SYS_CFG_Reg.DIS_DRXB := (if Enabled then Not_Disabled else Disabled);
+      SYS_CFG_Reg.DIS_DRXB := (if Enable then Not_Disabled else Disabled);
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Rx_Double_Buffer;
+
+   ---------------------------------
+   --  Set_Rx_Frame_Wait_Timeout  --
+   ---------------------------------
 
    procedure Set_Rx_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time)
    is
@@ -1248,7 +1462,7 @@ is
       if Timeout > 0.0 then
          SYS_CFG_Reg.RXWTOE := Enabled;
 
-         RX_FWTO.Write ( (RXFWTO => Timeout) );
+         RX_FWTO.Write ((RXFWTO => Timeout));
 
       else
          SYS_CFG_Reg.RXWTOE := Disabled;
@@ -1258,11 +1472,19 @@ is
       SYS_CFG.Write (SYS_CFG_Reg);
    end Set_Rx_Frame_Wait_Timeout;
 
-   procedure Set_Preamble_Detect_Timeout (Timeout : in Types.Bits_16)
+   -----------------------------------
+   --  Set_Preamble_Detect_Timeout  --
+   -----------------------------------
+
+   procedure Set_Preamble_Detect_Timeout (Timeout : in DRX_PRETOC_Field)
    is
    begin
-      DRX_PRETOC.Write ( (DRX_PRETOC => DRX_PRETOC_Field (Timeout)) );
+      DRX_PRETOC.Write ((DRX_PRETOC => Timeout));
    end Set_Preamble_Detect_Timeout;
+
+   -----------------------------
+   --  Calibrate_Sleep_Count  --
+   -----------------------------
 
    procedure Calibrate_Sleep_Count
      (Half_XTAL_Cycles_Per_LP_Osc_Cycle : out Types.Bits_16)
@@ -1272,14 +1494,14 @@ is
       Data : Types.Byte_Array (1 .. 2);
 
    begin
-      -- Enable calibration
+      --  Enable calibration
       AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Disabled,
                                      SMXX     => Clear,
                                      LPOSC_C  => Enabled,
                                      Reserved => 0));
       Upload_AON_Config;
 
-      -- Disable calibration
+      --  Disable calibration
       AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Disabled,
                                      SMXX     => Clear,
                                      LPOSC_C  => Disabled,
@@ -1291,7 +1513,7 @@ is
       PMSC_CTRL0_Reg.RXCLKS  := Auto;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
-      -- Read number of XTAL/2 cycles per LP osc cycle
+      --  Read number of XTAL/2 cycles per LP osc cycle
       AON_Contiguous_Read (Start_Address => 117,
                            Data          => Data);
 
@@ -1299,11 +1521,15 @@ is
         := (Types.Bits_16 (Data (1))
             or Shift_Left (Types.Bits_16 (Data (2)), 8));
 
-      -- Reset PMSC_CTRL0
+      --  Reset PMSC_CTRL0
       PMSC_CTRL0_Reg.SYSCLKS := Auto;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
    end Calibrate_Sleep_Count;
+
+   -------------------------
+   --  Upload_AON_Config  --
+   -------------------------
 
    procedure Upload_AON_Config
    is
@@ -1322,6 +1548,10 @@ is
                                      Reserved => 0));
    end Upload_AON_Config;
 
+   -----------------------------
+   --  Save_Registers_To_AON  --
+   -----------------------------
+
    procedure Save_Registers_To_AON
    is
    begin
@@ -1332,6 +1562,10 @@ is
                                      DCA_ENAB => Disabled,
                                      Reserved => 0));
    end Save_Registers_To_AON;
+
+   ----------------------------------
+   --  Restore_Registers_From_AON  --
+   ----------------------------------
 
    procedure Restore_Registers_From_AON
    is
@@ -1344,16 +1578,20 @@ is
                                      Reserved => 0));
    end Restore_Registers_From_AON;
 
+   ---------------------
+   --  AON_Read_Byte  --
+   ---------------------
+
    procedure AON_Read_Byte (Address : in     AON_ADDR_Field;
                             Data    :    out Types.Bits_8)
    is
       AON_RDAT_Reg : AON_RDAT_Type;
 
    begin
-      -- Load address
+      --  Load address
       AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Address));
 
-      -- Enable DCA_ENAB
+      --  Enable DCA_ENAB
       AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                      SAVE     => No_Action,
                                      UPL_CFG  => No_Action,
@@ -1361,7 +1599,7 @@ is
                                      DCA_ENAB => Enabled,
                                      Reserved => 0));
 
-      -- Now also enable DCA_READ
+      --  Now also enable DCA_READ
       AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                      SAVE     => No_Action,
                                      UPL_CFG  => No_Action,
@@ -1369,11 +1607,11 @@ is
                                      DCA_ENAB => Enabled,
                                      Reserved => 0));
 
-      -- Read the result
+      --  Read the result
       AON_RDAT.Read (AON_RDAT_Reg);
       Data := AON_RDAT_Reg.AON_RDAT;
 
-      -- Clear DCA_ENAB and DCA_READ
+      --  Clear DCA_ENAB and DCA_READ
       AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                      SAVE     => No_Action,
                                      UPL_CFG  => No_Action,
@@ -1381,6 +1619,10 @@ is
                                      DCA_ENAB => Disabled,
                                      Reserved => 0));
    end AON_Read_Byte;
+
+   ---------------------------
+   --  AON_Contiguous_Read  --
+   ---------------------------
 
    procedure AON_Contiguous_Read (Start_Address : in     AON_ADDR_Field;
                                   Data          :    out Types.Byte_Array)
@@ -1390,10 +1632,10 @@ is
 
    begin
       for I in Data'Range loop
-         -- Load address
+         --  Load address
          AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Address));
 
-         -- Enable DCA_ENAB
+         --  Enable DCA_ENAB
          AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                         SAVE     => No_Action,
                                         UPL_CFG  => No_Action,
@@ -1401,7 +1643,7 @@ is
                                         DCA_ENAB => Enabled,
                                         Reserved => 0));
 
-         -- Now also enable DCA_READ
+         --  Now also enable DCA_READ
          AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                         SAVE     => No_Action,
                                         UPL_CFG  => No_Action,
@@ -1409,14 +1651,14 @@ is
                                         DCA_ENAB => Enabled,
                                         Reserved => 0));
 
-         -- Read the result
+         --  Read the result
          AON_RDAT.Read (AON_RDAT_Reg);
          Data (I) := AON_RDAT_Reg.AON_RDAT;
 
          Address := Address + 1;
       end loop;
 
-      -- Clear DCA_ENAB and DCA_READ
+      --  Clear DCA_ENAB and DCA_READ
       AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                      SAVE     => No_Action,
                                      UPL_CFG  => No_Action,
@@ -1424,6 +1666,10 @@ is
                                      DCA_ENAB => Disabled,
                                      Reserved => 0));
    end AON_Contiguous_Read;
+
+   ------------------------
+   --  AON_Scatter_Read  --
+   ------------------------
 
    procedure AON_Scatter_Read (Addresses : in     AON_Address_Array;
                                Data      :    out Types.Byte_Array)
@@ -1437,10 +1683,10 @@ is
       Data := (others => 0); -- workaround for flow analysis.
 
       for I in 0 .. Data'Length - 1 loop
-         -- Load address
+         --  Load address
          AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Addresses (A_First + I)));
 
-         -- Enable DCA_ENAB
+         --  Enable DCA_ENAB
          AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                         SAVE     => No_Action,
                                         UPL_CFG  => No_Action,
@@ -1448,7 +1694,7 @@ is
                                         DCA_ENAB => Enabled,
                                         Reserved => 0));
 
-         -- Now also enable DCA_READ
+         --  Now also enable DCA_READ
          AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                         SAVE     => No_Action,
                                         UPL_CFG  => No_Action,
@@ -1456,12 +1702,12 @@ is
                                         DCA_ENAB => Enabled,
                                         Reserved => 0));
 
-         -- Read the result
+         --  Read the result
          AON_RDAT.Read (AON_RDAT_Reg);
          Data (D_First + I) := AON_RDAT_Reg.AON_RDAT;
       end loop;
 
-      -- Clear DCA_ENAB and DCA_READ
+      --  Clear DCA_ENAB and DCA_READ
       AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                      SAVE     => No_Action,
                                      UPL_CFG  => No_Action,
@@ -1469,6 +1715,10 @@ is
                                      DCA_ENAB => Disabled,
                                      Reserved => 0));
    end AON_Scatter_Read;
+
+   -----------------------------
+   --  Configure_Sleep_Count  --
+   -----------------------------
 
    procedure Configure_Sleep_Count (Sleep_Count : in AON_CFG0_SLEEP_TIM_Field)
    is
@@ -1480,7 +1730,7 @@ is
       PMSC_CTRL0_Reg.RXCLKS  := Auto;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
-      -- Make sure we don't accidentally sleep
+      --  Make sure we don't accidentally sleep
       AON_CFG0.Write (AON_CFG0_Type'(SLEEP_EN  => Disabled,
                                      WAKE_PIN  => Disabled,
                                      WAKE_SPI  => Disabled,
@@ -1494,10 +1744,10 @@ is
                                      LPOSC_C  => Disabled,
                                      Reserved => 0));
 
-      -- Disable the sleep counter
+      --  Disable the sleep counter
       Upload_AON_Config;
 
-      -- Set the new value
+      --  Set the new value
       AON_CFG0.Write (AON_CFG0_Type'(SLEEP_EN  => Disabled,
                                      WAKE_PIN  => Disabled,
                                      WAKE_SPI  => Disabled,
@@ -1507,7 +1757,7 @@ is
                                      SLEEP_TIM => Sleep_Count));
       Upload_AON_Config;
 
-      -- Enable the new value
+      --  Enable the new value
       AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Enabled,
                                      SMXX     => Clear,
                                      LPOSC_C  => Disabled,
@@ -1518,6 +1768,9 @@ is
 
    end Configure_Sleep_Count;
 
+   ---------------------
+   --  Set_XTAL_Trim  --
+   ---------------------
 
    procedure Set_XTAL_Trim (Trim : in FS_XTALT_Field)
    is
@@ -1528,6 +1781,10 @@ is
       FS_XTALT_Reg.XTALT := Trim;
       FS_XTALT.Write (FS_XTALT_Reg);
    end Set_XTAL_Trim;
+
+   ----------------------
+   --  Configure_LEDs  --
+   ----------------------
 
    procedure Configure_LEDs (Tx_LED_Enable    : in Boolean;
                              Rx_LED_Enable    : in Boolean;
@@ -1558,7 +1815,7 @@ is
       PMSC_CTRL0_Reg.KHZCLKEN := Enabled;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
-      -- Enable LEDs
+      --  Enable LEDs
       PMSC_LEDC.Read (PMSC_LEDC_Reg);
       PMSC_LEDC_Reg.BLINK_TIM := 0.224;
       PMSC_LEDC_Reg.BLNKEN    := (if LED_Enabled then Enabled else Disabled);

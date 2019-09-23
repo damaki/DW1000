@@ -260,13 +260,11 @@ is
      Global => null;
    --  Convert a 40-bit time span to the equivalent System_Time_Span value.
 
-
    function To_Antenna_Delay_Time (Bits : in Bits_16)
                                    return Antenna_Delay_Time
      with Inline,
      Global => null;
    --  Convert a 16-bit antenna delay register value to Antenna_Delay_Time.
-
 
    function System_Time_Offset (Time : in Fine_System_Time;
                                 Span : in System_Time_Span)
@@ -286,7 +284,6 @@ is
                                 Span : in System_Time_Span)
                                 return Fine_System_Time
    is (System_Time_Offset (Fine_System_Time (Time), Span));
-
 
    function Calculate_Span (Start_Time : in Fine_System_Time;
                             End_Time   : in Fine_System_Time)
@@ -308,7 +305,6 @@ is
    --  17 seconds, so it is possible for the End_Time to be less than the
    --  Start_Time. This function takes this wrap-around behavior into account.
 
-
    function Calculate_Span (Start_Time : in Fine_System_Time;
                             End_Time   : in Coarse_System_Time)
                             return System_Time_Span
@@ -318,7 +314,6 @@ is
    --  Note that since the DW1000 system time wraps-around after about every
    --  17 seconds, so it is possible for the End_Time to be less than the
    --  Start_Time. This function takes this wrap-around behavior into account.
-
 
    function Calculate_Span (Start_Time : in Coarse_System_Time;
                             End_Time   : in Fine_System_Time)

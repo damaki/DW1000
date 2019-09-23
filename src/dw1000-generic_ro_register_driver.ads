@@ -41,7 +41,7 @@ generic
 package DW1000.Generic_RO_Register_Driver
 is
 
-   procedure Read(Reg : out Register_Type)
+   procedure Read (Reg : out Register_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                  Reg                     => DW1000.BSP.Device_State),

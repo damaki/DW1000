@@ -199,7 +199,7 @@ is
             DW1000.Driver.Load_LDE_From_ROM;
 
          else
-            -- Should disable LDERUN bit, since the LDE isn't loaded.
+            --  Should disable LDERUN bit, since the LDE isn't loaded.
             DW1000.Registers.PMSC_CTRL1.Read (PMSC_CTRL1_Reg);
             PMSC_CTRL1_Reg.LDERUNE := Disabled;
             DW1000.Registers.PMSC_CTRL1.Write (PMSC_CTRL1_Reg);
@@ -235,8 +235,6 @@ is
 
       procedure Configure (Config : in Configuration_Type)
       is
-         SFD_Timeout : DW1000.Driver.SFD_Timeout_Number;
-
       begin
 
          --  110 kbps data rate has special handling
@@ -259,17 +257,14 @@ is
          DW1000.Driver.Configure_PLL (Config.Channel);
          DW1000.Driver.Configure_RF (Config.Channel);
 
-         --  Don't allow a zero SFD timeout
-         SFD_Timeout := (if Config.SFD_Timeout = 0
-                         then Default_SFD_Timeout
-                         else Config.SFD_Timeout);
-
          DW1000.Driver.Configure_DRX
            (PRF                => Config.PRF,
             Data_Rate          => Config.Data_Rate,
             Tx_Preamble_Length => Config.Tx_Preamble_Length,
             PAC                => Config.Rx_PAC,
-            SFD_Timeout        => SFD_Timeout,
+            SFD_Timeout        => (if Config.SFD_Timeout = 0
+                                   then Default_SFD_Timeout
+                                   else Config.SFD_Timeout),
             Nonstandard_SFD    => Config.Use_Nonstandard_SFD);
 
          DW1000.Driver.Configure_AGC (Config.PRF);
@@ -351,18 +346,18 @@ is
       --  Configure_Errors  --
       ------------------------
 
-      procedure Configure_Errors (Frame_Timeout : in Boolean;
-                                  SFD_Timeout   : in Boolean;
-                                  PHR_Error     : in Boolean;
-                                  RS_Error      : in Boolean;
-                                  FCS_Error     : in Boolean)
+      procedure Configure_Errors (Enable_Frame_Timeout : in Boolean;
+                                  Enable_SFD_Timeout   : in Boolean;
+                                  Enable_PHR_Error     : in Boolean;
+                                  Enable_RS_Error      : in Boolean;
+                                  Enable_FCS_Error     : in Boolean)
       is
       begin
-         Detect_Frame_Timeout := Frame_Timeout;
-         Detect_SFD_Timeout   := SFD_Timeout;
-         Detect_PHR_Error     := PHR_Error;
-         Detect_RS_Error      := RS_Error;
-         Detect_FCS_Error     := FCS_Error;
+         Detect_Frame_Timeout := Enable_Frame_Timeout;
+         Detect_SFD_Timeout   := Enable_SFD_Timeout;
+         Detect_PHR_Error     := Enable_PHR_Error;
+         Detect_RS_Error      := Enable_RS_Error;
+         Detect_FCS_Error     := Enable_FCS_Error;
       end Configure_Errors;
 
       -----------------------
@@ -624,7 +619,7 @@ is
       --  Receive_Error  --
       ---------------------
 
-      procedure Receive_Error (Error : in Rx_Status_Type)
+      procedure Receive_Error (Result : in Rx_Status_Type)
       is
          Next_Idx     : Rx_Frame_Queue_Index;
 
@@ -638,7 +633,7 @@ is
             Rx_Count := Rx_Count + 1;
 
             Frame_Queue (Next_Idx).Length     := 0;
-            Frame_Queue (Next_Idx).Status     := Error;
+            Frame_Queue (Next_Idx).Status     := Result;
             Frame_Queue (Next_Idx).Overrun    := Overrun_Occurred;
             Frame_Queue (Next_Idx).Frame_Info := Null_Frame_Info;
             Overrun_Occurred := False;
@@ -743,7 +738,7 @@ is
             --  Frame sent
             Ada.Synchronous_Task_Control.Set_True (Tx_Complete_Flag);
 
-            -- Clear all TX events
+            --  Clear all TX events
             SYS_STATUS_Clear.AAT   := 1;
             SYS_STATUS_Clear.TXFRS := 1;
             SYS_STATUS_Clear.TXFRB := 1;

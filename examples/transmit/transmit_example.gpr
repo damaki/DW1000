@@ -23,7 +23,7 @@ project Transmit_Example is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatn", "-ffunction-sections", "-fdata-sections", "-gnatp", "-g", "-gnat12");
+      for Default_Switches ("ada") use ("-gnatn", "-ffunction-sections", "-fdata-sections", "-gnatp", "-g", "-gnat12", "-gnatwc.cefghijklmoqrtvwxyz", "-gnaty3aAbcdefhiklL7M100nrSstu");
    end Compiler;
 
    package Linker is

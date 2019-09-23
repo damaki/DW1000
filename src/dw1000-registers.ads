@@ -26,20 +26,20 @@ with DW1000.Generic_RW_Register_Driver;
 with DW1000.Register_Types;
 with DW1000.Types;
 
-pragma Elaborate_All(DW1000.Generic_RO_Register_Driver);
-pragma Elaborate_All(DW1000.Generic_WO_Register_Driver);
-pragma Elaborate_All(DW1000.Generic_RW_Register_Driver);
+pragma Elaborate_All (DW1000.Generic_RO_Register_Driver);
+pragma Elaborate_All (DW1000.Generic_WO_Register_Driver);
+pragma Elaborate_All (DW1000.Generic_RW_Register_Driver);
 
--- This package defines register driver instances for each of the DW1000
--- device registers to allow for typed reading and writing each register
--- (or sub-register).
+--  This package defines register driver instances for each of the DW1000
+--  device registers to allow for typed reading and writing each register
+--  (or sub-register).
 --
--- Each register is typed, using the corresponding type defined in the package
--- DW1000.Register_Types. These types allow for easy manipulation for the
--- register's fields.
+--  Each register is typed, using the corresponding type defined in the package
+--  DW1000.Register_Types. These types allow for easy manipulation for the
+--  register's fields.
 --
--- Below is an example of modifying the receive and transmit channels from
--- the CHAN_CTRL register (package names omitted for clarity):
+--  Below is an example of modifying the receive and transmit channels from
+--  the CHAN_CTRL register (package names omitted for clarity):
 --    declare
 --       Reg : CHAN_CTRL_Type;
 --    begin
@@ -52,7 +52,7 @@ package DW1000.Registers
 with SPARK_Mode => On
 is
    ----------------------------------------------------------------------------
-   -- Register IDs
+   --  Register IDs
    DEV_ID_Reg_ID     : constant Types.Bits_6 := 16#00#;
    EUI_Reg_ID        : constant Types.Bits_6 := 16#01#;
    PANADR_Reg_ID     : constant Types.Bits_6 := 16#03#;
@@ -94,7 +94,7 @@ is
    PMSC_Reg_ID       : constant Types.Bits_6 := 16#36#;
 
    ----------------------------------------------------------------------------
-   -- Sub-Register IDs
+   --  Sub-Register IDs
 
    AGC_CTRL1_Sub_Reg_ID : constant Types.Bits_15 := 16#02#;
    AGC_TUNE1_Sub_Reg_ID : constant Types.Bits_15 := 16#04#;
@@ -189,7 +189,7 @@ is
    PMSC_LEDC_Sub_Reg_ID   : constant Types.Bits_15 := 16#28#;
 
    ----------------------------------------------------------------------------
-   -- Register Definitions
+   --  Register Definitions
 
    package DEV_ID is new DW1000.Generic_RO_Register_Driver
      (Register_Type => DW1000.Register_Types.DEV_ID_Type,
@@ -698,6 +698,5 @@ is
      (Register_Type => DW1000.Register_Types.PMSC_LEDC_Type,
       Register_ID   => PMSC_Reg_ID,
       Sub_Register  => PMSC_LEDC_Sub_Reg_ID);
-
 
 end DW1000.Registers;
