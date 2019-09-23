@@ -672,15 +672,14 @@ is
       Frame_Queue : Implementation.Rx_Frame_Queue_Type
         := (others => (Length     => 0,
                        Frame      => (others => 0),
-                       Frame_Info => Frame_Info_Type'
-                         (RX_TIME_Reg      => (others => <>),
-                          RX_FINFO_Reg     => (others => <>),
-                          RX_FQUAL_Reg     => (others => <>),
-                          RXPACC_NOSAT_Reg => (others => 0),
-                          RX_TTCKI_Reg     => (others => <>),
-                          RX_TTCKO_Reg     => (others => <>),
-                          SFD_LENGTH       => 0,
-                          Non_Standard_SFD => False),
+                       Frame_Info => (RX_TIME_Reg      => (others => <>),
+                                      RX_FINFO_Reg     => (others => <>),
+                                      RX_FQUAL_Reg     => (others => <>),
+                                      RXPACC_NOSAT_Reg => (others => 0),
+                                      RX_TTCKI_Reg     => (others => <>),
+                                      RX_TTCKO_Reg     => (others => <>),
+                                      SFD_LENGTH       => 0,
+                                      Non_Standard_SFD => False),
                        Status     => No_Error,
                        Overrun    => False));
       --  Cyclic buffer for storing received frames, read from the DW1000.

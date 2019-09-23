@@ -188,16 +188,15 @@ is
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
       --  Kick off the NV MEM load
-      OTP_CTRL.Write (OTP_CTRL_Type'
-                        (OTPRDEN    => Disabled,
-                         OTPREAD    => No_Action,
-                         OTPMRWR    => Clear,
-                         OTPPROG    => Clear,
-                         OTPMR      => Clear,
-                         LDELOAD    => Load_LDE_Microcode,
-                         Reserved_1 => 0,
-                         Reserved_2 => 0,
-                         Reserved_3 => 0));
+      OTP_CTRL.Write ((OTPRDEN    => Disabled,
+                       OTPREAD    => No_Action,
+                       OTPMRWR    => Clear,
+                       OTPPROG    => Clear,
+                       OTPMR      => Clear,
+                       LDELOAD    => Load_LDE_Microcode,
+                       Reserved_1 => 0,
+                       Reserved_2 => 0,
+                       Reserved_3 => 0));
 
       --  Code upload takes up to 150 us
       --  A busy wait is used here to prevent blocking the calling task.
@@ -299,20 +298,18 @@ is
 
    begin
       --  Set OTP address to read
-      OTP_ADDR.Write (OTP_ADDR_Type'(OTP_ADDR => Address,
-                                     Reserved => 0));
+      OTP_ADDR.Write ((OTP_ADDR => Address, others => <>));
 
       --  Trigger OTP read
-      CTRL_Reg := OTP_CTRL_Type'
-        (OTPRDEN    => Enabled,
-         OTPREAD    => Trigger_Read,
-         OTPMRWR    => Clear,
-         OTPPROG    => Clear,
-         OTPMR      => Clear,
-         LDELOAD    => No_Action,
-         Reserved_1 => 0,
-         Reserved_2 => 0,
-         Reserved_3 => 0);
+      CTRL_Reg := (OTPRDEN    => Enabled,
+                   OTPREAD    => Trigger_Read,
+                   OTPMRWR    => Clear,
+                   OTPPROG    => Clear,
+                   OTPMR      => Clear,
+                   LDELOAD    => No_Action,
+                   Reserved_1 => 0,
+                   Reserved_2 => 0,
+                   Reserved_3 => 0);
 
       OTP_CTRL.Write (CTRL_Reg);
 
@@ -479,7 +476,7 @@ is
 
    begin
       LDE_CFG1.Write (LDE_CFG1_Value);
-      LDE_CFG2.Write (LDE_CFG2_Type'(LDE_CFG2 => LDE_CFG2_Values (PRF)));
+      LDE_CFG2.Write ((LDE_CFG2 => LDE_CFG2_Values (PRF)));
 
       REPC_Coeff := LDE_Replica_Coeffs (Rx_Preamble_Code);
 
@@ -901,19 +898,15 @@ is
 
    begin
       if Config.Smart_Tx_Power_Enabled then
-         TX_POWER.Write
-           (TX_POWER_Type'
-              (BOOSTNORM => Config.Boost_Normal,
-               BOOSTP500 => Config.Boost_500us,
-               BOOSTP250 => Config.Boost_250us,
-               BOOSTP125 => Config.Boost_125us));
+         TX_POWER.Write ((BOOSTNORM => Config.Boost_Normal,
+                          BOOSTP500 => Config.Boost_500us,
+                          BOOSTP250 => Config.Boost_250us,
+                          BOOSTP125 => Config.Boost_125us));
       else
-         TX_POWER.Write
-           (TX_POWER_Type'
-              (BOOSTNORM => Config.Boost_PHR,
-               BOOSTP500 => Config.Boost_PHR,
-               BOOSTP250 => Config.Boost_SHR,
-               BOOSTP125 => Config.Boost_SHR));
+         TX_POWER.Write ((BOOSTNORM => Config.Boost_PHR,
+                          BOOSTP500 => Config.Boost_PHR,
+                          BOOSTP250 => Config.Boost_SHR,
+                          BOOSTP125 => Config.Boost_SHR));
       end if;
 
       SYS_CFG.Read (SYS_CFG_Reg);
@@ -964,19 +957,20 @@ is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
 
    begin
-      SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => (if Auto_Append_FCS then Not_Suppressed else Suppressed),
-         TXSTRT     => Start_Tx,
-         TXDLYS     => Not_Delayed,
-         CANSFCS    => Not_Cancelled,
-         TRXOFF     => No_Action,
-         WAIT4RESP  => (if Rx_After_Tx then Wait else No_Wait),
-         RXENAB     => No_Action,
-         RXDLYE     => Not_Delayed,
-         HRBPT      => No_Action,
-         Reserved_1 => 0,
-         Reserved_2 => 0,
-         Reserved_3 => 0);
+      SYS_CTRL_Reg :=  (SFCST      => (if Auto_Append_FCS
+                                       then Not_Suppressed
+                                       else Suppressed),
+                        TXSTRT     => Start_Tx,
+                        TXDLYS     => Not_Delayed,
+                        CANSFCS    => Not_Cancelled,
+                        TRXOFF     => No_Action,
+                        WAIT4RESP  => (if Rx_After_Tx then Wait else No_Wait),
+                        RXENAB     => No_Action,
+                        RXDLYE     => Not_Delayed,
+                        HRBPT      => No_Action,
+                        Reserved_1 => 0,
+                        Reserved_2 => 0,
+                        Reserved_3 => 0);
 
       SYS_CTRL.Write (SYS_CTRL_Reg);
    end Start_Tx_Immediate;
@@ -991,19 +985,18 @@ is
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
    begin
-      SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => Not_Suppressed,
-         TXSTRT     => Start_Tx,
-         TXDLYS     => Delayed,
-         CANSFCS    => Not_Cancelled,
-         TRXOFF     => No_Action,
-         WAIT4RESP  => (if Rx_After_Tx then Wait else No_Wait),
-         RXENAB     => No_Action,
-         RXDLYE     => Not_Delayed,
-         HRBPT      => No_Action,
-         Reserved_1 => 0,
-         Reserved_2 => 0,
-         Reserved_3 => 0);
+      SYS_CTRL_Reg := (SFCST      => Not_Suppressed,
+                       TXSTRT     => Start_Tx,
+                       TXDLYS     => Delayed,
+                       CANSFCS    => Not_Cancelled,
+                       TRXOFF     => No_Action,
+                       WAIT4RESP  => (if Rx_After_Tx then Wait else No_Wait),
+                       RXENAB     => No_Action,
+                       RXDLYE     => Not_Delayed,
+                       HRBPT      => No_Action,
+                       Reserved_1 => 0,
+                       Reserved_2 => 0,
+                       Reserved_3 => 0);
 
       SYS_CTRL.Write (SYS_CTRL_Reg);
 
@@ -1014,18 +1007,18 @@ is
 
       else
          --  Cancel the transmit
-         SYS_CTRL_Reg := SYS_CTRL_Type'(SFCST      => Not_Suppressed,
-                                        TXSTRT     => No_Action,
-                                        TXDLYS     => Not_Delayed,
-                                        CANSFCS    => Not_Cancelled,
-                                        TRXOFF     => Transceiver_Off,
-                                        WAIT4RESP  => No_Wait,
-                                        RXENAB     => No_Action,
-                                        RXDLYE     => Not_Delayed,
-                                        HRBPT      => No_Action,
-                                        Reserved_1 => 0,
-                                        Reserved_2 => 0,
-                                        Reserved_3 => 0);
+         SYS_CTRL_Reg := (SFCST      => Not_Suppressed,
+                          TXSTRT     => No_Action,
+                          TXDLYS     => Not_Delayed,
+                          CANSFCS    => Not_Cancelled,
+                          TRXOFF     => Transceiver_Off,
+                          WAIT4RESP  => No_Wait,
+                          RXENAB     => No_Action,
+                          RXDLYE     => Not_Delayed,
+                          HRBPT      => No_Action,
+                          Reserved_1 => 0,
+                          Reserved_2 => 0,
+                          Reserved_3 => 0);
          SYS_CTRL.Write (SYS_CTRL_Reg);
 
          Set_Sleep_After_Tx (Enable => False);
@@ -1054,7 +1047,7 @@ is
 
    procedure Set_Delayed_Tx_Rx_Time (Delay_Time : in Coarse_System_Time) is
    begin
-      DX_TIME.Write (DX_TIME_Type'(DX_TIME => Delay_Time));
+      DX_TIME.Write ((DX_TIME => Delay_Time));
    end Set_Delayed_Tx_Rx_Time;
 
    --------------------------
@@ -1180,35 +1173,34 @@ is
    begin
       --  Temporarily disable all interrupts
       SYS_MASK.Read (SYS_MASK_Reg);
-      SYS_MASK.Write (SYS_MASK_Type'(others => <>));
+      SYS_MASK.Write ((others => <>));
 
       --  Force transceiver off;
-      SYS_CTRL.Write (SYS_CTRL_Type'(TRXOFF => Transceiver_Off,
-                                     others => <>));
+      SYS_CTRL.Write ((TRXOFF => Transceiver_Off, others => <>));
 
       --  Clear any pending events.
-      SYS_STATUS.Write (SYS_STATUS_Type'(AAT        => 1,
-                                         TXFRB      => 1,
-                                         TXPRS      => 1,
-                                         TXPHS      => 1,
-                                         TXFRS      => 1,
-                                         RXPRD      => 1,
-                                         RXSFDD     => 1,
-                                         LDEDONE    => 1,
-                                         RXPHD      => 1,
-                                         RXPHE      => 1,
-                                         RXDFR      => 1,
-                                         RXFCG      => 1,
-                                         RXFCE      => 1,
-                                         RXRFSL     => 1,
-                                         RXRFTO     => 1,
-                                         LDEERR     => 1,
-                                         RXPTO      => 1,
-                                         RXSFDTO    => 1,
-                                         AFFREJ     => 1,
-                                         Reserved_1 => 0,
-                                         Reserved_2 => 0,
-                                         others     => 0));
+      SYS_STATUS.Write ((AAT        => 1,
+                         TXFRB      => 1,
+                         TXPRS      => 1,
+                         TXPHS      => 1,
+                         TXFRS      => 1,
+                         RXPRD      => 1,
+                         RXSFDD     => 1,
+                         LDEDONE    => 1,
+                         RXPHD      => 1,
+                         RXPHE      => 1,
+                         RXDFR      => 1,
+                         RXFCG      => 1,
+                         RXFCE      => 1,
+                         RXRFSL     => 1,
+                         RXRFTO     => 1,
+                         LDEERR     => 1,
+                         RXPTO      => 1,
+                         RXSFDTO    => 1,
+                         AFFREJ     => 1,
+                         Reserved_1 => 0,
+                         Reserved_2 => 0,
+                         others     => 0));
 
       Sync_Rx_Buffer_Pointers;
 
@@ -1278,19 +1270,18 @@ is
    begin
       Sync_Rx_Buffer_Pointers;
 
-      SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => Not_Suppressed,
-         TXSTRT     => No_Action,
-         TXDLYS     => Not_Delayed,
-         CANSFCS    => Not_Cancelled,
-         TRXOFF     => No_Action,
-         WAIT4RESP  => No_Wait,
-         RXENAB     => Start_Rx,
-         RXDLYE     => Not_Delayed,
-         HRBPT      => No_Action,
-         Reserved_1 => 0,
-         Reserved_2 => 0,
-         Reserved_3 => 0);
+      SYS_CTRL_Reg := (SFCST      => Not_Suppressed,
+                       TXSTRT     => No_Action,
+                       TXDLYS     => Not_Delayed,
+                       CANSFCS    => Not_Cancelled,
+                       TRXOFF     => No_Action,
+                       WAIT4RESP  => No_Wait,
+                       RXENAB     => Start_Rx,
+                       RXDLYE     => Not_Delayed,
+                       HRBPT      => No_Action,
+                       Reserved_1 => 0,
+                       Reserved_2 => 0,
+                       Reserved_3 => 0);
 
       SYS_CTRL.Write (SYS_CTRL_Reg);
 
@@ -1307,19 +1298,18 @@ is
    begin
       Sync_Rx_Buffer_Pointers;
 
-      SYS_CTRL_Reg := SYS_CTRL_Type'
-        (SFCST      => Not_Suppressed,
-         TXSTRT     => No_Action,
-         TXDLYS     => Not_Delayed,
-         CANSFCS    => Not_Cancelled,
-         TRXOFF     => No_Action,
-         WAIT4RESP  => No_Wait,
-         RXENAB     => Start_Rx,
-         RXDLYE     => Delayed,
-         HRBPT      => No_Action,
-         Reserved_1 => 0,
-         Reserved_2 => 0,
-         Reserved_3 => 0);
+      SYS_CTRL_Reg := (SFCST      => Not_Suppressed,
+                       TXSTRT     => No_Action,
+                       TXDLYS     => Not_Delayed,
+                       CANSFCS    => Not_Cancelled,
+                       TRXOFF     => No_Action,
+                       WAIT4RESP  => No_Wait,
+                       RXENAB     => Start_Rx,
+                       RXDLYE     => Delayed,
+                       HRBPT      => No_Action,
+                       Reserved_1 => 0,
+                       Reserved_2 => 0,
+                       Reserved_3 => 0);
 
       SYS_CTRL.Write (SYS_CTRL_Reg);
 
@@ -1350,18 +1340,14 @@ is
                           Rx_Off_Time : in Sniff_Off_Time) is
    begin
       if Mode = Normal then
-         RX_SNIFF.Write (RX_SNIFF_Type'(SNIFF_ONT  => 0,
-                                        SNIFF_OFFT => 0.0,
-                                        Reserved_1 => 0,
-                                        Reserved_2 => 0));
+         RX_SNIFF.Write ((SNIFF_ONT  => 0,
+                          SNIFF_OFFT => 0.0,
+                          others     => <>));
 
       else
-         RX_SNIFF.Write
-           (RX_SNIFF_Type'
-              (SNIFF_ONT  => Rx_On_Time,
-               SNIFF_OFFT => Rx_Off_Time,
-               Reserved_1 => 0,
-               Reserved_2 => 0));
+         RX_SNIFF.Write ((SNIFF_ONT  => Rx_On_Time,
+                          SNIFF_OFFT => Rx_Off_Time,
+                          others     => <>));
       end if;
 
    end Set_Rx_Mode;
@@ -1436,17 +1422,17 @@ is
 
    begin
       --  Enable calibration
-      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Disabled,
-                                     SMXX     => Clear,
-                                     LPOSC_C  => Enabled,
-                                     Reserved => 0));
+      AON_CFG1.Write ((SLEEP_CE => Disabled,
+                       SMXX     => Clear,
+                       LPOSC_C  => Enabled,
+                       Reserved => 0));
       Upload_AON_Config;
 
       --  Disable calibration
-      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Disabled,
-                                     SMXX     => Clear,
-                                     LPOSC_C  => Disabled,
-                                     Reserved => 0));
+      AON_CFG1.Write ((SLEEP_CE => Disabled,
+                       SMXX     => Clear,
+                       LPOSC_C  => Disabled,
+                       Reserved => 0));
       Upload_AON_Config;
 
       PMSC_CTRL0.Read (PMSC_CTRL0_Reg);
@@ -1474,18 +1460,18 @@ is
 
    procedure Upload_AON_Config is
    begin
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                     SAVE     => No_Action,
-                                     UPL_CFG  => Upload,
-                                     DCA_READ => No_Action,
-                                     DCA_ENAB => Disabled,
-                                     Reserved => 0));
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                     SAVE     => No_Action,
-                                     UPL_CFG  => No_Action,
-                                     DCA_READ => No_Action,
-                                     DCA_ENAB => Disabled,
-                                     Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => No_Action,
+                       SAVE     => No_Action,
+                       UPL_CFG  => Upload,
+                       DCA_READ => No_Action,
+                       DCA_ENAB => Disabled,
+                       Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => No_Action,
+                       SAVE     => No_Action,
+                       UPL_CFG  => No_Action,
+                       DCA_READ => No_Action,
+                       DCA_ENAB => Disabled,
+                       Reserved => 0));
    end Upload_AON_Config;
 
    -----------------------------
@@ -1494,12 +1480,12 @@ is
 
    procedure Save_Registers_To_AON is
    begin
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                     SAVE     => Save,      --  This bit auto-clears
-                                     UPL_CFG  => No_Action,
-                                     DCA_READ => No_Action,
-                                     DCA_ENAB => Disabled,
-                                     Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => No_Action,
+                       SAVE     => Save,      --  This bit auto-clears
+                       UPL_CFG  => No_Action,
+                       DCA_READ => No_Action,
+                       DCA_ENAB => Disabled,
+                       Reserved => 0));
    end Save_Registers_To_AON;
 
    ----------------------------------
@@ -1508,12 +1494,12 @@ is
 
    procedure Restore_Registers_From_AON is
    begin
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => Restore,   --  This bit auto-clears
-                                     SAVE     => No_Action,
-                                     UPL_CFG  => No_Action,
-                                     DCA_READ => No_Action,
-                                     DCA_ENAB => Disabled,
-                                     Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => Restore,   --  This bit auto-clears
+                       SAVE     => No_Action,
+                       UPL_CFG  => No_Action,
+                       DCA_READ => No_Action,
+                       DCA_ENAB => Disabled,
+                       Reserved => 0));
    end Restore_Registers_From_AON;
 
    ---------------------
@@ -1526,35 +1512,35 @@ is
 
    begin
       --  Load address
-      AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Address));
+      AON_ADDR.Write ((AON_ADDR => Address));
 
       --  Enable DCA_ENAB
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                     SAVE     => No_Action,
-                                     UPL_CFG  => No_Action,
-                                     DCA_READ => No_Action,
-                                     DCA_ENAB => Enabled,
-                                     Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => No_Action,
+                       SAVE     => No_Action,
+                       UPL_CFG  => No_Action,
+                       DCA_READ => No_Action,
+                       DCA_ENAB => Enabled,
+                       Reserved => 0));
 
       --  Now also enable DCA_READ
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                     SAVE     => No_Action,
-                                     UPL_CFG  => No_Action,
-                                     DCA_READ => Trigger_Read,
-                                     DCA_ENAB => Enabled,
-                                     Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => No_Action,
+                       SAVE     => No_Action,
+                       UPL_CFG  => No_Action,
+                       DCA_READ => Trigger_Read,
+                       DCA_ENAB => Enabled,
+                       Reserved => 0));
 
       --  Read the result
       AON_RDAT.Read (AON_RDAT_Reg);
       Data := AON_RDAT_Reg.AON_RDAT;
 
       --  Clear DCA_ENAB and DCA_READ
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                     SAVE     => No_Action,
-                                     UPL_CFG  => No_Action,
-                                     DCA_READ => No_Action,
-                                     DCA_ENAB => Disabled,
-                                     Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => No_Action,
+                       SAVE     => No_Action,
+                       UPL_CFG  => No_Action,
+                       DCA_READ => No_Action,
+                       DCA_ENAB => Disabled,
+                       Reserved => 0));
    end AON_Read_Byte;
 
    ---------------------------
@@ -1569,23 +1555,23 @@ is
    begin
       for I in Data'Range loop
          --  Load address
-         AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Address));
+         AON_ADDR.Write ((AON_ADDR => Address));
 
          --  Enable DCA_ENAB
-         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                        SAVE     => No_Action,
-                                        UPL_CFG  => No_Action,
-                                        DCA_READ => No_Action,
-                                        DCA_ENAB => Enabled,
-                                        Reserved => 0));
+         AON_CTRL.Write ((RESTORE  => No_Action,
+                          SAVE     => No_Action,
+                          UPL_CFG  => No_Action,
+                          DCA_READ => No_Action,
+                          DCA_ENAB => Enabled,
+                          Reserved => 0));
 
          --  Now also enable DCA_READ
-         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                        SAVE     => No_Action,
-                                        UPL_CFG  => No_Action,
-                                        DCA_READ => Trigger_Read,
-                                        DCA_ENAB => Enabled,
-                                        Reserved => 0));
+         AON_CTRL.Write ((RESTORE  => No_Action,
+                          SAVE     => No_Action,
+                          UPL_CFG  => No_Action,
+                          DCA_READ => Trigger_Read,
+                          DCA_ENAB => Enabled,
+                          Reserved => 0));
 
          --  Read the result
          AON_RDAT.Read (AON_RDAT_Reg);
@@ -1595,12 +1581,12 @@ is
       end loop;
 
       --  Clear DCA_ENAB and DCA_READ
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                     SAVE     => No_Action,
-                                     UPL_CFG  => No_Action,
-                                     DCA_READ => No_Action,
-                                     DCA_ENAB => Disabled,
-                                     Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => No_Action,
+                       SAVE     => No_Action,
+                       UPL_CFG  => No_Action,
+                       DCA_READ => No_Action,
+                       DCA_ENAB => Disabled,
+                       Reserved => 0));
    end AON_Contiguous_Read;
 
    ------------------------
@@ -1619,23 +1605,23 @@ is
 
       for I in 0 .. Data'Length - 1 loop
          --  Load address
-         AON_ADDR.Write (AON_ADDR_Type'(AON_ADDR => Addresses (A_First + I)));
+         AON_ADDR.Write ((AON_ADDR => Addresses (A_First + I)));
 
          --  Enable DCA_ENAB
-         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                        SAVE     => No_Action,
-                                        UPL_CFG  => No_Action,
-                                        DCA_READ => No_Action,
-                                        DCA_ENAB => Enabled,
-                                        Reserved => 0));
+         AON_CTRL.Write ((RESTORE  => No_Action,
+                          SAVE     => No_Action,
+                          UPL_CFG  => No_Action,
+                          DCA_READ => No_Action,
+                          DCA_ENAB => Enabled,
+                          Reserved => 0));
 
          --  Now also enable DCA_READ
-         AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                        SAVE     => No_Action,
-                                        UPL_CFG  => No_Action,
-                                        DCA_READ => Trigger_Read,
-                                        DCA_ENAB => Enabled,
-                                        Reserved => 0));
+         AON_CTRL.Write ((RESTORE  => No_Action,
+                          SAVE     => No_Action,
+                          UPL_CFG  => No_Action,
+                          DCA_READ => Trigger_Read,
+                          DCA_ENAB => Enabled,
+                          Reserved => 0));
 
          --  Read the result
          AON_RDAT.Read (AON_RDAT_Reg);
@@ -1643,12 +1629,12 @@ is
       end loop;
 
       --  Clear DCA_ENAB and DCA_READ
-      AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
-                                     SAVE     => No_Action,
-                                     UPL_CFG  => No_Action,
-                                     DCA_READ => No_Action,
-                                     DCA_ENAB => Disabled,
-                                     Reserved => 0));
+      AON_CTRL.Write ((RESTORE  => No_Action,
+                       SAVE     => No_Action,
+                       UPL_CFG  => No_Action,
+                       DCA_READ => No_Action,
+                       DCA_ENAB => Disabled,
+                       Reserved => 0));
    end AON_Scatter_Read;
 
    -----------------------------
@@ -1665,37 +1651,37 @@ is
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
 
       --  Make sure we don't accidentally sleep
-      AON_CFG0.Write (AON_CFG0_Type'(SLEEP_EN  => Disabled,
-                                     WAKE_PIN  => Disabled,
-                                     WAKE_SPI  => Disabled,
-                                     WAKE_CNT  => Disabled,
-                                     LPDIV_EN  => Disabled,
-                                     LPCLKDIVA => <>,
-                                     SLEEP_TIM => <>));
+      AON_CFG0.Write ((SLEEP_EN  => Disabled,
+                       WAKE_PIN  => Disabled,
+                       WAKE_SPI  => Disabled,
+                       WAKE_CNT  => Disabled,
+                       LPDIV_EN  => Disabled,
+                       LPCLKDIVA => <>,
+                       SLEEP_TIM => <>));
 
-      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Disabled,
-                                     SMXX     => Clear,
-                                     LPOSC_C  => Disabled,
-                                     Reserved => 0));
+      AON_CFG1.Write ((SLEEP_CE => Disabled,
+                       SMXX     => Clear,
+                       LPOSC_C  => Disabled,
+                       Reserved => 0));
 
       --  Disable the sleep counter
       Upload_AON_Config;
 
       --  Set the new value
-      AON_CFG0.Write (AON_CFG0_Type'(SLEEP_EN  => Disabled,
-                                     WAKE_PIN  => Disabled,
-                                     WAKE_SPI  => Disabled,
-                                     WAKE_CNT  => Disabled,
-                                     LPDIV_EN  => Disabled,
-                                     LPCLKDIVA => <>,
-                                     SLEEP_TIM => Sleep_Count));
+      AON_CFG0.Write ((SLEEP_EN  => Disabled,
+                       WAKE_PIN  => Disabled,
+                       WAKE_SPI  => Disabled,
+                       WAKE_CNT  => Disabled,
+                       LPDIV_EN  => Disabled,
+                       LPCLKDIVA => <>,
+                       SLEEP_TIM => Sleep_Count));
       Upload_AON_Config;
 
       --  Enable the new value
-      AON_CFG1.Write (AON_CFG1_Type'(SLEEP_CE => Enabled,
-                                     SMXX     => Clear,
-                                     LPOSC_C  => Disabled,
-                                     Reserved => 0));
+      AON_CFG1.Write ((SLEEP_CE => Enabled,
+                       SMXX     => Clear,
+                       LPOSC_C  => Disabled,
+                       Reserved => 0));
 
       PMSC_CTRL0_Reg.SYSCLKS := Auto;
       PMSC_CTRL0.Write (PMSC_CTRL0_Reg);
