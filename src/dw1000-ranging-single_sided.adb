@@ -25,12 +25,17 @@ with DW1000.Types; use DW1000.Types;
 package body DW1000.Ranging.Single_Sided
 with SPARK_Mode => On
 is
+
+   ------------------------
+   --  Compute_Distance  --
+   ------------------------
+
    function Compute_Distance
      (Tag_Tx_Poll_Timestamp    : in Fine_System_Time;
       Anchor_Rx_Poll_Timestamp : in Fine_System_Time;
       Anchor_Tx_Resp_Timestamp : in Fine_System_Time;
-      Tag_Rx_Resp_Timestamp    : in Fine_System_Time) return Biased_Distance
-   is
+      Tag_Rx_Resp_Timestamp    : in Fine_System_Time) return Biased_Distance is
+
       type System_Time_Span_Div2 is
       delta System_Time_Span'Delta / 2.0
       range 0.0 .. System_Time_Span'Last / 2.0
@@ -67,6 +72,9 @@ is
       return Biased_Distance (TOF_Float * Speed_Of_Light_In_Air);
    end Compute_Distance;
 
+   ------------------------
+   --  Compute_Distance  --
+   ------------------------
 
    function Compute_Distance
      (Tag_Tx_Poll_Timestamp    : in Fine_System_Time;
@@ -74,8 +82,8 @@ is
       Anchor_Tx_Resp_Timestamp : in Fine_System_Time;
       Tag_Rx_Resp_Timestamp    : in Fine_System_Time;
       Channel                  : in DW1000.Driver.Channel_Number;
-      PRF                      : in DW1000.Driver.PRF_Type) return Meters
-   is
+      PRF                      : in DW1000.Driver.PRF_Type) return Meters is
+
       Distance_With_Bias : Biased_Distance;
 
    begin
@@ -90,6 +98,5 @@ is
          Channel           => Channel,
          PRF               => PRF);
    end Compute_Distance;
-
 
 end DW1000.Ranging.Single_Sided;

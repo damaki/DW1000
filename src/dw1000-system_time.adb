@@ -30,9 +30,10 @@ is
 
    function System_Time_Offset (Time : in Fine_System_Time;
                                 Span : in System_Time_Span)
-                                return Fine_System_Time
-   is
+                                return Fine_System_Time is
+
       Span_FST : constant Fine_System_Time := Fine_System_Time (Span);
+
    begin
       if Fine_System_Time'Last - Time >= Span_FST then
          return Time + Span_FST;
@@ -48,8 +49,7 @@ is
 
    function Calculate_Span (Start_Time : in Fine_System_Time;
                             End_Time   : in Fine_System_Time)
-                            return System_Time_Span
-   is
+                            return System_Time_Span is
    begin
       if Start_Time <= End_Time then
          return System_Time_Span (End_Time - Start_Time);

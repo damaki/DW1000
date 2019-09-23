@@ -166,8 +166,7 @@ is
    --  Load_LDE_From_ROM  --
    -------------------------
 
-   procedure Load_LDE_From_ROM
-   is
+   procedure Load_LDE_From_ROM is
       use type Ada.Real_Time.Time;
 
       Finish_Time : Ada.Real_Time.Time;
@@ -229,8 +228,7 @@ is
    --  Enable_Clocks  --
    ---------------------
 
-   procedure Enable_Clocks (Clock : in Clocks)
-   is
+   procedure Enable_Clocks (Clock : in Clocks) is
       PMSC_CTRL0_Reg : PMSC_CTRL0_Type;
 
    begin
@@ -295,8 +293,7 @@ is
    ----------------
 
    procedure Read_OTP (Address : in     OTP_ADDR_Field;
-                       Word    :    out Bits_32)
-   is
+                       Word    :    out Bits_32) is
       CTRL_Reg : OTP_CTRL_Type;
       RDAT_Reg : OTP_RDAT_Type;
 
@@ -334,8 +331,7 @@ is
    --  Read_EUID  --
    -----------------
 
-   procedure Read_EUID (EUID : out Bits_64)
-   is
+   procedure Read_EUID (EUID : out Bits_64) is
       EUI_Reg : EUI_Type;
 
    begin
@@ -348,8 +344,7 @@ is
    --  Write_EUID  --
    ------------------
 
-   procedure Write_EUID (EUID : in Bits_64)
-   is
+   procedure Write_EUID (EUID : in Bits_64) is
    begin
       EUI.Write ((EUI => EUID));
    end Write_EUID;
@@ -358,8 +353,7 @@ is
    --  Read_PAN_ID  --
    -------------------
 
-   procedure Read_PAN_ID (PAN_ID : out Bits_16)
-   is
+   procedure Read_PAN_ID (PAN_ID : out Bits_16) is
       PANADR_Reg : PANADR_Type;
 
    begin
@@ -371,8 +365,7 @@ is
    --  Write_PAN_ID  --
    --------------------
 
-   procedure Write_PAN_ID (PAN_ID : in Bits_16)
-   is
+   procedure Write_PAN_ID (PAN_ID : in Bits_16) is
       PANADR_Reg : PANADR_Type;
 
    begin
@@ -385,8 +378,7 @@ is
    --  Read_Short_Address  --
    --------------------------
 
-   procedure Read_Short_Address (Short_Address : out Bits_16)
-   is
+   procedure Read_Short_Address (Short_Address : out Bits_16) is
       PANADR_Reg : PANADR_Type;
 
    begin
@@ -398,8 +390,7 @@ is
    --  Write_Short_Address  --
    ---------------------------
 
-   procedure Write_Short_Address (Short_Address : in Bits_16)
-   is
+   procedure Write_Short_Address (Short_Address : in Bits_16) is
       PANADR_Reg : PANADR_Type;
 
    begin
@@ -413,8 +404,7 @@ is
    -------------------------------------
 
    procedure Read_PAN_ID_And_Short_Address (PAN_ID        : out Bits_16;
-                                            Short_Address : out Bits_16)
-   is
+                                            Short_Address : out Bits_16) is
       PANADR_Reg : PANADR_Type;
 
    begin
@@ -428,8 +418,7 @@ is
    --------------------------------------
 
    procedure Write_PAN_ID_And_Short_Address (PAN_ID        : in Bits_16;
-                                             Short_Address : in Bits_16)
-   is
+                                             Short_Address : in Bits_16) is
    begin
       PANADR.Write ((PAN_ID     => PAN_ID,
                      SHORT_ADDR => Short_Address));
@@ -439,8 +428,7 @@ is
    --  Read_Tx_Antenna_Delay  --
    -----------------------------
 
-   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
-   is
+   procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time) is
       TX_ANTD_Reg : TX_ANTD_Type;
 
    begin
@@ -453,8 +441,7 @@ is
    --  Write_Tx_Antenna_Delay  --
    ------------------------------
 
-   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
-   is
+   procedure Write_Tx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time) is
    begin
       TX_ANTD.Write ((TX_ANTD => Antenna_Delay));
    end Write_Tx_Antenna_Delay;
@@ -463,8 +450,7 @@ is
    --  Read_Rx_Antenna_Delay  --
    -----------------------------
 
-   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
-   is
+   procedure Read_Rx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time) is
       LDE_RXANTD_Reg : LDE_RXANTD_Type;
 
    begin
@@ -477,8 +463,7 @@ is
    --  Write_Rx_Antenna_Delay  --
    ------------------------------
 
-   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time)
-   is
+   procedure Write_Rx_Antenna_Delay (Antenna_Delay : in Antenna_Delay_Time) is
    begin
       LDE_RXANTD.Write ((LDE_RXANTD => Antenna_Delay));
    end Write_Rx_Antenna_Delay;
@@ -489,8 +474,7 @@ is
 
    procedure Configure_LDE (PRF              : in PRF_Type;
                             Rx_Preamble_Code : in Preamble_Code_Number;
-                            Data_Rate        : in Data_Rates)
-   is
+                            Data_Rate        : in Data_Rates) is
       REPC_Coeff : LDE_REPC_Field;
 
    begin
@@ -513,8 +497,7 @@ is
    --  Configure_PLL  --
    ---------------------
 
-   procedure Configure_PLL (Channel : in Channel_Number)
-   is
+   procedure Configure_PLL (Channel : in Channel_Number) is
    begin
       FS_PLLCFG.Write  ((FS_PLLCFG  => FS_PLLCFG_Values  (Positive (Channel))));
       FS_PLLTUNE.Write ((FS_PLLTUNE => FS_PLLTUNE_Values (Positive (Channel))));
@@ -525,8 +508,7 @@ is
    --  Configure_RF  --
    --------------------
 
-   procedure Configure_RF (Channel : in Channel_Number)
-   is
+   procedure Configure_RF (Channel : in Channel_Number) is
    begin
       RF_RXCTRLH.Write ((RF_RXCTRLH => RF_RXCTRLH_Values (Positive (Channel))));
       RF_TXCTRL.Write  ((RF_TXCTRL  => RF_TXCTRL_Values (Positive (Channel))));
@@ -542,8 +524,7 @@ is
                             Tx_Preamble_Length : in Preamble_Lengths;
                             PAC                : in Preamble_Acq_Chunk_Length;
                             SFD_Timeout        : in SFD_Timeout_Number;
-                            Nonstandard_SFD    : in Boolean)
-   is
+                            Nonstandard_SFD    : in Boolean) is
    begin
       DRX_TUNE0b.Write ((DRX_TUNE0b => DRX_TUNE0b_Values (Data_Rate,
                                                           Nonstandard_SFD)));
@@ -568,8 +549,7 @@ is
    --  Configure_AGC  --
    ---------------------
 
-   procedure Configure_AGC (PRF : in PRF_Type)
-   is
+   procedure Configure_AGC (PRF : in PRF_Type) is
    begin
 
       AGC_TUNE2.Write ((AGC_TUNE2 => AGC_TUNE2_Value));
@@ -582,8 +562,7 @@ is
    --  Configure_TC  --
    --------------------
 
-   procedure Configure_TC (Channel : in Channel_Number)
-   is
+   procedure Configure_TC (Channel : in Channel_Number) is
    begin
       TC_PGDELAY.Write
         ((TC_PGDELAY => TC_PGDELAY_Values (Positive (Channel))));
@@ -599,8 +578,7 @@ is
                                  Ranging             : in Boolean;
                                  Preamble_Length     : in Preamble_Lengths;
                                  Tx_Buffer_Offset    : in Natural;
-                                 Inter_Frame_Spacing : in Natural)
-   is
+                                 Inter_Frame_Spacing : in Natural) is
    begin
       TX_FCTRL.Write
         ((TFLEN    => TX_FCTRL_TFLEN_Field (Frame_Length mod 128),
@@ -640,8 +618,7 @@ is
       Use_Rx_User_Defined_SFD : in Boolean;
       Rx_PRF                  : in PRF_Type;
       Tx_Preamble_Code        : in Preamble_Code_Number;
-      Rx_Preamble_Code        : in Preamble_Code_Number)
-   is
+      Rx_Preamble_Code        : in Preamble_Code_Number) is
    begin
       CHAN_CTRL.Write ((TX_CHAN  => CHAN_CTRL_Channel_Field (Tx_Channel),
                         RX_CHAN  => CHAN_CTRL_Channel_Field (Rx_Channel),
@@ -665,8 +642,7 @@ is
    --  Configure_Nonstandard_SFD_Length  --
    ----------------------------------------
 
-   procedure Configure_Nonstandard_SFD_Length (Data_Rate : in Data_Rates)
-   is
+   procedure Configure_Nonstandard_SFD_Length (Data_Rate : in Data_Rates) is
       USR_SFD_Reg : Register_Types.USR_SFD_Type;
 
    begin
@@ -680,8 +656,7 @@ is
    ----------------------------------
 
    procedure Configure_Non_Standard_SFD (Rx_SFD : in String;
-                                         Tx_SFD : in String)
-   is
+                                         Tx_SFD : in String) is
 
       --  Takes a string of up to 8 SFD symbols and compute the value of one
       --  of the USR_SFD register's magnitude sub-registers (8 bits).
@@ -802,8 +777,7 @@ is
    --  Set_Frame_Filtering_Enabled  --
    -----------------------------------
 
-   procedure Set_Frame_Filtering_Enabled (Enable : in Boolean)
-   is
+   procedure Set_Frame_Filtering_Enabled (Enable : in Boolean) is
       SYS_CFG_Reg : SYS_CFG_Type;
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
@@ -815,8 +789,7 @@ is
    --  Set_FCS_Check_Enabled  --
    -----------------------------
 
-   procedure Set_FCS_Check_Enabled (Enable : in Boolean)
-   is
+   procedure Set_FCS_Check_Enabled (Enable : in Boolean) is
       SYS_CFG_Reg : SYS_CFG_Type;
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
@@ -835,8 +808,7 @@ is
                                         Allow_MAC_Cmd_Frame     : in Boolean;
                                         Allow_Reserved_Frame    : in Boolean;
                                         Allow_Frame_Type_4      : in Boolean;
-                                        Allow_Frame_Type_5      : in Boolean)
-   is
+                                        Allow_Frame_Type_5      : in Boolean) is
       SYS_CFG_Reg : SYS_CFG_Type;
    begin
       SYS_CFG.Read (SYS_CFG_Reg);
@@ -855,8 +827,7 @@ is
    --  Set_Smart_Tx_Power  --
    --------------------------
 
-   procedure Set_Smart_Tx_Power (Enable : in Boolean)
-   is
+   procedure Set_Smart_Tx_Power (Enable : in Boolean) is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
@@ -871,8 +842,7 @@ is
 
    procedure Read_OTP_Tx_Power_Level (Channel     : in     Channel_Number;
                                       PRF         : in     PRF_Type;
-                                      Power_Level :    out TX_POWER_Type)
-   is
+                                      Power_Level :    out TX_POWER_Type) is
       Address : OTP_ADDR_Field;
       Word    : Bits_32;
 
@@ -906,8 +876,7 @@ is
 
    procedure Read_OTP_Antenna_Delay
      (Antenna_Delay_16_MHz : out Antenna_Delay_Time;
-      Antenna_Delay_64_MHz : out Antenna_Delay_Time)
-   is
+      Antenna_Delay_64_MHz : out Antenna_Delay_Time) is
       Word : Bits_32;
       Lo   : Bits_16;
       Hi   : Bits_16;
@@ -927,8 +896,7 @@ is
    --  Configure_Tx_Power  --
    --------------------------
 
-   procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
-   is
+   procedure Configure_Tx_Power (Config : Tx_Power_Config_Type) is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
@@ -960,8 +928,7 @@ is
    -------------------
 
    procedure Set_Tx_Data (Data   : in Types.Byte_Array;
-                          Offset : in Natural)
-   is
+                          Offset : in Natural) is
    begin
       if Data'Length > 0 then
          DW1000.Register_Driver.Write_Register
@@ -976,8 +943,7 @@ is
    ---------------------------
 
    procedure Set_Tx_Frame_Length (Length : in Natural;
-                                  Offset : in Natural)
-   is
+                                  Offset : in Natural) is
       TX_FCTRL_Reg : TX_FCTRL_Type;
 
    begin
@@ -994,8 +960,7 @@ is
    --------------------------
 
    procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
-                                 Auto_Append_FCS : in Boolean)
-   is
+                                 Auto_Append_FCS : in Boolean) is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
 
    begin
@@ -1021,8 +986,7 @@ is
    ------------------------
 
    procedure Start_Tx_Delayed (Rx_After_Tx : in     Boolean;
-                               Result      :    out Result_Type)
-   is
+                               Result      :    out Result_Type) is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
@@ -1076,8 +1040,7 @@ is
    --------------------
 
    procedure Read_Rx_Data (Data   :    out Types.Byte_Array;
-                           Offset : in     Natural)
-   is
+                           Offset : in     Natural) is
    begin
       DW1000.Register_Driver.Read_Register
         (Register_ID => Registers.RX_BUFFER_Reg_ID,
@@ -1089,8 +1052,7 @@ is
    --  Set_Delayed_Tx_Rx_Time  --
    ------------------------------
 
-   procedure Set_Delayed_Tx_Rx_Time (Delay_Time : in Coarse_System_Time)
-   is
+   procedure Set_Delayed_Tx_Rx_Time (Delay_Time : in Coarse_System_Time) is
    begin
       DX_TIME.Write (DX_TIME_Type'(DX_TIME => Delay_Time));
    end Set_Delayed_Tx_Rx_Time;
@@ -1099,8 +1061,7 @@ is
    --  Set_Sleep_After_Tx  --
    --------------------------
 
-   procedure Set_Sleep_After_Tx (Enable : in Boolean)
-   is
+   procedure Set_Sleep_After_Tx (Enable : in Boolean) is
       PMSC_CTRL1_Reg : PMSC_CTRL1_Type;
 
    begin
@@ -1113,8 +1074,7 @@ is
    --  Read_Rx_Adjusted_Timestamp  --
    ----------------------------------
 
-   procedure Read_Rx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
-   is
+   procedure Read_Rx_Adjusted_Timestamp (Timestamp : out Fine_System_Time) is
       RX_TIME_Reg : RX_TIME_Type;
 
    begin
@@ -1126,8 +1086,7 @@ is
    --  Read_Rx_Raw_Timestamp  --
    -----------------------------
 
-   procedure Read_Rx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
-   is
+   procedure Read_Rx_Raw_Timestamp (Timestamp : out Coarse_System_Time) is
       RX_TIME_Reg : RX_TIME_Type;
 
    begin
@@ -1140,8 +1099,7 @@ is
    --------------------------
 
    procedure Read_Rx_Timestamps (Adjusted : out Fine_System_Time;
-                                 Raw      : out Coarse_System_Time)
-   is
+                                 Raw      : out Coarse_System_Time) is
       RX_TIME_Reg : RX_TIME_Type;
 
    begin
@@ -1154,8 +1112,7 @@ is
    --  Read_Tx_Adjusted_Timestamp  --
    ----------------------------------
 
-   procedure Read_Tx_Adjusted_Timestamp (Timestamp : out Fine_System_Time)
-   is
+   procedure Read_Tx_Adjusted_Timestamp (Timestamp : out Fine_System_Time) is
       TX_TIME_Reg : TX_TIME_Type;
 
    begin
@@ -1167,8 +1124,7 @@ is
    --  Read_Tx_Raw_Timestamp  --
    -----------------------------
 
-   procedure Read_Tx_Raw_Timestamp (Timestamp : out Coarse_System_Time)
-   is
+   procedure Read_Tx_Raw_Timestamp (Timestamp : out Coarse_System_Time) is
       TX_TIME_Reg : TX_TIME_Type;
 
    begin
@@ -1181,8 +1137,7 @@ is
    --------------------------
 
    procedure Read_Tx_Timestamps (Adjusted : out Fine_System_Time;
-                                 Raw      : out Coarse_System_Time)
-   is
+                                 Raw      : out Coarse_System_Time) is
       TX_TIME_Reg : TX_TIME_Type;
 
    begin
@@ -1195,8 +1150,7 @@ is
    --  Read_System_Timestamp  --
    -----------------------------
 
-   procedure Read_System_Timestamp (Timestamp : out Coarse_System_Time)
-   is
+   procedure Read_System_Timestamp (Timestamp : out Coarse_System_Time) is
       SYS_TIME_Reg : SYS_TIME_Type;
 
    begin
@@ -1208,8 +1162,7 @@ is
    --  Check_Overrun  --
    ---------------------
 
-   procedure Check_Overrun (Overrun : out Boolean)
-   is
+   procedure Check_Overrun (Overrun : out Boolean) is
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
    begin
@@ -1221,8 +1174,7 @@ is
    --  Force_Tx_Rx_Off  --
    -----------------------
 
-   procedure Force_Tx_Rx_Off
-   is
+   procedure Force_Tx_Rx_Off is
       SYS_MASK_Reg : SYS_MASK_Type;
 
    begin
@@ -1269,8 +1221,7 @@ is
    --  Reset_Rx  --
    ----------------
 
-   procedure Reset_Rx
-   is
+   procedure Reset_Rx is
       PMSC_CTRL0_Reg : PMSC_CTRL0_Type;
 
    begin
@@ -1291,8 +1242,7 @@ is
    --  Toggle_Host_Side_Rx_Buffer_Pointer  --
    ------------------------------------------
 
-   procedure Toggle_Host_Side_Rx_Buffer_Pointer
-   is
+   procedure Toggle_Host_Side_Rx_Buffer_Pointer is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
    begin
       SYS_CTRL.Read (SYS_CTRL_Reg);
@@ -1304,8 +1254,7 @@ is
    --  Sync_Rx_Buffer_Pointers  --
    -------------------------------
 
-   procedure Sync_Rx_Buffer_Pointers
-   is
+   procedure Sync_Rx_Buffer_Pointers is
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
    begin
@@ -1323,8 +1272,7 @@ is
    --  Start_Rx_Immediate  --
    --------------------------
 
-   procedure Start_Rx_Immediate
-   is
+   procedure Start_Rx_Immediate is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
 
    begin
@@ -1352,8 +1300,7 @@ is
    --  Start_Rx_Delayed  --
    ------------------------
 
-   procedure Start_Rx_Delayed (Result  : out Result_Type)
-   is
+   procedure Start_Rx_Delayed (Result  : out Result_Type) is
       SYS_CTRL_Reg   : SYS_CTRL_Type;
       SYS_STATUS_Reg : SYS_STATUS_Type;
 
@@ -1400,8 +1347,7 @@ is
 
    procedure Set_Rx_Mode (Mode        : in Rx_Modes;
                           Rx_On_Time  : in RX_SNIFF_SNIFF_ONT_Field;
-                          Rx_Off_Time : in Sniff_Off_Time)
-   is
+                          Rx_Off_Time : in Sniff_Off_Time) is
    begin
       if Mode = Normal then
          RX_SNIFF.Write (RX_SNIFF_Type'(SNIFF_ONT  => 0,
@@ -1424,8 +1370,7 @@ is
    --  Set_Auto_Rx_Reenable  --
    ----------------------------
 
-   procedure Set_Auto_Rx_Reenable (Enable : in Boolean)
-   is
+   procedure Set_Auto_Rx_Reenable (Enable : in Boolean) is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
@@ -1438,8 +1383,7 @@ is
    --  Set_Rx_Double_Buffer  --
    ----------------------------
 
-   procedure Set_Rx_Double_Buffer (Enable : in Boolean)
-   is
+   procedure Set_Rx_Double_Buffer (Enable : in Boolean) is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
@@ -1452,8 +1396,7 @@ is
    --  Set_Rx_Frame_Wait_Timeout  --
    ---------------------------------
 
-   procedure Set_Rx_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time)
-   is
+   procedure Set_Rx_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time) is
       SYS_CFG_Reg : SYS_CFG_Type;
 
    begin
@@ -1476,8 +1419,7 @@ is
    --  Set_Preamble_Detect_Timeout  --
    -----------------------------------
 
-   procedure Set_Preamble_Detect_Timeout (Timeout : in DRX_PRETOC_Field)
-   is
+   procedure Set_Preamble_Detect_Timeout (Timeout : in DRX_PRETOC_Field) is
    begin
       DRX_PRETOC.Write ((DRX_PRETOC => Timeout));
    end Set_Preamble_Detect_Timeout;
@@ -1487,8 +1429,7 @@ is
    -----------------------------
 
    procedure Calibrate_Sleep_Count
-     (Half_XTAL_Cycles_Per_LP_Osc_Cycle : out Types.Bits_16)
-   is
+     (Half_XTAL_Cycles_Per_LP_Osc_Cycle : out Types.Bits_16) is
       PMSC_CTRL0_Reg : PMSC_CTRL0_Type;
 
       Data : Types.Byte_Array (1 .. 2);
@@ -1531,8 +1472,7 @@ is
    --  Upload_AON_Config  --
    -------------------------
 
-   procedure Upload_AON_Config
-   is
+   procedure Upload_AON_Config is
    begin
       AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                      SAVE     => No_Action,
@@ -1552,8 +1492,7 @@ is
    --  Save_Registers_To_AON  --
    -----------------------------
 
-   procedure Save_Registers_To_AON
-   is
+   procedure Save_Registers_To_AON is
    begin
       AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => No_Action,
                                      SAVE     => Save,      --  This bit auto-clears
@@ -1567,8 +1506,7 @@ is
    --  Restore_Registers_From_AON  --
    ----------------------------------
 
-   procedure Restore_Registers_From_AON
-   is
+   procedure Restore_Registers_From_AON is
    begin
       AON_CTRL.Write (AON_CTRL_Type'(RESTORE  => Restore,   --  This bit auto-clears
                                      SAVE     => No_Action,
@@ -1583,8 +1521,7 @@ is
    ---------------------
 
    procedure AON_Read_Byte (Address : in     AON_ADDR_Field;
-                            Data    :    out Types.Bits_8)
-   is
+                            Data    :    out Types.Bits_8) is
       AON_RDAT_Reg : AON_RDAT_Type;
 
    begin
@@ -1625,8 +1562,7 @@ is
    ---------------------------
 
    procedure AON_Contiguous_Read (Start_Address : in     AON_ADDR_Field;
-                                  Data          :    out Types.Byte_Array)
-   is
+                                  Data          :    out Types.Byte_Array) is
       Address      : AON_ADDR_Field := Start_Address;
       AON_RDAT_Reg : AON_RDAT_Type;
 
@@ -1672,8 +1608,7 @@ is
    ------------------------
 
    procedure AON_Scatter_Read (Addresses : in     AON_Address_Array;
-                               Data      :    out Types.Byte_Array)
-   is
+                               Data      :    out Types.Byte_Array) is
       AON_RDAT_Reg : AON_RDAT_Type;
 
       A_First : constant Integer := Addresses'First;
@@ -1720,8 +1655,7 @@ is
    --  Configure_Sleep_Count  --
    -----------------------------
 
-   procedure Configure_Sleep_Count (Sleep_Count : in AON_CFG0_SLEEP_TIM_Field)
-   is
+   procedure Configure_Sleep_Count (Sleep_Count : in AON_CFG0_SLEEP_TIM_Field) is
       PMSC_CTRL0_Reg : PMSC_CTRL0_Type;
 
    begin
@@ -1772,8 +1706,7 @@ is
    --  Set_XTAL_Trim  --
    ---------------------
 
-   procedure Set_XTAL_Trim (Trim : in FS_XTALT_Field)
-   is
+   procedure Set_XTAL_Trim (Trim : in FS_XTALT_Field) is
       FS_XTALT_Reg : FS_XTALT_Type;
 
    begin
@@ -1790,8 +1723,7 @@ is
                              Rx_LED_Enable    : in Boolean;
                              Rx_OK_LED_Enable : in Boolean;
                              SFD_LED_Enable   : in Boolean;
-                             Test_Flash       : in Boolean)
-   is
+                             Test_Flash       : in Boolean) is
       GPIO_MODE_Reg  : Register_Types.GPIO_MODE_Type;
       PMSC_LEDC_Reg  : Register_Types.PMSC_LEDC_Type;
       PMSC_CTRL0_Reg : Register_Types.PMSC_CTRL0_Type;

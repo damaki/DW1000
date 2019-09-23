@@ -32,8 +32,7 @@ is
         (Source => Register_Type,
          Target => Register_Byte_Array);
 
-   procedure Write (Reg : in Register_Type)
-   is
+   procedure Write (Reg : in Register_Type) is
       Reg_Bytes : Register_Byte_Array;
 
    begin

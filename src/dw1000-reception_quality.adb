@@ -45,8 +45,8 @@ is
    --  Argument_Error function.
 
    function Log10 (X : in Long_Float) return Long_Float
-     with SPARK_Mode => Off
-   is
+     with SPARK_Mode => Off is
+
       package Long_Float_Math is
         new Ada.Numerics.Generic_Elementary_Functions (Long_Float);
    begin
@@ -61,8 +61,8 @@ is
                            RXPACC_NOSAT        : in RXPACC_NOSAT_Field;
                            RXBR                : in RX_FINFO_RXBR_Field;
                            SFD_LENGTH          : in Bits_8;
-                           Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field
-   is
+                           Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field is
+
       RXPACC_Adjustment : RX_FINFO_RXPACC_Field;
 
    begin
@@ -106,8 +106,8 @@ is
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
                                   RXPACC        : in RX_FINFO_RXPACC_Field;
                                   CIR_PWR       : in RX_FQUAL_CIR_PWR_Field)
-                                  return Float
-   is
+                                  return Float is
+
       subtype Numerator_Range is Long_Float
       range 2.0**17 .. (2.0**16 - 1.0) * 2.0**17;
 
@@ -191,8 +191,8 @@ is
                                      F2            : in RX_FQUAL_FP_AMPL2_Field;
                                      F3            : in RX_FQUAL_FP_AMPL3_Field;
                                      RXPACC        : in RX_FINFO_RXPACC_Field)
-                                     return Float
-   is
+                                     return Float is
+
       subtype F_Range is Long_Float range 0.0 .. (2.0**16 - 1.0)**2;
 
       subtype Numerator_Range  is Long_Float
@@ -282,8 +282,8 @@ is
 
    function Transmitter_Clock_Offset (RXTOFS  : in RX_TTCKO_RXTOFS_Field;
                                       RXTTCKI : in RX_TTCKI_RXTTCKI_Field)
-                                      return Long_Float
-   is
+                                      return Long_Float is
+
       Offset   : Long_Float;
       Interval : Long_Float;
    begin

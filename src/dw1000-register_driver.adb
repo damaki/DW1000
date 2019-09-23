@@ -42,10 +42,14 @@ is
      (Source => Long_Indexed_Header,
       Target => Long_Indexed_Header_Bytes);
 
+   ---------------------
+   --  Read_Register  --
+   ---------------------
+
    procedure Read_Register (Register_ID : in     DW1000.Types.Bits_6;
                             Sub_Address : in     DW1000.Types.Bits_15;
-                            Data        :    out DW1000.Types.Byte_Array)
-   is
+                            Data        :    out DW1000.Types.Byte_Array) is
+
       use type Types.Bits_15;
 
    begin
@@ -91,10 +95,14 @@ is
       end if;
    end Read_Register;
 
+   ----------------------
+   --  Write_Register  --
+   ----------------------
+
    procedure Write_Register (Register_ID : in DW1000.Types.Bits_6;
                              Sub_Address : in DW1000.Types.Bits_15;
-                             Data        : in DW1000.Types.Byte_Array)
-   is
+                             Data        : in DW1000.Types.Byte_Array) is
+
       use type Types.Bits_15;
 
    begin

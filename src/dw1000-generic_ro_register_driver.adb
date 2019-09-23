@@ -39,8 +39,9 @@ is
 
    procedure Deserialize (Source : in     Register_Byte_Array;
                           Target :    out Register_Type)
-     with SPARK_Mode => Off
-   is
+     with SPARK_Mode => Off is
+
+      --  Overlay a byte array onto the target register value.
       Target_Bytes : Register_Byte_Array
         with Import,
         Convention => Ada,
@@ -54,8 +55,7 @@ is
    --  Read  --
    ------------
 
-   procedure Read (Reg : out Register_Type)
-   is
+   procedure Read (Reg : out Register_Type) is
       Reg_Bytes : Register_Byte_Array;
 
    begin

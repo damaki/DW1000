@@ -56,8 +56,7 @@ is
    -------------------------
 
    function Receive_Timestamp (Frame_Info : in Frame_Info_Type)
-                               return Fine_System_Time
-   is
+                               return Fine_System_Time is
    begin
       return Frame_Info.RX_TIME_Reg.RX_STAMP;
    end Receive_Timestamp;
@@ -67,8 +66,7 @@ is
    ----------------------------
 
    function Receive_Signal_Power (Frame_Info : in Frame_Info_Type)
-                                  return Float
-   is
+                                  return Float is
       RXBR       : RX_FINFO_RXBR_Field;
       SFD_LENGTH : Bits_8;
       RXPACC     : RX_FINFO_RXPACC_Field;
@@ -102,8 +100,7 @@ is
    -------------------------------
 
    function First_Path_Signal_Power (Frame_Info : in Frame_Info_Type)
-                                     return Float
-   is
+                                     return Float is
       RXBR       : RX_FINFO_RXBR_Field;
       SFD_LENGTH : Bits_8;
       RXPACC     : RX_FINFO_RXPACC_Field;
@@ -138,8 +135,7 @@ is
    --------------------------------
 
    function Transmitter_Clock_Offset (Frame_Info : in Frame_Info_Type)
-                                      return Long_Float
-   is
+                                      return Long_Float is
    begin
       return Transmitter_Clock_Offset
         (RXTOFS  => Frame_Info.RX_TTCKO_Reg.RXTOFS,
@@ -150,8 +146,7 @@ is
    --  Driver  --
    --------------
 
-   protected body Driver
-   is
+   protected body Driver is
 
       ------------------
       --  Initialize  --
@@ -159,8 +154,7 @@ is
 
       procedure Initialize (Load_Antenna_Delay   : in Boolean;
                             Load_XTAL_Trim       : in Boolean;
-                            Load_UCode_From_ROM  : in Boolean)
-      is
+                            Load_UCode_From_ROM  : in Boolean) is
          Word : Bits_32;
 
          PMSC_CTRL1_Reg : DW1000.Register_Types.PMSC_CTRL1_Type;
@@ -233,8 +227,7 @@ is
       --  Configure  --
       -----------------
 
-      procedure Configure (Config : in Configuration_Type)
-      is
+      procedure Configure (Config : in Configuration_Type) is
       begin
 
          --  110 kbps data rate has special handling
@@ -350,8 +343,7 @@ is
                                   Enable_SFD_Timeout   : in Boolean;
                                   Enable_PHR_Error     : in Boolean;
                                   Enable_RS_Error      : in Boolean;
-                                  Enable_FCS_Error     : in Boolean)
-      is
+                                  Enable_FCS_Error     : in Boolean) is
       begin
          Detect_Frame_Timeout := Enable_Frame_Timeout;
          Detect_SFD_Timeout   := Enable_SFD_Timeout;
@@ -364,8 +356,7 @@ is
       --  Force_Tx_Rx_Off  --
       -----------------------
 
-      procedure Force_Tx_Rx_Off
-      is
+      procedure Force_Tx_Rx_Off is
       begin
          DW1000.Driver.Force_Tx_Rx_Off;
 
@@ -378,8 +369,7 @@ is
       --  Get_Part_ID  --
       -------------------
 
-      function Get_Part_ID return Bits_32
-      is
+      function Get_Part_ID return Bits_32 is
       begin
          return Part_ID;
       end Get_Part_ID;
@@ -388,8 +378,7 @@ is
       --  Get_Lot_ID  --
       ------------------
 
-      function Get_Lot_ID  return Bits_32
-      is
+      function Get_Lot_ID  return Bits_32 is
       begin
          return Lot_ID;
       end Get_Lot_ID;
@@ -398,8 +387,7 @@ is
       --  PHR_Mode  --
       ----------------
 
-      function PHR_Mode return DW1000.Driver.Physical_Header_Modes
-      is
+      function PHR_Mode return DW1000.Driver.Physical_Header_Modes is
       begin
          if Long_Frames then
             return Extended_Frames;
@@ -413,8 +401,7 @@ is
       --------------------------
 
       procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
-                                    Auto_Append_FCS : in Boolean)
-      is
+                                    Auto_Append_FCS : in Boolean) is
       begin
          DW1000.Driver.Start_Tx_Immediate (Rx_After_Tx, Auto_Append_FCS);
 
@@ -427,8 +414,7 @@ is
 
       procedure Start_Tx_Delayed
         (Rx_After_Tx : in     Boolean;
-         Result      :    out DW1000.Driver.Result_Type)
-      is
+         Result      :    out DW1000.Driver.Result_Type) is
       begin
          DW1000.Driver.Start_Tx_Delayed (Rx_After_Tx => Rx_After_Tx,
                                          Result      => Result);
@@ -449,8 +435,7 @@ is
                      Frame_Info :    out Frame_Info_Type;
                      Status     :    out Rx_Status_Type;
                      Overrun    :    out Boolean)
-        when Frame_Ready
-      is
+        when Frame_Ready is
       begin
          pragma Assume (Frame_Ready,
                         "barrier condition is true on entry");
@@ -489,8 +474,7 @@ is
       --  Pending_Frames_Count  --
       ----------------------------
 
-      function Pending_Frames_Count return Natural
-      is
+      function Pending_Frames_Count return Natural is
       begin
          return Rx_Count;
       end Pending_Frames_Count;
@@ -499,8 +483,7 @@ is
       --  Discard_Pending_Frames  --
       ------------------------------
 
-      procedure Discard_Pending_Frames
-      is
+      procedure Discard_Pending_Frames is
       begin
          Rx_Count := 0;
       end Discard_Pending_Frames;
@@ -509,8 +492,7 @@ is
       --  Start_Rx_Immediate  --
       --------------------------
 
-      procedure Start_Rx_Immediate
-      is
+      procedure Start_Rx_Immediate is
       begin
          DW1000.Driver.Start_Rx_Immediate;
       end Start_Rx_Immediate;
@@ -519,18 +501,16 @@ is
       --  Start_Rx_Delayed  --
       ------------------------
 
-      procedure Start_Rx_Delayed (Result  : out Result_Type)
-      is
+      procedure Start_Rx_Delayed (Result  : out Result_Type) is
       begin
-         DW1000.Driver.Start_Rx_Delayed (Result => Result);
+         DW1000.Driver.Start_Rx_Delayed (Result);
       end Start_Rx_Delayed;
 
       ----------------------
       --  Frame_Received  --
       ----------------------
 
-      procedure Frame_Received
-      is
+      procedure Frame_Received is
          RX_FINFO_Reg : DW1000.Register_Types.RX_FINFO_Type;
 
          Frame_Length : Natural;
@@ -619,8 +599,7 @@ is
       --  Receive_Error  --
       ---------------------
 
-      procedure Receive_Error (Result : in Rx_Status_Type)
-      is
+      procedure Receive_Error (Result : in Rx_Status_Type) is
          Next_Idx     : Rx_Frame_Queue_Index;
 
       begin
@@ -646,8 +625,7 @@ is
       --  DW1000_IRQ  --
       ------------------
 
-      procedure DW1000_IRQ
-      is
+      procedure DW1000_IRQ is
          SYS_STATUS_Reg : DW1000.Register_Types.SYS_STATUS_Type;
 
          SYS_STATUS_Clear : DW1000.Register_Types.SYS_STATUS_Type

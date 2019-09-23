@@ -45,8 +45,7 @@ is
    --  Read  --
    ------------
 
-   procedure Read (Reg : out Register_Type)
-   is
+   procedure Read (Reg : out Register_Type) is
    begin
       Read_Driver.Read (Reg);
    end Read;
@@ -55,8 +54,7 @@ is
    --  Write  --
    -------------
 
-   procedure Write (Reg : in Register_Type)
-   is
+   procedure Write (Reg : in Register_Type) is
    begin
       Write_Driver.Write (Reg);
    end Write;
