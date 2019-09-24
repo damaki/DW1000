@@ -24,11 +24,16 @@ package body DW1000.System_Time
 with SPARK_Mode => On
 is
 
+   --------------------------
+   --  System_Time_Offset  --
+   --------------------------
+
    function System_Time_Offset (Time : in Fine_System_Time;
                                 Span : in System_Time_Span)
-                                return Fine_System_Time
-   is
+                                return Fine_System_Time is
+
       Span_FST : constant Fine_System_Time := Fine_System_Time (Span);
+
    begin
       if Fine_System_Time'Last - Time >= Span_FST then
          return Time + Span_FST;
@@ -38,10 +43,13 @@ is
       end if;
    end System_Time_Offset;
 
+   ----------------------
+   --  Calculate_Span  --
+   ----------------------
+
    function Calculate_Span (Start_Time : in Fine_System_Time;
                             End_Time   : in Fine_System_Time)
-                            return System_Time_Span
-   is
+                            return System_Time_Span is
    begin
       if Start_Time <= End_Time then
          return System_Time_Span (End_Time - Start_Time);

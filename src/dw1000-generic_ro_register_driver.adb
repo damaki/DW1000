@@ -25,19 +25,23 @@ with DW1000.Register_Driver;
 package body DW1000.Generic_RO_Register_Driver
 is
    subtype Register_Byte_Array is
-     DW1000.Types.Byte_Array(1 .. Register_Type'Size / 8);
+     DW1000.Types.Byte_Array (1 .. Register_Type'Size / 8);
 
-   procedure Deserialize(Source : in     Register_Byte_Array;
-                         Target :    out Register_Type)
+   -------------------
+   --  Deserialize  --
+   -------------------
+
+   procedure Deserialize (Source : in     Register_Byte_Array;
+                          Target :    out Register_Type)
      with Inline,
      Depends => (Target => Source),
      SPARK_Mode => On;
 
+   procedure Deserialize (Source : in     Register_Byte_Array;
+                          Target :    out Register_Type)
+     with SPARK_Mode => Off is
 
-   procedure Deserialize(Source : in     Register_Byte_Array;
-                         Target :    out Register_Type)
-     with SPARK_Mode => Off
-   is
+      --  Overlay a byte array onto the target register value.
       Target_Bytes : Register_Byte_Array
         with Import,
         Convention => Ada,
@@ -47,18 +51,20 @@ is
       Target_Bytes := Source;
    end Deserialize;
 
+   ------------
+   --  Read  --
+   ------------
 
-   procedure Read(Reg : out Register_Type)
-   is
+   procedure Read (Reg : out Register_Type) is
       Reg_Bytes : Register_Byte_Array;
 
    begin
-      DW1000.Register_Driver.Read_Register(Register_ID,
-                                           Sub_Register,
-                                           Reg_Bytes);
+      DW1000.Register_Driver.Read_Register (Register_ID,
+                                            Sub_Register,
+                                            Reg_Bytes);
 
-      Deserialize(Source => Reg_Bytes,
-                  Target => Reg);
+      Deserialize (Source => Reg_Bytes,
+                   Target => Reg);
    end Read;
 
 end DW1000.Generic_RO_Register_Driver;

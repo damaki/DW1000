@@ -35,9 +35,9 @@ procedure Transmit_Example
              In_Out => (DW1000.BSP.Device_State,
                         DecaDriver.Driver,
                         DecaDriver.Tx_Complete_Flag)),
-  Depends => (DecaDriver.Driver           => + DW1000.BSP.Device_State,
-              DW1000.BSP.Device_State     => + DecaDriver.Driver,
-              DecaDriver.Tx_Complete_Flag => + null,
+  Depends => (DecaDriver.Driver           =>+ DW1000.BSP.Device_State,
+              DW1000.BSP.Device_State     =>+ DecaDriver.Driver,
+              DecaDriver.Tx_Complete_Flag =>+ null,
               null                        => Ada.Real_Time.Clock_Time)
 is
    Packet : constant DW1000.Types.Byte_Array (1 .. 10) := (others => 16#AA#);

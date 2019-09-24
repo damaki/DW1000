@@ -91,7 +91,6 @@ is
          35 => 63.75,
          36 => 63.75);
 
-
    Correction_Table_Ch2_16MHz : constant Correction_Table
      := (0 => 0.25,
          1 => 0.50,
@@ -588,11 +587,15 @@ is
    -------------------------
 
    function Lookup_Correction (Measured_Distance : in Meters;
-                               Table           : in Correction_Table)
+                               Table             : in Correction_Table)
                                return Correction_Distance
      with Global => null,
-     Pre => Table'Length <= 68
-   is
+     Pre => Table'Length <= 68;
+
+   function Lookup_Correction (Measured_Distance : in Meters;
+                               Table             : in Correction_Table)
+                               return Correction_Distance is
+
       Distance_25cm : Short_Distance;
 
       I : Natural;
@@ -632,8 +635,7 @@ is
    function Remove_Ranging_Bias
      (Measured_Distance : in Biased_Distance;
       Channel           : in DW1000.Driver.Channel_Number;
-      PRF               : in DW1000.Driver.PRF_Type) return Meters
-   is
+      PRF               : in DW1000.Driver.PRF_Type) return Meters is
       Initial_Distance : constant Meters := Meters (Measured_Distance);
 
       Correction : Correction_Distance;

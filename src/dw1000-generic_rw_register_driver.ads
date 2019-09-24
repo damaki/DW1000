@@ -41,17 +41,17 @@ generic
 package DW1000.Generic_RW_Register_Driver
 is
 
-   procedure Read(Reg : out Register_Type)
+   procedure Read (Reg : out Register_Type)
      with Inline,
      Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => DW1000.BSP.Device_State,
                  Reg                     => DW1000.BSP.Device_State),
      SPARK_Mode => On;
 
-   procedure Write(Reg : in Register_Type)
+   procedure Write (Reg : in Register_Type)
      with Inline,
      Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Reg),
+     Depends => (DW1000.BSP.Device_State =>+ Reg),
      SPARK_Mode => On;
 
 end DW1000.Generic_RW_Register_Driver;

@@ -26,7 +26,11 @@ with DW1000.Generic_WO_Register_Driver;
 package body DW1000.Generic_RW_Register_Driver
 is
 
-   -- Reuse the Read/Write procedures from the other drivers.
+   -------------------
+   --  Read_Driver  --
+   -------------------
+
+   --  Reuse the Read/Write procedures from the other drivers.
    package Read_Driver is new Generic_RO_Register_Driver
      (Register_Type,
       Register_ID,
@@ -37,18 +41,22 @@ is
       Register_ID,
       Sub_Register);
 
+   ------------
+   --  Read  --
+   ------------
 
-   procedure Read(Reg : out Register_Type)
-   is
+   procedure Read (Reg : out Register_Type) is
    begin
-      Read_Driver.Read(Reg);
+      Read_Driver.Read (Reg);
    end Read;
 
+   -------------
+   --  Write  --
+   -------------
 
-   procedure Write(Reg : in Register_Type)
-   is
+   procedure Write (Reg : in Register_Type) is
    begin
-      Write_Driver.Write(Reg);
+      Write_Driver.Write (Reg);
    end Write;
 
 end DW1000.Generic_RW_Register_Driver;

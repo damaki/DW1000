@@ -63,7 +63,6 @@ is
    --  @param Non_Standard_SFD Determines whether or not the standards-defined
    --     SFD sequence is used, or the DecaWave defined sequence is used.
 
-
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
                                   RXPACC        : in RX_FINFO_RXPACC_Field;
                                   CIR_PWR       : in RX_FQUAL_CIR_PWR_Field)
@@ -84,7 +83,6 @@ is
    --
    --  @return The estimated receive signal power in dBm. The theoretical range
    --     is -166.90 dBm to -14.43 dBm.
-
 
    function First_Path_Signal_Power (Use_16MHz_PRF : in Boolean;
                                      F1            : in RX_TIME_FP_AMPL1_Field;
@@ -112,7 +110,6 @@ is
    --
    --  @return The estimated first path power in dBm. The theoretical range
    --     is -218.07 dBm to -12.67 dBm.
-
 
    function Transmitter_Clock_Offset (RXTOFS  : in RX_TTCKO_RXTOFS_Field;
                                       RXTTCKI : in RX_TTCKI_RXTTCKI_Field)

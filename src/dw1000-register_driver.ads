@@ -43,7 +43,6 @@ is
    --
    --  This bit is only used for the 2 octet and 3 octet long headers.
 
-
    type Non_Indexed_Header is record
       Register_ID : DW1000.Types.Bits_6 := 0;
       Sub_Index   : Sub_Index_Type      := Not_Present;
@@ -76,7 +75,6 @@ is
    --
    --  In this header the Sub_Index field must always be set to Present
    --  and the Extended_Address field must always be set to Not_Extended.
-
 
    for Short_Indexed_Header use record
       Register_ID          at 0 range  0 ..  5;
@@ -112,23 +110,22 @@ is
       Register_Sub_Address_MSB at 0 range 16 .. 23;
    end record;
 
-
-   procedure Read_Register(Register_ID : in     DW1000.Types.Bits_6;
-                           Sub_Address : in     DW1000.Types.Bits_15;
-                           Data        :    out DW1000.Types.Byte_Array)
+   procedure Read_Register (Register_ID : in     DW1000.Types.Bits_6;
+                            Sub_Address : in     DW1000.Types.Bits_15;
+                            Data        :    out DW1000.Types.Byte_Array)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (Register_ID, Sub_Address, Data),
+     Depends => (DW1000.BSP.Device_State =>+ (Register_ID, Sub_Address, Data),
                  Data                    => (DW1000.BSP.Device_State,
                                              Register_ID,
                                              Sub_Address)),
      Pre => Data'Length > 0;
    --  Read a register on the DW1000.
 
-   procedure Write_Register(Register_ID : in DW1000.Types.Bits_6;
-                            Sub_Address : in DW1000.Types.Bits_15;
-                            Data        : in DW1000.Types.Byte_Array)
+   procedure Write_Register (Register_ID : in DW1000.Types.Bits_6;
+                             Sub_Address : in DW1000.Types.Bits_15;
+                             Data        : in DW1000.Types.Byte_Array)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (Register_ID, Sub_Address, Data)),
+     Depends => (DW1000.BSP.Device_State =>+ (Register_ID, Sub_Address, Data)),
      Pre => Data'Length > 0;
    --  Write to a register on the DW1000.
 

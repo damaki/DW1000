@@ -21,20 +21,48 @@
 -------------------------------------------------------------------------------
 
 with Ada.Numerics.Generic_Elementary_Functions;
-with DW1000.Register_Types;                     use DW1000.Register_Types;
 with Interfaces;                                use Interfaces;
 
 package body DW1000.Reception_Quality
 with SPARK_Mode => On
 is
 
+   -------------
+   --  Log10  --
+   -------------
+
+   function Log10 (X : in Long_Float) return Long_Float
+     with Global => null,
+     Pre => X > 0.0;
+   --  Compute the base 10 logarithm.
+   --
+   --  This function is a wrapper around the Log function in the package
+   --  Ada.Numerics.Generic_Elementary_Functions. This is necessary since
+   --  the Ada.Numerics.Generic_Elementary_Functions package is not in SPARK.
+   --
+   --  The precondition of this function ensures that the Log function in
+   --  Ada.Numerics.Generic_Elementary_Functions doesn't raise an
+   --  Argument_Error function.
+
+   function Log10 (X : in Long_Float) return Long_Float
+     with SPARK_Mode => Off is
+
+      package Long_Float_Math is
+        new Ada.Numerics.Generic_Elementary_Functions (Long_Float);
+   begin
+      return Long_Float_Math.Log (X, 10.0);
+   end Log10;
+
+   ---------------------
+   --  Adjust_RXPACC  --
+   ---------------------
 
    function Adjust_RXPACC (RXPACC              : in RX_FINFO_RXPACC_Field;
                            RXPACC_NOSAT        : in RXPACC_NOSAT_Field;
                            RXBR                : in RX_FINFO_RXBR_Field;
                            SFD_LENGTH          : in Bits_8;
-                           Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field
-   is
+                           Non_Standard_SFD    : in Boolean) return RX_FINFO_RXPACC_Field is
+
       RXPACC_Adjustment : RX_FINFO_RXPACC_Field;
 
    begin
@@ -52,10 +80,10 @@ is
          else
             --  Standard-defined SFD sequence is used
             if RXBR = Data_Rate_110K then
-               -- 110 kbps data rate. SFD length is always 64 symbols
+               --  110 kbps data rate. SFD length is always 64 symbols
                RXPACC_Adjustment := 64;
             else
-               -- 850 kbps and 6.8 Mbps. SFD length is always 8 symbols.
+               --  850 kbps and 6.8 Mbps. SFD length is always 8 symbols.
                RXPACC_Adjustment := 5;
             end if;
          end if;
@@ -71,37 +99,15 @@ is
       end if;
    end Adjust_RXPACC;
 
-
-   function Log10 (X : in Long_Float) return Long_Float
-     with Global => null,
-     Pre => X > 0.0;
-   --  Compute the base 10 logarithm.
-   --
-   --  This function is a wrapper around the Log function in the package
-   --  Ada.Numerics.Generic_Elementary_Functions. This is necessary since
-   --  it doesn't have the necessary SPARK annotations, so it is hidden from
-   --  SPARK with this function.
-   --
-   --  The precondition of this function ensures that the Log function in
-   --  Ada.Numerics.Generic_Elementary_Functions doesn't raise an
-   --  Argument_Error function.
-
-
-   function Log10 (X : in Long_Float) return Long_Float
-     with SPARK_Mode => Off
-   is
-      package Long_Float_Math is
-        new Ada.Numerics.Generic_Elementary_Functions (Long_Float);
-   begin
-      return Long_Float_Math.Log (X, 10.0);
-   end Log10;
-
+   ----------------------------
+   --  Receive_Signal_Power  --
+   ----------------------------
 
    function Receive_Signal_Power (Use_16MHz_PRF : in Boolean;
                                   RXPACC        : in RX_FINFO_RXPACC_Field;
                                   CIR_PWR       : in RX_FQUAL_CIR_PWR_Field)
-                                  return Float
-   is
+                                  return Float is
+
       subtype Numerator_Range is Long_Float
       range 2.0**17 .. (2.0**16 - 1.0) * 2.0**17;
 
@@ -176,14 +182,17 @@ is
 
    end Receive_Signal_Power;
 
+   -------------------------------
+   --  First_Path_Signal_Power  --
+   -------------------------------
 
    function First_Path_Signal_Power (Use_16MHz_PRF : in Boolean;
                                      F1            : in RX_TIME_FP_AMPL1_Field;
                                      F2            : in RX_FQUAL_FP_AMPL2_Field;
                                      F3            : in RX_FQUAL_FP_AMPL3_Field;
                                      RXPACC        : in RX_FINFO_RXPACC_Field)
-                                     return Float
-   is
+                                     return Float is
+
       subtype F_Range is Long_Float range 0.0 .. (2.0**16 - 1.0)**2;
 
       subtype Numerator_Range  is Long_Float
@@ -267,11 +276,14 @@ is
 
    end First_Path_Signal_Power;
 
+   --------------------------------
+   --  Transmitter_Clock_Offset  --
+   --------------------------------
 
    function Transmitter_Clock_Offset (RXTOFS  : in RX_TTCKO_RXTOFS_Field;
                                       RXTTCKI : in RX_TTCKI_RXTTCKI_Field)
-                                      return Long_Float
-   is
+                                      return Long_Float is
+
       Offset   : Long_Float;
       Interval : Long_Float;
    begin

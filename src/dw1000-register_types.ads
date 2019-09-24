@@ -33,7 +33,7 @@ with SPARK_Mode => On
 is
 
    ----------------------------------------------------------------------------
-   -- DEV_ID register file
+   --  DEV_ID register file
 
    type DEV_ID_Type is record
       REV    : Types.Bits_4  := 2#0000#;
@@ -53,7 +53,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- EUI register file
+   --  EUI register file
 
    type EUI_Type is record
       EUI : Types.Bits_64;
@@ -67,7 +67,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- PANDADR register file
+   --  PANDADR register file
 
    type PANADR_Type is record
       SHORT_ADDR : Types.Bits_16 := 16#FFFF#;
@@ -83,7 +83,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- SYS_CFG register file
+   --  SYS_CFG register file
 
    type SYS_CFG_FFEN_Field is
      (Disabled,
@@ -292,7 +292,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- SYS_TIME register file
+   --  SYS_TIME register file
 
    type SYS_TIME_Type is record
       SYS_TIME : System_Time.Coarse_System_Time;
@@ -302,7 +302,7 @@ is
      Scalar_Storage_Order => System.Low_Order_First;
 
    ----------------------------------------------------------------------------
-   -- TX_FCTRL register file
+   --  TX_FCTRL register file
 
    type TX_FCTRL_TFLEN_Field is range 0 .. 127
      with Size => 7;
@@ -384,10 +384,10 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- TX_BUFFER register file
+   --  TX_BUFFER register file
 
    type TX_BUFFER_Type is record
-      TX_BUFFER : Types.Byte_Array(1 .. 1024) := (others => 0);
+      TX_BUFFER : Types.Byte_Array (1 .. 1024) := (others => 0);
    end record
      with Size => 8192,
      Bit_Order => System.Low_Order_First,
@@ -398,7 +398,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- DX_TIME register file
+   --  DX_TIME register file
 
    type DX_TIME_Type is record
       DX_TIME : System_Time.Coarse_System_Time := 0.0;
@@ -408,7 +408,7 @@ is
      Scalar_Storage_Order => System.Low_Order_First;
 
    ----------------------------------------------------------------------------
-   -- RX_FWTO register file
+   --  RX_FWTO register file
 
    type RX_FWTO_Type is record
       RXFWTO : System_Time.Frame_Wait_Timeout_Time := 0.0;
@@ -422,7 +422,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- SYS_CTRL register file
+   --  SYS_CTRL register file
 
    type SYS_CTRL_SFCST_Field is
      (Not_Suppressed,
@@ -518,7 +518,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- SYS_MASK register file
+   --  SYS_MASK register file
 
    type SYS_MASK_Mask_Field is
      (Masked,
@@ -603,7 +603,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- SYS_STATUS register file
+   --  SYS_STATUS register file
 
    type SYS_STATUS_Type is record
       IRQS      : Types.Bits_1  := 0;
@@ -691,7 +691,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- RX_FINFO register file
+   --  RX_FINFO register file
 
    type RX_FINFO_RXFLEN_Field is range 0 .. 127
      with Size => 7;
@@ -769,10 +769,10 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- RX_BUFFER register file
+   --  RX_BUFFER register file
 
    type RX_BUFFER_Type is record
-      RX_BUFFER : Types.Byte_Array(1 .. 1024) := (others => 0);
+      RX_BUFFER : Types.Byte_Array (1 .. 1024) := (others => 0);
    end record
      with Size => 8192,
      Bit_Order => System.Low_Order_First,
@@ -783,7 +783,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- RX_FQUAL register file
+   --  RX_FQUAL register file
 
    type RX_FQUAL_STD_NOISE_Field is range 0 .. 2**16 - 1
      with Size => 16;
@@ -819,7 +819,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- RX_TTCKI register file
+   --  RX_TTCKI register file
 
    type RX_TTCKI_RXTTCKI_Field is range 0 .. 2**32 - 1
      with Size => 32;
@@ -837,7 +837,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- RX_TTCKO register file
+   --  RX_TTCKO register file
 
    type RX_TTCKO_RXTOFS_Field is range -2**18 .. 2**18 - 1
      with Size => 19;
@@ -881,7 +881,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- RX_TIME register file
+   --  RX_TIME register file
 
    type RX_TIME_FP_INDEX_Field is range 0 .. 2**16 - 1
      with Size => 16;
@@ -897,7 +897,7 @@ is
       FP_AMPL1 : RX_TIME_FP_AMPL1_Field         := 0;
       RX_RAWST : System_Time.Coarse_System_Time := 0.0;
    end record
-     with Size => 8*14,
+     with Size => 8 * 14,
      Bit_Order => System.Low_Order_First,
      Scalar_Storage_Order => System.Low_Order_First;
 
@@ -909,7 +909,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- TX_TIME register file
+   --  TX_TIME register file
 
    type TX_TIME_Type is record
       TX_STAMP : System_Time.Fine_System_Time   := 0.0;
@@ -925,7 +925,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- TX_ANTD register file
+   --  TX_ANTD register file
 
    type TX_ANTD_Type is record
       TX_ANTD : System_Time.Antenna_Delay_Time := 0.0;
@@ -943,11 +943,11 @@ is
 
    type SYS_STATE_TX_STATE_Field is
      (Idle,
-      Preamble,
-      SFD,
-      PHR,
-      SDE,
-      DATA,
+      Transmitting_Preamble,
+      Transmitting_SFD,
+      Transmitting_PHR,
+      Transmitting_SDE,
+      Transmitting_DATA,
       Reserved_0110,
       Reserved_0111,
       Reserved_1000,
@@ -1044,7 +1044,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- ACK_RESP_T register file
+   --  ACK_RESP_T register file
 
    type ACK_RESP_T_ACK_TIM_Field is range 0 .. 255
      with Size => 8;
@@ -1069,7 +1069,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- RX_SNIFF register file
+   --  RX_SNIFF register file
 
    type RX_SNIFF_SNIFF_ONT_Field is range 0 .. 15
      with Size => 4;
@@ -1097,7 +1097,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- TX_POWER register file
+   --  TX_POWER register file
 
    type TX_POWER_COARSE_Field is
      (Gain_15_dB,
@@ -1152,7 +1152,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- CHAN_CTRL register file
+   --  CHAN_CTRL register file
 
    type CHAN_CTRL_Channel_Field is range 0 .. 15
      with Size => 4;
@@ -1221,21 +1221,21 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- USR_SFD register file
+   --  USR_SFD register file
 
    type USR_SFD_Type is record
-      Sub_Registers : Types.Byte_Array(0 .. 40);
+      Sub_Registers : Types.Byte_Array (0 .. 40);
    end record
-     with Size => 41*8,
+     with Size => 41 * 8,
      Bit_Order => System.Low_Order_First,
      Scalar_Storage_Order => System.Low_Order_First;
 
    for USR_SFD_Type use record
-      Sub_Registers at 0 range 0 .. 41*8 - 1;
+      Sub_Registers at 0 range 0 .. (41 * 8) - 1;
    end record;
 
    ----------------------------------------------------------------------------
-   -- AGC_CTRL register file
+   --  AGC_CTRL register file
 
    ------------------------------
    --  AGC_CTRL1 sub-register  --
@@ -1352,7 +1352,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- EXT_SYNC register file
+   --  EXT_SYNC register file
 
    ---------------------------
    -- EC_CTRL sub-register  --
@@ -1453,7 +1453,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- ACC_MEM register file
+   --  ACC_MEM register file
 
    type ACC_MEM_Number_Type is range -32_768 .. 32_767
      with Size => 16;
@@ -1471,21 +1471,21 @@ is
       Imag at 2 range 0 .. 15;
    end record;
 
-   type ACC_MEM_CIR_Array is array(Types.Index range <>) of ACC_MEM_Sample_Type;
+   type ACC_MEM_CIR_Array is array (Types.Index range <>) of ACC_MEM_Sample_Type;
 
    type ACC_MEM_Type is record
       CIR : ACC_MEM_CIR_Array (0 .. 1015);
    end record
-     with Size => 4064*8,
+     with Size => 4064 * 8,
      Bit_Order => System.Low_Order_First,
      Scalar_Storage_Order => System.Low_Order_First;
 
    for ACC_MEM_Type use record
-      CIR at 0 range 0 .. (4064*8) - 1;
+      CIR at 0 range 0 .. (4064 * 8) - 1;
    end record;
 
    ----------------------------------------------------------------------------
-   -- GPIO_CTRL register file
+   --  GPIO_CTRL register file
 
    -----------------------------
    -- GPIO_MODE sub-register  --
@@ -2014,7 +2014,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- DRX_CONF register file
+   --  DRX_CONF register file
 
    ------------------------------
    -- DRX_TUNE0b sub-register  --
@@ -2070,7 +2070,7 @@ is
    --  Preamble lengths > 1024 symbols, for 110 kbps operation
 
    DRX_TUNE1b_850K_6M8 : constant DRX_TUNE1b_Field := 16#0020#;
-   -- Preamble lengths 128 to 1024 symbols, for 850 kbps and 6.8 Mbps operation
+   --  Preamble lengths 128 to 1024 symbols, for 850 kbps and 6.8 Mbps operation
 
    DRX_TUNE1b_6M8      : constant DRX_TUNE1b_Field := 16#0010#;
    --  Preamble length = 64 symbols, for 6.8 Mbps operation
@@ -2189,7 +2189,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- RF_CONF register file
+   --  RF_CONF register file
 
    ---------------------------
    -- RF_CONF sub-register  --
@@ -2338,7 +2338,7 @@ is
 
    type LDOTUNE_Field is new Bits_40;
 
-   type LDOTUNE_Type is Record
+   type LDOTUNE_Type is record
       LDOTUNE : LDOTUNE_Field := 16#88_8888_8888#;
    end record
      with Size => 40,
@@ -2350,7 +2350,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- TX_CAL register file
+   --  TX_CAL register file
 
    ---------------------------
    -- TC_SARC sub-register  --
@@ -2537,7 +2537,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- FS_CTRL register file
+   --  FS_CTRL register file
 
    -----------------------------
    -- FS_PLLCFG sub-register  --
@@ -2611,7 +2611,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- AON register file
+   --  AON register file
 
    ----------------------------
    -- AON_WCFG sub-register  --
@@ -2680,7 +2680,7 @@ is
       Reserved_2 : Types.Bits_2 := 0;
       Reserved_3 : Types.Bits_2 := 0;
       Reserved_4 : Types.Bits_3 := 0;
-   end Record
+   end record
      with Size => 16,
      Bit_Order => System.Low_Order_First,
      Scalar_Storage_Order => System.Low_Order_First;
@@ -2909,7 +2909,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- OTP_IF register file
+   --  OTP_IF register file
 
    ----------------------------
    -- OTP_WDAT sub-register  --
@@ -3124,7 +3124,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- LDE_IF register file
+   --  LDE_IF register file
 
    ------------------------------
    -- LDE_THRESH sub-register  --
@@ -3283,7 +3283,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- DIG_DIAG register file
+   --  DIG_DIAG register file
 
    ----------------------------
    -- EVC_CTRL sub-register  --
@@ -3296,7 +3296,7 @@ is
    --  Event Counters Enable.
 
    type EVC_CTRL_EVC_CLR_Field is
-     (No_action,
+     (No_Action,
       Clear_Counters)
      with Size => 1;
    --  Event Counters Clear.
@@ -3578,7 +3578,7 @@ is
    end record;
 
    ----------------------------------------------------------------------------
-   -- PMSC register file
+   --  PMSC register file
 
    type PMSC_CTRL0_SYSCLKS_Field is
      (Auto,
@@ -3755,7 +3755,7 @@ is
      (Disabled,
       Enabled)
      with Size => 1;
-   -- This enables a special 1 GHz clock used for some external SYNC modes.
+   --  This enables a special 1 GHz clock used for some external SYNC modes.
 
    type PMSC_CTRL1_LDERUNE_Field is
      (Disabled,

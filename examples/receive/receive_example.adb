@@ -32,8 +32,8 @@ procedure Receive_Example
   Global => (Input  => Ada.Real_Time.Clock_Time,
              In_Out => (DW1000.BSP.Device_State,
                         DecaDriver.Driver)),
-  Depends => (DecaDriver.Driver         => + DW1000.BSP.Device_State,
-              DW1000.BSP.Device_State   => + DecaDriver.Driver,
+  Depends => (DecaDriver.Driver         =>+ DW1000.BSP.Device_State,
+              DW1000.BSP.Device_State   =>+ DecaDriver.Driver,
               null                      => Ada.Real_Time.Clock_Time)
 is
    Rx_Packet        : DW1000.Types.Byte_Array (1 .. 127) := (others => 0);
@@ -78,7 +78,7 @@ begin
    --  so configure the DW1000 to automatically re-enable the receiver when
    --  errors occur. The driver will not be notified of receiver errors whilst
    --  this is enabled.
-   DW1000.Driver.Set_Auto_Rx_Reenable (Enabled => True);
+   DW1000.Driver.Set_Auto_Rx_Reenable (Enable => True);
 
    --  Continuously receive packets
    loop

@@ -59,7 +59,7 @@ is
       Data_Rate_6M8  => 2#10#);
 
    type Channel_Number is range 1 .. 7
-     with Static_Predicate => Channel_Number in 1..5 | 7;
+     with Static_Predicate => Channel_Number in 1 .. 5 | 7;
    --  Channels 1 .. 5 and 7 are supported by the DW1000.
 
    type PRF_Type is (PRF_16MHz, PRF_64MHz);
@@ -128,7 +128,6 @@ is
           when PAC_32 => 32,
           when PAC_64 => 64);
 
-
    function To_Positive (Preamble_Length : in Preamble_Lengths) return Positive
    is (case Preamble_Length is
           when PLEN_64   => 64,
@@ -155,7 +154,6 @@ is
    --  on the preamble length.
    --
    --  These recommendations are from Section 4.1.1 of the DW1000 User Manual.
-
 
    function Recommended_SFD_Timeout
      (Preamble_Length : in Preamble_Lengths;
@@ -198,7 +196,7 @@ is
 
    procedure Enable_Clocks (Clock : in Clocks)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Clock);
+     Depends => (DW1000.BSP.Device_State =>+ Clock);
    --  Enables and configures the specified clock.
    --
    --  This procedure configures the following registers:
@@ -214,14 +212,14 @@ is
    --  The package DW1000.Constants defines the addresses used to store the
    --  various data stored in the OTP memory.
 
-   procedure Read_OTP_Tx_Power_Level (Channel  : in     Channel_Number;
-                                      PRF      : in     PRF_Type;
-                                      Tx_Power :    out TX_POWER_Type)
+   procedure Read_OTP_Tx_Power_Level (Channel     : in     Channel_Number;
+                                      PRF         : in     PRF_Type;
+                                      Power_Level :    out TX_POWER_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                              Channel,
                                              PRF),
-                 Tx_Power                => (DW1000.BSP.Device_State,
+                 Power_Level             => (DW1000.BSP.Device_State,
                                              Channel,
                                              PRF));
 
@@ -235,7 +233,7 @@ is
 
    procedure Configure_Tx_Power (Config : Tx_Power_Config_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Config);
+     Depends => (DW1000.BSP.Device_State =>+ Config);
    --  Configure the transmit power of the DW1000 transmitter.
    --
    --  This procedure is used to configure both smart transmit power and
@@ -284,7 +282,7 @@ is
 
    procedure Write_EUID (EUID : in Bits_64)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + EUID);
+     Depends => (DW1000.BSP.Device_State =>+ EUID);
    --  Write the extended unique identifier (EUID).
 
    procedure Read_PAN_ID (PAN_ID : out Bits_16)
@@ -293,7 +291,7 @@ is
 
    procedure Write_PAN_ID (PAN_ID : in Bits_16)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + PAN_ID);
+     Depends => (DW1000.BSP.Device_State =>+ PAN_ID);
 
    procedure Read_Short_Address (Short_Address : out Bits_16)
      with Global => (In_Out => DW1000.BSP.Device_State),
@@ -302,7 +300,7 @@ is
 
    procedure Write_Short_Address (Short_Address : in Bits_16)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Short_Address);
+     Depends => (DW1000.BSP.Device_State =>+ Short_Address);
 
    procedure Read_PAN_ID_And_Short_Address (PAN_ID        : out Bits_16;
                                             Short_Address : out Bits_16)
@@ -314,7 +312,7 @@ is
    procedure Write_PAN_ID_And_Short_Address (PAN_ID        : in Bits_16;
                                              Short_Address : in Bits_16)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (PAN_ID, Short_Address));
+     Depends => (DW1000.BSP.Device_State =>+ (PAN_ID, Short_Address));
 
    procedure Read_Tx_Antenna_Delay (Antenna_Delay : out Antenna_Delay_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
@@ -434,7 +432,7 @@ is
 
    procedure Configure_AGC (PRF : in PRF_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + PRF);
+     Depends => (DW1000.BSP.Device_State =>+ PRF);
    --  Configures the automatic gain control (AGC) subsystem.
    --
    --  This procedure configures the following registers:
@@ -443,7 +441,7 @@ is
 
    procedure Configure_TC (Channel : in Channel_Number)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Channel);
+     Depends => (DW1000.BSP.Device_State =>+ Channel);
    --  Configure the transmit calibration (TC) block for the specified channel.
 
    procedure Configure_TX_FCTRL (Frame_Length        : in Natural;
@@ -468,7 +466,6 @@ is
         and then Frame_Length + Tx_Buffer_Offset <= Constants.TX_BUFFER_Length
         and then Inter_Frame_Spacing < 256);
 
-
    procedure Configure_CHAN_CTRL
      (Tx_Channel              : in Channel_Number;
       Rx_Channel              : in Channel_Number;
@@ -491,10 +488,9 @@ is
      Pre => ((if Use_Tx_User_Defined_SFD then not Use_DecaWave_SFD)
              and (if Use_Rx_User_Defined_SFD then not Use_DecaWave_SFD));
 
-
    procedure Configure_Nonstandard_SFD_Length (Data_Rate : in Data_Rates)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Data_Rate);
+     Depends => (DW1000.BSP.Device_State =>+ Data_Rate);
    --  Configures the length of the non-standard SFD for the specified
    --  data rate.
    --
@@ -504,7 +500,7 @@ is
    procedure Configure_Non_Standard_SFD (Rx_SFD : in String;
                                          Tx_SFD : in String)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (Rx_SFD, Tx_SFD)),
+     Depends => (DW1000.BSP.Device_State =>+ (Rx_SFD, Tx_SFD)),
      Pre => (Rx_SFD'Length in 8 .. 16 | 64
              and Tx_SFD'Length = Rx_SFD'Length
              and (for all I in Rx_SFD'Range => Rx_SFD (I) in '+' | '-' | '0')
@@ -531,9 +527,9 @@ is
    --
    --  @param Tx_SFD The SFD sequence to use in the transmitter.
 
-   procedure Set_Frame_Filtering_Enabled (Enabled : in Boolean)
+   procedure Set_Frame_Filtering_Enabled (Enable : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Enabled);
+     Depends => (DW1000.BSP.Device_State =>+ Enable);
    --  Enable or disable frame filtering.
    --
    --  Frame filtering allows the DW1000 to automatically reject frames
@@ -546,9 +542,9 @@ is
    --  @param Enabled When set to True frame filtering is enabled. Otherwise,
    --     it is disabled.
 
-   procedure Set_FCS_Check_Enabled (Enabled : in Boolean)
+   procedure Set_FCS_Check_Enabled (Enable : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Enabled);
+     Depends => (DW1000.BSP.Device_State =>+ Enable);
    --  Enable or disable the automatic frame check sequence (FCS) on received
    --  frames.
    --
@@ -628,9 +624,9 @@ is
    --     When set to False and when frame filtering is enabled the DW1000
    --     will reject these frames.
 
-   procedure Set_Smart_Tx_Power (Enabled : in Boolean)
+   procedure Set_Smart_Tx_Power (Enable : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Enabled);
+     Depends => (DW1000.BSP.Device_State =>+ Enable);
    --  Enables or disables smart Tx power control.
    --
    --  Regulations for UWB typically specify a maximum transmit power limit of
@@ -647,7 +643,6 @@ is
    --
    --  This procedure configures the following registers:
    --    * SYS_CFG
-
 
    procedure Set_Tx_Data (Data   : in Types.Byte_Array;
                           Offset : in Natural)
@@ -674,7 +669,7 @@ is
    procedure Set_Tx_Frame_Length (Length : in Natural;
                                   Offset : in Natural)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (Length, Offset)),
+     Depends => (DW1000.BSP.Device_State =>+ (Length, Offset)),
      Pre => (Length < DW1000.Constants.TX_BUFFER_Length
              and then Offset < DW1000.Constants.TX_BUFFER_Length
              and then Length + Offset <= DW1000.Constants.TX_BUFFER_Length);
@@ -687,7 +682,7 @@ is
    procedure Read_Rx_Data (Data   :    out Types.Byte_Array;
                            Offset : in     Natural)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (Offset, Data),
+     Depends => (DW1000.BSP.Device_State =>+ (Offset, Data),
                  Data                    => (DW1000.BSP.Device_State, Offset)),
      Pre =>
        (Data'Length > 0
@@ -699,12 +694,12 @@ is
    procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
                                  Auto_Append_FCS : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (Rx_After_Tx, Auto_Append_FCS));
+     Depends => (DW1000.BSP.Device_State =>+ (Rx_After_Tx, Auto_Append_FCS));
 
    procedure Start_Tx_Delayed (Rx_After_Tx : in     Boolean;
                                Result      :    out Result_Type)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Rx_After_Tx,
+     Depends => (DW1000.BSP.Device_State =>+ Rx_After_Tx,
                  Result                  => (DW1000.BSP.Device_State,
                                              Rx_After_Tx));
    --  Transmit the contents of the TX buffer with a delay.
@@ -720,7 +715,7 @@ is
 
    procedure Set_Delayed_Tx_Rx_Time (Delay_Time : in Coarse_System_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Delay_Time);
+     Depends => (DW1000.BSP.Device_State =>+ Delay_Time);
    --  Set the receive and transmit delay.
    --
    --  Both Rx and Tx share the same delay. It is not possible for the receiver
@@ -736,9 +731,9 @@ is
    --  This procedure configures the following registers:
    --    * DX_TIME
 
-   procedure Set_Sleep_After_Tx (Enabled : in Boolean)
+   procedure Set_Sleep_After_Tx (Enable : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Enabled);
+     Depends => (DW1000.BSP.Device_State =>+ Enable);
    --  Configures the DW1000 to enter sleep more (or not) after transmitting a
    --  frame.
    --
@@ -888,7 +883,7 @@ is
                           Rx_On_Time  : in RX_SNIFF_SNIFF_ONT_Field;
                           Rx_Off_Time : in Sniff_Off_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + (Mode, Rx_On_Time, Rx_Off_Time)),
+     Depends => (DW1000.BSP.Device_State =>+ (Mode, Rx_On_Time, Rx_Off_Time)),
      Pre => (if Mode = Sniff then Rx_Off_Time > 0.0);
    --  Enables or disables the receiver sniff mode.
    --
@@ -917,9 +912,9 @@ is
    --  This procedure configures the following registers:
    --    * RX_SNIFF
 
-   procedure Set_Auto_Rx_Reenable (Enabled : in Boolean)
+   procedure Set_Auto_Rx_Reenable (Enable : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Enabled);
+     Depends => (DW1000.BSP.Device_State =>+ Enable);
    --  Enable or disable the Rx auto re-enable feature.
    --
    --  This feature has different behaviour depending on whether or not the
@@ -941,9 +936,9 @@ is
    --  This procedure configures the following registers:
    --    * SYS_CFG
 
-   procedure Set_Rx_Double_Buffer (Enabled : in Boolean)
+   procedure Set_Rx_Double_Buffer (Enable : in Boolean)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Enabled);
+     Depends => (DW1000.BSP.Device_State =>+ Enable);
    --  Configures double-buffer mode.
    --
    --  By default the DW1000 operates in single-buffer mode. Double-buffer
@@ -958,7 +953,7 @@ is
 
    procedure Set_Rx_Frame_Wait_Timeout (Timeout : in Frame_Wait_Timeout_Time)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Timeout);
+     Depends => (DW1000.BSP.Device_State =>+ Timeout);
    --  Configure the receive timeout.
    --
    --  When the receiver is enabled the receive timeout is started.
@@ -978,9 +973,9 @@ is
    --     E.g. a value of 0.001 is 1 millisecond. The maximum permitted value
    --     is 0.067_215_385, i.e. a little over 67 milliseconds.
 
-   procedure Set_Preamble_Detect_Timeout (Timeout : in Types.Bits_16)
+   procedure Set_Preamble_Detect_Timeout (Timeout : in DRX_PRETOC_Field)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Timeout);
+     Depends => (DW1000.BSP.Device_State =>+ Timeout);
    --  Configure the preamble detection timeout.
    --
    --  When the receiver is enabled the preamble timeout is started.
@@ -1035,7 +1030,7 @@ is
      Depends =>
        (DW1000.BSP.Device_State => (DW1000.BSP.Device_State, Address),
         Data                    => (DW1000.BSP.Device_State, Address));
-   -- Reads a single byte from the Always-On block.
+   --  Reads a single byte from the Always-On block.
 
    procedure AON_Contiguous_Read (Start_Address : in     AON_ADDR_Field;
                                   Data          :    out Types.Byte_Array)
@@ -1043,11 +1038,11 @@ is
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                              Start_Address,
                                              Data),
-                 Data                    => + (DW1000.BSP.Device_State,
+                 Data                    =>+ (DW1000.BSP.Device_State,
                                                Start_Address)),
      Pre => (Data'Length <= 256
              and then Natural (Start_Address) + Data'Length <= 256);
-   -- Reads a contiguous sequence of bytes from the Always-On block.
+   --  Reads a contiguous sequence of bytes from the Always-On block.
 
    procedure AON_Scatter_Read (Addresses : in     AON_Address_Array;
                                Data      :    out Types.Byte_Array)
@@ -1055,7 +1050,7 @@ is
      Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                              Addresses,
                                              Data),
-                 Data                    => + (DW1000.BSP.Device_State,
+                 Data                    =>+ (DW1000.BSP.Device_State,
                                                Addresses)),
      Pre => Addresses'Length = Data'Length;
    --  Reads a non-contiguous set of bytes from the Always-on block.
@@ -1066,11 +1061,11 @@ is
 
    procedure Configure_Sleep_Count (Sleep_Count : in AON_CFG0_SLEEP_TIM_Field)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Sleep_Count);
+     Depends => (DW1000.BSP.Device_State =>+ Sleep_Count);
 
    procedure Set_XTAL_Trim (Trim : in FS_XTALT_Field)
      with Global => (In_Out => DW1000.BSP.Device_State),
-     Depends => (DW1000.BSP.Device_State => + Trim);
+     Depends => (DW1000.BSP.Device_State =>+ Trim);
 
    procedure Configure_LEDs (Tx_LED_Enable    : in Boolean;
                              Rx_LED_Enable    : in Boolean;

@@ -74,7 +74,6 @@ is
      with Global => (In_Out => Device_State);
    --  Enables the DW1000 IRQ.
 
-
    procedure Use_Slow_SPI_Clock
      with Global => (In_Out => Device_State);
    --  Switch the BSP to use a slow SPI clock speed (no faster than 3 MHz).
@@ -82,14 +81,12 @@ is
    --  The slow SPI clock speed should be used when the DW1000 is in the INIT
    --  state.
 
-
    procedure Use_Fast_SPI_Clock
      with Global => (In_Out => Device_State);
    --  Switch the BSP to use a faster SPI clock speed (no faster than 20 MHz).
    --
    --  The fast SPI clock speed can be used when the DW1000 has left the INIT
    --  state.
-
 
    procedure Wakeup (Wait_For_INIT : in Boolean)
      with Global => (In_Out => Device_State);
@@ -105,11 +102,10 @@ is
    --  This is a non-blocking function (the Ada 'delay' statement is not used).
    --  Instead, a busy wait is be used for the delays.
 
-
-   procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
-                               Data   : in DW1000.Types.Byte_Array)
+   procedure Write_Transaction (Header : in DW1000.Types.Byte_Array;
+                                Data   : in DW1000.Types.Byte_Array)
      with Global => (In_Out => Device_State),
-     Depends => (Device_State => + (Header, Data)),
+     Depends => (Device_State =>+ (Header, Data)),
      Pre => (Header'Length in 1 .. 3
              and Data'Length > 0);
    --  Perform a "write" transaction to the DW1000.
@@ -126,10 +122,10 @@ is
    --  Note: This procedure must not block. I.e. the procedure must not use
    --  the 'delay until' statement, nor call any protected entries.
 
-   procedure Read_Transaction(Header : in     DW1000.Types.Byte_Array;
+   procedure Read_Transaction (Header : in     DW1000.Types.Byte_Array;
                               Data   :    out DW1000.Types.Byte_Array)
      with Global => (In_Out => Device_State),
-     Depends => (Device_State => + (Header, Data),
+     Depends => (Device_State =>+ (Header, Data),
                  Data         => (Header, Device_State)),
      Pre => (Header'Length in 1 .. 3
              and Data'Length > 0);

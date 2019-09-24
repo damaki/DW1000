@@ -60,7 +60,6 @@ is
    --     measurement contains a bias which must be removed to obtain a more
    --     accurate measurement.
 
-
    function Compute_Distance
      (Tag_Tx_Poll_Timestamp     : in Fine_System_Time;
       Anchor_Rx_Poll_Timestamp  : in Fine_System_Time;

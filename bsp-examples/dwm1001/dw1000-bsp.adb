@@ -78,27 +78,24 @@ is
    --  give this protected object an Interrupt_Priority.
 
    protected Driver
-     with Interrupt_Priority => DecaDriver_Config.Driver_Priority
-   is
-      procedure Reset_DW1000;
+     with Interrupt_Priority => DecaDriver_Config.Driver_Priority is
+      procedure PO_Reset_DW1000;
 
-      procedure Get_Reset_State (State : out DW1000.Types.Bits_1);
+      procedure PO_Get_Reset_State (State : out DW1000.Types.Bits_1);
 
-      procedure Use_Slow_SPI_Clock;
+      procedure PO_Use_Slow_SPI_Clock;
 
-      procedure Use_Fast_SPI_Clock;
+      procedure PO_Use_Fast_SPI_Clock;
 
-      procedure Wakeup (Wait_For_INIT : in Boolean);
+      procedure PO_Wakeup (Wait_For_INIT : in Boolean);
 
-      procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
-                                  Data   : in DW1000.Types.Byte_Array)
-        with Pre => (Header'Length in 1 .. 3
-                     and Data'Length > 0);
+      procedure PO_Write_Transaction (Header : in DW1000.Types.Byte_Array;
+                                      Data   : in DW1000.Types.Byte_Array)
+        with Pre => (Header'Length in 1 .. 3 and Data'Length > 0);
 
-      procedure Read_Transaction(Header : in     DW1000.Types.Byte_Array;
-                                 Data   :    out DW1000.Types.Byte_Array)
-        with Pre => (Header'Length in 1 .. 3
-                     and Data'Length > 0);
+      procedure PO_Read_Transaction (Header : in     DW1000.Types.Byte_Array;
+                                     Data   :    out DW1000.Types.Byte_Array)
+        with Pre => (Header'Length in 1 .. 3 and Data'Length > 0);
 
    private
 
@@ -114,12 +111,11 @@ is
 
    protected body Driver is
 
-      --------------------
-      --  Reset_DW1000  --
-      --------------------
+      -----------------------
+      --  PO_Reset_DW1000  --
+      -----------------------
 
-      procedure Reset_DW1000
-      is
+      procedure PO_Reset_DW1000 is
          End_Time : Ada.Real_Time.Time;
       begin
 
@@ -147,53 +143,49 @@ is
                                            DRIVE  => S0S1,
                                            SENSE  => Disabled,
                                            others => <>);
-      end Reset_DW1000;
+      end PO_Reset_DW1000;
 
-      -----------------------
-      --  Get_Reset_State  --
-      -----------------------
+      --------------------------
+      --  PO_Get_Reset_State  --
+      --------------------------
 
-      procedure Get_Reset_State (State : out DW1000.Types.Bits_1)
-      is
+      procedure PO_Get_Reset_State (State : out DW1000.Types.Bits_1) is
       begin
          if P0_Periph.IN_k.Arr (Reset_Pin) = Low then
             State := 0;
          else
             State := 1;
          end if;
-      end Get_Reset_State;
+      end PO_Get_Reset_State;
 
-      --------------------------
-      --  Use_Slow_SPI_Clock  --
-      --------------------------
+      -----------------------------
+      --  PO_Use_Slow_SPI_Clock  --
+      -----------------------------
 
-      procedure Use_Slow_SPI_Clock
-      is
+      procedure PO_Use_Slow_SPI_Clock is
       begin
          --  Select fastest possible SPI speed that does not exceed 3 MHz.
          SPI1_Periph.ENABLE := (ENABLE => Disabled, others => <>);
          SPI1_Periph.FREQUENCY := SPI_Frequency_2_MHz;
          SPI1_Periph.ENABLE := (ENABLE => Enabled, others => <>);
-      end Use_Slow_SPI_Clock;
+      end PO_Use_Slow_SPI_Clock;
 
-      --------------------------
-      --  Use_Fast_SPI_Clock  --
-      --------------------------
+      -----------------------------
+      --  PO_Use_Fast_SPI_Clock  --
+      -----------------------------
 
-      procedure Use_Fast_SPI_Clock
-      is
+      procedure PO_Use_Fast_SPI_Clock is
       begin
          SPI1_Periph.ENABLE := (ENABLE => Disabled, others => <>);
          SPI1_Periph.FREQUENCY := SPI_Frequency_Max;
          SPI1_Periph.ENABLE := (ENABLE => Enabled, others => <>);
-      end Use_Fast_SPI_Clock;
+      end PO_Use_Fast_SPI_Clock;
 
-      --------------
-      --  Wakeup  --
-      --------------
+      -----------------
+      --  PO_Wakeup  --
+      -----------------
 
-      procedure Wakeup (Wait_For_INIT : in Boolean)
-      is
+      procedure PO_Wakeup (Wait_For_INIT : in Boolean) is
          use type DW1000.Types.Bits_1;
 
          Now        : Ada.Real_Time.Time;
@@ -231,15 +223,14 @@ is
             end loop;
          end if;
 
-      end Wakeup;
+      end PO_Wakeup;
 
-      -------------------------
-      --  Write_Transaction  --
-      -------------------------
+      ----------------------------
+      --  PO_Write_Transaction  --
+      ----------------------------
 
-      procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
-                                  Data   : in DW1000.Types.Byte_Array)
-      is
+      procedure PO_Write_Transaction (Header : in DW1000.Types.Byte_Array;
+                                      Data   : in DW1000.Types.Byte_Array) is
          Dummy : Byte;
 
       begin
@@ -265,15 +256,14 @@ is
 
          Enable_DW1000_IRQ;
 
-      end Write_Transaction;
+      end PO_Write_Transaction;
 
-      ------------------------
-      --  Read_Transaction  --
-      ------------------------
+      ---------------------------
+      --  PO_Read_Transaction  --
+      ---------------------------
 
-      procedure Read_Transaction(Header : in     DW1000.Types.Byte_Array;
-                                 Data   :    out DW1000.Types.Byte_Array)
-      is
+      procedure PO_Read_Transaction (Header : in     DW1000.Types.Byte_Array;
+                                     Data   :    out DW1000.Types.Byte_Array) is
          Rx_Byte : Byte;
 
       begin
@@ -301,15 +291,14 @@ is
 
          Enable_DW1000_IRQ;
 
-      end Read_Transaction;
+      end PO_Read_Transaction;
 
       -------------------------
       --  SPI_Transfer_Byte  --
       -------------------------
 
       procedure SPI_Transfer_Byte (Tx_Byte : in     NRF52.Byte;
-                                   Rx_Byte :    out NRF52.Byte)
-      is
+                                   Rx_Byte :    out NRF52.Byte) is
       begin
          SPI1_Periph.TXD := (TXD => Tx_Byte, others => <>);
 
@@ -328,28 +317,25 @@ is
    --  Reset_DW1000  --
    --------------------
 
-   procedure Reset_DW1000
-   is
+   procedure Reset_DW1000 is
    begin
-      Driver.Reset_DW1000;
+      Driver.PO_Reset_DW1000;
    end Reset_DW1000;
 
    -----------------------
    --  Get_Reset_State  --
    -----------------------
 
-   procedure Get_Reset_State (State : out DW1000.Types.Bits_1)
-   is
+   procedure Get_Reset_State (State : out DW1000.Types.Bits_1) is
    begin
-      Driver.Get_Reset_State (State);
+      Driver.PO_Get_Reset_State (State);
    end Get_Reset_State;
 
    ------------------------------
    --  Acknowledge_DW1000_IRQ  --
    ------------------------------
 
-   procedure Acknowledge_DW1000_IRQ
-   is
+   procedure Acknowledge_DW1000_IRQ is
    begin
       GPIOTE_Periph.EVENTS_IN (IRQ_Event) := (EVENTS_IN => 0, others => <>);
    end Acknowledge_DW1000_IRQ;
@@ -358,8 +344,7 @@ is
    --  Disable_DW1000_IRQ  --
    --------------------------
 
-   procedure Disable_DW1000_IRQ
-   is
+   procedure Disable_DW1000_IRQ is
    begin
       GPIOTE_Periph.INTENCLR.IN_k.Arr (IRQ_Event) := Clear;
    end Disable_DW1000_IRQ;
@@ -368,8 +353,7 @@ is
    --  Enable_DW1000_IRQ  --
    -------------------------
 
-   procedure Enable_DW1000_IRQ
-   is
+   procedure Enable_DW1000_IRQ is
    begin
       GPIOTE_Periph.INTENSET.IN_k.Arr (IRQ_Event) := Set;
    end Enable_DW1000_IRQ;
@@ -378,60 +362,54 @@ is
    --  Use_Slow_SPI_Clock  --
    --------------------------
 
-   procedure Use_Slow_SPI_Clock
-   is
+   procedure Use_Slow_SPI_Clock is
    begin
-      Driver.Use_Slow_SPI_Clock;
+      Driver.PO_Use_Slow_SPI_Clock;
    end Use_Slow_SPI_Clock;
 
    --------------------------
    --  Use_Fast_SPI_Clock  --
    --------------------------
 
-   procedure Use_Fast_SPI_Clock
-   is
+   procedure Use_Fast_SPI_Clock is
    begin
-      Driver.Use_Fast_SPI_Clock;
+      Driver.PO_Use_Fast_SPI_Clock;
    end Use_Fast_SPI_Clock;
 
    --------------
    --  Wakeup  --
    --------------
 
-   procedure Wakeup (Wait_For_INIT : in Boolean)
-   is
+   procedure Wakeup (Wait_For_INIT : in Boolean) is
    begin
-      Driver.Wakeup (Wait_For_INIT);
+      Driver.PO_Wakeup (Wait_For_INIT);
    end Wakeup;
 
    -------------------------
    --  Write_Transaction  --
    -------------------------
 
-   procedure Write_Transaction(Header : in DW1000.Types.Byte_Array;
-                               Data   : in DW1000.Types.Byte_Array)
-   is
+   procedure Write_Transaction (Header : in DW1000.Types.Byte_Array;
+                                Data   : in DW1000.Types.Byte_Array) is
    begin
-      Driver.Write_Transaction (Header, Data);
+      Driver.PO_Write_Transaction (Header, Data);
    end Write_Transaction;
 
    ------------------------
    --  Read_Transaction  --
    ------------------------
 
-   procedure Read_Transaction(Header : in     DW1000.Types.Byte_Array;
-                              Data   :    out DW1000.Types.Byte_Array)
-   is
+   procedure Read_Transaction (Header : in     DW1000.Types.Byte_Array;
+                               Data   :    out DW1000.Types.Byte_Array) is
    begin
-      Driver.Read_Transaction (Header, Data);
+      Driver.PO_Read_Transaction (Header, Data);
    end Read_Transaction;
 
    ---------------------
    --  Select_Device  --
    ---------------------
 
-   procedure Select_Device
-   is
+   procedure Select_Device is
    begin
       P0_Periph.OUTCLR := (As_Array => True,
                            Arr      => (SPI_CS_Pin => Clear,
@@ -442,14 +420,12 @@ is
    --  Deselect_Device  --
    -----------------------
 
-   procedure Deselect_Device
-   is
+   procedure Deselect_Device is
    begin
       P0_Periph.OUTSET := (As_Array => True,
                            Arr      => (SPI_CS_Pin => Set,
                                         others     => <>));
    end Deselect_Device;
-
 
 begin
    --  Configure GPIOs
@@ -495,7 +471,7 @@ begin
                                       others => <>);
 
    --  Configure SPI
-   SPI1_Periph.CONFIG := (ORDER  => MsbFirst,
+   SPI1_Periph.CONFIG := (ORDER  => Msbfirst,
                           CPHA   => Leading,
                           CPOL   => Activehigh,
                           others => <>);

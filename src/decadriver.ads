@@ -388,10 +388,10 @@ is
                                                 Load_Antenna_Delay,
                                                 Load_XTAL_Trim,
                                                 Load_UCode_From_ROM),
-                    Driver             => + (DW1000.BSP.Device_State,
-                                                  Load_Antenna_Delay,
-                                                  Load_XTAL_Trim,
-                                                  Load_UCode_From_ROM),
+                    Driver             =>+ (DW1000.BSP.Device_State,
+                                            Load_Antenna_Delay,
+                                            Load_XTAL_Trim,
+                                            Load_UCode_From_ROM),
                     null                    => Ada.Real_Time.Clock_Time);
       --  Initialize the DecaDriver and DW1000.
       --
@@ -418,21 +418,20 @@ is
         Depends => (DW1000.BSP.Device_State => (DW1000.BSP.Device_State,
                                                 Config,
                                                 Driver),
-                    Driver             => + Config);
+                    Driver             =>+ Config);
       --  Configure the DW1000 for a specific channel, PRF, preamble, etc...
 
-
-      procedure Configure_Errors (Frame_Timeout : in Boolean;
-                                  SFD_Timeout   : in Boolean;
-                                  PHR_Error     : in Boolean;
-                                  RS_Error      : in Boolean;
-                                  FCS_Error     : in Boolean)
+      procedure Configure_Errors (Enable_Frame_Timeout : in Boolean;
+                                  Enable_SFD_Timeout   : in Boolean;
+                                  Enable_PHR_Error     : in Boolean;
+                                  Enable_RS_Error      : in Boolean;
+                                  Enable_FCS_Error     : in Boolean)
         with Global => null,
-        Depends => (Driver =>+ (Frame_Timeout,
-                                SFD_Timeout,
-                                PHR_Error,
-                                RS_Error,
-                                FCS_Error));
+        Depends => (Driver =>+ (Enable_Frame_Timeout,
+                                Enable_SFD_Timeout,
+                                Enable_PHR_Error,
+                                Enable_RS_Error,
+                                Enable_FCS_Error));
       --  Configure which error notifications are enabled.
       --
       --  @param Frame_Timeout Set to True if error notifications should be
@@ -469,7 +468,7 @@ is
       function Get_Lot_ID  return Bits_32;
 
       function PHR_Mode return DW1000.Driver.Physical_Header_Modes
-        With Depends => (PHR_Mode'Result => Driver);
+        with Depends => (PHR_Mode'Result => Driver);
 
       procedure Start_Tx_Immediate (Rx_After_Tx     : in Boolean;
                                     Auto_Append_FCS : in Boolean)
@@ -493,7 +492,6 @@ is
       --  If Auto_Append_FCS is set to True then the DW1000 will automatically
       --  calculate and append the 2-byte frame check sequence (FCS) to the
       --  transmitted frame.
-
 
       procedure Start_Tx_Delayed
         (Rx_After_Tx : in     Boolean;
@@ -526,7 +524,7 @@ is
                      Frame_Info :    out Frame_Info_Type;
                      Status     :    out Rx_Status_Type;
                      Overrun    :    out Boolean)
-      with Depends => (Frame         => + Driver,
+      with Depends => (Frame         =>+ Driver,
                        Frame_Info    => Driver,
                        Length        => Driver,
                        Driver        => Driver,
@@ -616,14 +614,14 @@ is
 
       procedure Frame_Received
         with Global => (In_Out => DW1000.BSP.Device_State),
-        Depends => (DW1000.BSP.Device_State => + Driver,
-                    Driver                  => + DW1000.BSP.Device_State);
+        Depends => (DW1000.BSP.Device_State =>+ Driver,
+                    Driver                  =>+ DW1000.BSP.Device_State);
       --  Reads a received frame from the DW1000.
       --
 
-      procedure Receive_Error (Error : in Rx_Status_Type)
-        with Depends => (Driver => + Error),
-        Pre => Error /= No_Error;
+      procedure Receive_Error (Result : in Rx_Status_Type)
+        with Depends => (Driver =>+ Result),
+        Pre => Result /= No_Error;
 
       procedure DW1000_IRQ
         with Attach_Handler => DecaDriver_Config.DW1000_IRQ_Id,
@@ -674,20 +672,21 @@ is
       Frame_Queue : Implementation.Rx_Frame_Queue_Type
         := (others => (Length     => 0,
                        Frame      => (others => 0),
-                       Frame_Info => Frame_Info_Type'
-                         (RX_TIME_Reg      => (others => <>),
-                          RX_FINFO_Reg     => (others => <>),
-                          RX_FQUAL_Reg     => (others => <>),
-                          RXPACC_NOSAT_Reg => (others => 0),
-                          RX_TTCKI_Reg     => (others => <>),
-                          RX_TTCKO_Reg     => (others => <>),
-                          SFD_LENGTH       => 0,
-                          Non_Standard_SFD => False),
+                       Frame_Info => (RX_TIME_Reg      => (others => <>),
+                                      RX_FINFO_Reg     => (others => <>),
+                                      RX_FQUAL_Reg     => (others => <>),
+                                      RXPACC_NOSAT_Reg => (others => 0),
+                                      RX_TTCKI_Reg     => (others => <>),
+                                      RX_TTCKO_Reg     => (others => <>),
+                                      SFD_LENGTH       => 0,
+                                      Non_Standard_SFD => False),
                        Status     => No_Error,
                        Overrun    => False));
       --  Cyclic buffer for storing received frames, read from the DW1000.
 
-      Queue_Head       : Implementation.Rx_Frame_Queue_Index := Implementation.Rx_Frame_Queue_Index'Last;
+      Queue_Head       : Implementation.Rx_Frame_Queue_Index
+        := Implementation.Rx_Frame_Queue_Index'Last;
+
       Rx_Count         : Implementation.Rx_Frame_Queue_Count := 0;
       Overrun_Occurred : Boolean                             := False;
       Frame_Ready      : Boolean                             := False;

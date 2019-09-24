@@ -36,11 +36,11 @@ procedure Echo_Example
              In_Out => (DW1000.BSP.Device_State,
                         DecaDriver.Driver,
                         DecaDriver.Tx_Complete_Flag)),
-  Depends => (DecaDriver.Driver           => + (DW1000.BSP.Device_State,
-                                                DecaDriver.Driver),
-              DW1000.BSP.Device_State     => + (DecaDriver.Driver),
-              DecaDriver.Tx_Complete_Flag => + (DecaDriver.Driver,
-                                                DW1000.BSP.Device_State),
+  Depends => (DecaDriver.Driver           =>+ (DW1000.BSP.Device_State,
+                                               DecaDriver.Driver),
+              DW1000.BSP.Device_State     =>+ (DecaDriver.Driver),
+              DecaDriver.Tx_Complete_Flag =>+ (DecaDriver.Driver,
+                                               DW1000.BSP.Device_State),
               null                        => Ada.Real_Time.Clock_Time)
 is
    Rx_Packet        : DW1000.Types.Byte_Array (1 .. 127) := (others => 0);
@@ -92,7 +92,7 @@ begin
    --  so configure the DW1000 to automatically re-enable the receiver when
    --  errors occur. The driver will not be notified of receiver errors whilst
    --  this is enabled.
-   DW1000.Driver.Set_Auto_Rx_Reenable (Enabled => True);
+   DW1000.Driver.Set_Auto_Rx_Reenable (Enable => True);
 
    DecaDriver.Driver.Start_Rx_Immediate;
 
