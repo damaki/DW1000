@@ -671,8 +671,7 @@ is
       --  Magnitude  --
       -----------------
 
-      function Magnitude (SFD : in String) return Types.Bits_8
-      is
+      function Magnitude (SFD : in String) return Types.Bits_8 is
          Result : Bits_8 := 0;
 
       begin
@@ -689,8 +688,7 @@ is
       --  Polarity  --
       ----------------
 
-      function Polarity (SFD : in String) return Types.Bits_8
-      is
+      function Polarity (SFD : in String) return Types.Bits_8 is
          Result : Bits_8 := 0;
 
       begin
