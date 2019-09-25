@@ -36,10 +36,26 @@ is
       Anchor_Tx_Resp_Timestamp : in Fine_System_Time;
       Tag_Rx_Resp_Timestamp    : in Fine_System_Time) return Biased_Distance is
 
+      Max_Time_Of_Flight : constant := 0.000_1;
+      --  Limit the Time of Flight to a maximum of 0.000_1 seconds (100 us).
+      --
+      --  This prevents overflow during the conversion from time of flight
+      --  to distance.
+      --
+      --  This limits the maximum computable distance to 29970 meters, but this
+      --  should be plenty as the operational range of the DW1000 is about
+      --  100 times below this limit (300 m).
+
       type System_Time_Span_Div2 is
       delta System_Time_Span'Delta / 2.0
       range 0.0 .. System_Time_Span'Last / 2.0
         with Small => System_Time_Span'Small / 2.0;
+
+      type Large_Meters is
+      delta Meters'Delta
+      range 0.0 .. (Max_Time_Of_Flight / System_Time_Span_Div2'Delta) * Speed_Of_Light_In_Vacuum;
+      --  A fixed-point type with a large enough integer part to store the
+      --  integer representation of a System_Time_Span_Div2 value.
 
       T_Tag : constant System_Time_Span := Calculate_Span
         (Start_Time => Tag_Tx_Poll_Timestamp,
@@ -53,8 +69,7 @@ is
 
       Time_Of_Flight : System_Time_Span_Div2;
 
-      TOF_I40   : Bits_40;
-      TOF_Float : Long_Float;
+      Result : Large_Meters;
 
    begin
       if T_Anchor >= T_Tag then
@@ -65,11 +80,25 @@ is
          Time_Of_Flight := System_Time_Span_Div2 (Diff / System_Time_Span (2.0));
       end if;
 
-      --  Convert to floating point
-      TOF_I40   := Bits_40 (Time_Of_Flight / System_Time_Span_Div2 (System_Time_Span_Div2'Delta));
-      TOF_Float := Long_Float (TOF_I40) * System_Time_Span_Div2'Delta;
+      --  Limit the Time_
+      if Time_Of_Flight >= Max_Time_Of_Flight then
+         Time_Of_Flight := Max_Time_Of_Flight;
+      end if;
 
-      return Biased_Distance (TOF_Float * Speed_Of_Light_In_Air);
+      pragma Assert_And_Cut (Time_Of_Flight <= Max_Time_Of_Flight);
+
+      --  Convert the fixed-point representation to its integer represention
+      --  (in multiples of the 'Delta).
+      Result := Large_Meters (Time_Of_Flight / System_Time_Span_Div2 (System_Time_Span_Div2'Delta));
+
+      --  Multiply the ToF (s) with the speed of light (m/s) to yield
+      --  the distance (m) in meters.
+      Result := Result * Large_Meters (Speed_Of_Light_In_Vacuum);
+
+      --  Convert back from integer representation to fixed-point representation.
+      Result := Result / Large_Meters (1.0 / System_Time_Span_Div2'Delta);
+
+      return Biased_Distance (Result);
    end Compute_Distance;
 
    ------------------------

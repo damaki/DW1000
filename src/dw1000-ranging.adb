@@ -611,7 +611,7 @@ is
          --  This is equivalent to:
          --     Distance_25cm := Short_Distance (Measured_Distance);
          Distance_25cm :=
-           Short_Distance'Delta * Integer (Measured_Distance / Short_Distance'Delta);
+           Short_Distance'Delta * Integer (Measured_Distance / Meters (Short_Distance'Delta));
       end if;
 
       --  Find the index of the table entry which matches the estimated distance.
