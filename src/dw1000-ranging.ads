@@ -33,21 +33,11 @@ is
    Speed_Of_Light_In_Air    : constant
      := Speed_Of_Light_In_Vacuum / Air_Refractive_Index; --  meters per second
 
-   type Meters is new Float
-     range 0.0 .. Float (Speed_Of_Light_In_Air * System_Time_Span'Last);
-   --  Distance in meters.
+   type Meters is delta 0.001 range 0.0 .. 30_000.0;
+   --  Distance in meters with a resolution of 1 mm.
    --
-   --  The range of this type is constrained to the range of distance values
-   --  possible based on the maximum possible value for the time of flight.
-   --
-   --  This is a Float type (rather than a fixed-point type) to avoid some
-   --  difficulties when dealing with fixed-point types with fractional 'smalls,
-   --  for example that 1.0 can't be represented exactly. If a fixed-point type
-   --  without a fractional 'small is used then we would run into problems where
-   --  conversions from System_Time_Span to Meters would not be provable in SPARK
-   --  because the conversion would not be in the perfect result set as defined
-   --  in Annex G.2.3 of the Ada 2012 LRM. GNATprove currently limits conversions
-   --  between fixed-point types to always belong to the perfect result set.
+   --  This type is constrained to a maximum range of 30 km, which is more than
+   --  enough since the operational range of the DW1000 is limited to 300 m.
 
    type Biased_Distance is new Meters;
    --  Type for distance measurements (in meters) which includes a ranging bias.
